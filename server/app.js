@@ -1,33 +1,28 @@
-require("dotenv").config({ path: "./config.env" });
-
 const express = require("express");
-const app = express();
-const port = process.env.PORT; 
-const roadtripRouter = require("./routes/RoadtripRoutes");
- 
-//middleware
-app.use(express.json());
-app.use("/api/roadtrips", roadtripRouter);
+const roadtripRoutes = require("./routes/roadtrips");
+const userRoutes = require("./routes/users"); 
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+const app = express();
+
+//middleware, use routes
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use("/roadtrips", roadtripRoutes);
+app.use("/users", userRoutes); 
+
+app.use((req, res, next) => {
+  const error = new Error("Not found");
+  error.status = 404;
+  next(error);
 });
 
-const mongoose = require("mongoose");
-//configure mongoose
-mongoose.connect(
-  process.env.ATLAS_URI || "mongodb://localhost/CRUD",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-  (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Connected to MongoDB");
-    }
-  }
-);
- 
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  res.json({
+    error: {
+      message: error.message,
+    },
+  });
+});
+
 module.exports = app;

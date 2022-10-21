@@ -5,7 +5,6 @@ import { PastTripsScreen } from './pages/PastTrips';
 import { MemoriesScreen } from './pages/Memories';
 import { ProfileScreen } from './pages/Profile';
 import { Ionicons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 

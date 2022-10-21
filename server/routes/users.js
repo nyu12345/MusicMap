@@ -26,8 +26,8 @@ router.post("/", async (req, res, next) => {
     .save()
     .then((doc) => {
       res.status(201).json({
-        message: 'Roadtrip created',
-        createdReview: doc,
+        message: 'User created',
+        createdUser: doc,
       })
     })
     .catch((err) => res.status(500).json(err));

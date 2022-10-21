@@ -4,7 +4,7 @@ const User = require("../models/userSchema");
 const mongoose = require("mongoose");
 
 router.get("/", (req, res) => {
-  Roadtrip.find()
+  User.find()
     .exec()
     .then((docs) => {
       res.status(200).json(docs);

@@ -34,10 +34,10 @@ export default function App() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen options={{headerShown: false}} name="Home" component={HomeScreen} />
         <Tab.Screen name="Past Trips" component={PastTripsScreen} />
-        <Tab.Screen name="Memories" component={MemoriesScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} /> 
+        <Tab.Screen options={{headerShown: false}} name="Memories" component={MemoriesScreen} />
+        <Tab.Screen options={{headerShown: false}} name="Profile" component={ProfileScreen} /> 
       </Tab.Navigator>
     </NavigationContainer>
   );

@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import lazyfair from './../assets/lazyfair.jpg'; 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,32 +17,11 @@ export function PastTripsScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        ...StyleSheet.absoluteFillObject,
-        height: 400,
-        width: 400,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    itemContainer: {
-        padding: 6,
-        margin: 6,
-        backgroundColor: "#eee",
-    },
-    contentContainer: {
-        backgroundColor: "white",
-    },
-    map: {
-        ...StyleSheet.absoluteFillObject,
-    },
-});
-
 function MapScreen() {
     const bottomSheetRef = useRef(null); 
 
     // Points for the bottom sheet to snap to, sorted from bottom to top
-    const snapPoints = useMemo(() => ['25%', '50%', '95%'], []);
+    const snapPoints = useMemo(() => ['13%', '50%', '95%'], []);
 
     // variables
     const data = useMemo(
@@ -53,12 +32,35 @@ function MapScreen() {
         []
     );
 
+    // const data = {
+    //     [
+    //         name: 'the first roadtrip', 
+    //         startLocation: 'San Francisco', 
+    //         destination: 'Monterrey',
+    //         startDate: '2020-01-01', 
+    //         endDate: '2020-01-09', 
+    //     ], 
+    //     [
+    //         name: 'the second roadtrip', 
+    //         startLocation: 'San Francisco', 
+    //         destination: 'Durham',
+    //         startDate: '2020-03-01', 
+    //         endDate: '2020-03-20', 
+    //     ]
+    // }
+
+    //console.log(data)
+    //console.log(typeof(data))
+
     // callbacks
     const handleSheetChange = useCallback((index) => {
         console.log("handleSheetChange", index);
     }, []);
     const handleClosePress = useCallback(() => {
         bottomSheetRef.current?.close();
+    }, []);
+    const handleRefresh = useCallback(() => {
+        console.log("handleRefresh");
     }, []);
 
     // render
@@ -96,13 +98,22 @@ function MapScreen() {
             </MapView>
             <BottomSheet
                 ref={bottomSheetRef}
+                index={1}
                 snapPoints={snapPoints}
                 onChange={handleSheetChange}
+                keyboardBehavior="fillParent"
             >
+                <BottomSheetTextInput
+                    placeholder='Search by date, song, people, or location'
+                    //onChangeText={setSearchInput} // look into for setting states
+                    style={styles.textInput}
+                />
                 <BottomSheetFlatList
                     data={data}
                     keyExtractor={(i) => i}
                     renderItem={renderItem}
+                    refreshing={false}
+                    onRefresh={handleRefresh}
                     contentContainerStyle={styles.contentContainer}
                 />
             </BottomSheet>
@@ -117,3 +128,27 @@ function StatisticsScreen() {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    itemContainer: {
+        padding: 10,
+        margin: 10,
+        backgroundColor: "#eee",
+    },
+    contentContainer: {
+        backgroundColor: "white",
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
+    },
+    textInput: {
+        alignSelf: "stretch",
+        marginHorizontal: 12,
+        marginBottom: 12,
+        padding: 12,
+        borderRadius: 12,
+        backgroundColor: "rgba(151, 151, 151, 0.25)",
+        color: "white",
+        textAlign: "left",
+    },
+});

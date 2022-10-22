@@ -35,7 +35,7 @@ export default function App() {
         })}
       >
         <Tab.Screen options={{headerShown: false}} name="Home" component={HomeScreen} />
-        <Tab.Screen name="Past Trips" component={PastTripsScreen} />
+        <Tab.Screen options={{headerShown: false}} name="Past Trips" component={PastTripsScreen} />
         <Tab.Screen options={{headerShown: false}} name="Memories" component={MemoriesScreen} />
         <Tab.Screen options={{headerShown: false}} name="Profile" component={ProfileScreen} /> 
       </Tab.Navigator>

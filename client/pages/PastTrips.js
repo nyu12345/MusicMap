@@ -1,18 +1,19 @@
 import { Text, View, StyleSheet, Image, Button } from 'react-native';
-//import * as React from 'react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import lazyfair from './../assets/lazyfair.jpg'; 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import ExpoConstants from 'expo-constants'; 
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const Tab = createMaterialTopTabNavigator();
 
 export function PastTripsScreen() {
     return (
-        <Tab.Navigator>
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Statistics" component={StatisticsScreen} />
+        <Tab.Navigator style={{ marginTop: ExpoConstants.statusBarHeight}} >
+                <Tab.Screen name="Map" component={MapScreen} />
+                <Tab.Screen name="Statistics" component={StatisticsScreen} />
         </Tab.Navigator>
     );
 }

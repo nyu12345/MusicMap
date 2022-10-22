@@ -1,43 +1,18 @@
 import { Text, View, StyleSheet, Image } from 'react-native';
-//import * as React from 'react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import lazyfair from './../assets/lazyfair.jpg'; 
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import lazyfair from './../../assets/lazyfair.jpg'; 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'; 
 
-const Tab = createMaterialTopTabNavigator();
-
-export function PastTripsScreen() {
-    return (
-        <Tab.Navigator>
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Statistics" component={StatisticsScreen} />
-        </Tab.Navigator>
-    );
-}
-
-const styles = StyleSheet.create({
-    container: {
-        ...StyleSheet.absoluteFillObject,
-        height: 400,
-        width: 400,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    map: {
-        ...StyleSheet.absoluteFillObject,
-    },
-});
-
 function MapScreen() {
-    const bottomSheetRef = useRef(null); 
+    const bottomSheetRef = useRef<BottomSheet>(null); 
     // Points for the bottom sheet to snap to, sorted from bottom to top
     const snapPoints = useMemo(() => ['25%', '50%'], []);
     // callbacks
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
     }, []);
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <MapView
@@ -75,10 +50,17 @@ function MapScreen() {
     );
 }
 
-function StatisticsScreen() {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>There are graphs and Statistics here</Text>
-        </View>
-    );
-}
+const styles = StyleSheet.create({
+    container: {
+        ...StyleSheet.absoluteFillObject,
+        height: 400,
+        width: 400,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
+    },
+});
+
+export default MapScreen; 

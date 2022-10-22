@@ -1,10 +1,10 @@
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Text, View, StyleSheet, Image, Button } from 'react-native';
 //import * as React from 'react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import lazyfair from './../assets/lazyfair.jpg'; 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'; 
+import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -25,6 +25,14 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center',
     },
+    itemContainer: {
+        padding: 6,
+        margin: 6,
+        backgroundColor: "#eee",
+    },
+    contentContainer: {
+        backgroundColor: "white",
+    },
     map: {
         ...StyleSheet.absoluteFillObject,
     },
@@ -32,12 +40,37 @@ const styles = StyleSheet.create({
 
 function MapScreen() {
     const bottomSheetRef = useRef(null); 
+
     // Points for the bottom sheet to snap to, sorted from bottom to top
-    const snapPoints = useMemo(() => ['25%', '50%'], []);
+    const snapPoints = useMemo(() => ['25%', '50%', '95%'], []);
+
+    // variables
+    const data = useMemo(
+        () =>
+        Array(50)
+            .fill(0)
+            .map((_, index) => `index-${index}`),
+        []
+    );
+
     // callbacks
-    const handleSheetChanges = useCallback((index: number) => {
-        console.log('handleSheetChanges', index);
+    const handleSheetChange = useCallback((index) => {
+        console.log("handleSheetChange", index);
     }, []);
+    const handleClosePress = useCallback(() => {
+        bottomSheetRef.current?.close();
+    }, []);
+
+    // render
+    const renderItem = useCallback(
+        ({ item }) => (
+        <View style={styles.itemContainer}>
+            <Text>{item}</Text>
+        </View>
+        ),
+        []
+    );
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <MapView
@@ -60,17 +93,19 @@ function MapScreen() {
                         <Text style={{textAlign: 'center'}}>Bryce Vine</Text>
                     </Callout>
                 </Marker>
-                <BottomSheet
-                    ref={bottomSheetRef}
-                    index={1}
-                    snapPoints={snapPoints}
-                    onChange={handleSheetChanges}
-                >
-                    <View style={styles.contentContainer}>
-                    <Text>Awesome 🎉</Text>
-                    </View>
-                </BottomSheet>
             </MapView>
+            <BottomSheet
+                ref={bottomSheetRef}
+                snapPoints={snapPoints}
+                onChange={handleSheetChange}
+            >
+                <BottomSheetFlatList
+                    data={data}
+                    keyExtractor={(i) => i}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.contentContainer}
+                />
+            </BottomSheet>
         </View>
     );
 }

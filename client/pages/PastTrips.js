@@ -1,6 +1,7 @@
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Image } from 'react-native';
 import * as React from 'react';
-import MapView from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
+import lazyfair from './../assets/lazyfair.jpg'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const Tab = createMaterialTopTabNavigator();
@@ -16,16 +17,16 @@ export function PastTripsScreen() {
 
 const styles = StyleSheet.create({
     container: {
-      ...StyleSheet.absoluteFillObject,
-      height: 400,
-      width: 400,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
+        ...StyleSheet.absoluteFillObject,
+        height: 400,
+        width: 400,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
     },
     map: {
-      ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFillObject,
     },
-   });
+});
 
 function MapScreen() {
     return (
@@ -39,7 +40,18 @@ function MapScreen() {
                     longitudeDelta: 0.0421,
                 }}
                 showsUserLocation={true}
-            />
+            >
+                <Marker
+                    coordinate={{ latitude: 37.7825259, longitude: -122.4351431 }}
+                    title={'San Francisco'}>
+                    <Callout>
+                        <Image style={{ alignSelf: 'center', width: 50, height: 50 }}
+                            source={require('./../assets/lazyfair.jpg')} />
+                        <Text style={{textAlign: 'center'}}>Sour Patch Kids</Text>
+                        <Text style={{textAlign: 'center'}}>Bryce Vine</Text>
+                    </Callout>
+                </Marker>
+            </MapView>
         </View>
     );
 }

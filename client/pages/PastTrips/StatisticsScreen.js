@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Text, View, StyleSheet, Image, Button, FlatList } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, RefreshControl, FlatList, TextInput } from 'react-native';
 import axios from 'axios';
 import { set } from 'react-native-reanimated';
-import { REACT_APP_BASE_URL } from '@env'; 
+import { REACT_APP_BASE_URL } from '@env';
 
 const overallStatistics = {
     _id: 'ba236b264f3ff33bd',
@@ -10,36 +10,62 @@ const overallStatistics = {
     numTrips: 6
 };
 
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 export function StatisticsScreen() {
     const [statistics, setStatistics] = useState([]);
-    const base_url = `${REACT_APP_BASE_URL}/users/`; 
+    const [search, onChangeSearch] = React.useState("");
+    const [refreshing, setRefreshing] = React.useState(false);
 
-    // Invoking get method to perform a GET request
-    //   axios.get(`http://localhost:6000/users/`).then((response) => {
-    //     console.log("Tried to get data");
-    //     console.log(response.data);
-    //   });
-    if (statistics.length == 0) {
-        axios.get(`${REACT_APP_BASE_URL}/users/`).then((response) => {
+    const onRefresh = React.useCallback(() => {
+        setStatistics([]);
+    }, []);
+
+    if (statistics.length == 0 || refreshing) {
+        axios.get(`${REACT_APP_BASE_URL}/statistics/`).then((response) => {
             console.log("Tried to get data");
             console.log(response.data);
             setStatistics(response.data);
         });
-        //console.log(statistics[0])
-    }
-    else {
-        console.log("Printing");
-        //console.log(statistics[0]);
     }
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            {
-                statistics.length == 0 ? <Text></Text> :
-                statistics.map((statistic) => (
-                    <Text key={statistic._id}>{statistic.name} has a username {statistic.spotifyUsername}</Text>
-                )
-                )
+        <ScrollView
+            contentContainerStyle={styles.scrollView}
+            refreshControl={
+                <RefreshControl
+                    refreshing={statistics.length == 0}
+                    onRefresh={onRefresh}
+                />
             }
-        </View>
+        >
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <TextInput
+                    style={styles.input}
+                    onChangeText={onChangeSearch}
+                    value={search}
+                    placeholder="Filter Username"
+                />
+                {
+                    statistics.length == 0 ? <Text></Text> :
+                        statistics.map((statistic) => (
+                            !statistic.spotifyUsername.includes(search.toLowerCase()) ?
+                                <Text></Text> : <Text key={statistic._id}>{statistic.spotifyUsername} has been on {statistic.numTrips} trips</Text>
+                        )
+                        )
+                }
+            </View>
+        </ScrollView>
     );
+
+
 }
+const styles = StyleSheet.create({
+    input: {
+        height: 40,
+        margin: 12,
+        borderWidth: 1,
+        padding: 10,
+    },
+});

@@ -1,7 +1,9 @@
+//require('dotenv').config()
 import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, StyleSheet, Image, Button, FlatList } from 'react-native';
 import axios from 'axios';
 import { set } from 'react-native-reanimated';
+import { REACT_APP_BASE_URL } from '@env'; 
 
 const overallStatistics = {
     _id: 'ba236b264f3ff33bd',
@@ -11,7 +13,7 @@ const overallStatistics = {
 
 export function StatisticsScreen() {
     const [statistics, setStatistics] = useState([]);
-    const base_url = "10.197.196.100";
+    const base_url = `${REACT_APP_BASE_URL}/users/`; 
 
     // Invoking get method to perform a GET request
     //   axios.get(`http://localhost:6000/users/`).then((response) => {
@@ -19,7 +21,7 @@ export function StatisticsScreen() {
     //     console.log(response.data);
     //   });
     if (statistics.length == 0) {
-        axios.get(`http://${base_url}:6000/users/`).then((response) => {
+        axios.get(`${REACT_APP_BASE_URL}/users/`).then((response) => {
             console.log("Tried to get data");
             console.log(response.data);
             setStatistics(response.data);

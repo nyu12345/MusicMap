@@ -3,10 +3,12 @@ const roadtripRoutes = require("./routes/roadtrips");
 const userRoutes = require("./routes/users"); 
 
 const app = express();
+const cors = require('cors');
 
 //middleware, use routes
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors({origin: true, credentials: true}));
 app.use("/roadtrips", roadtripRoutes);
 app.use("/users", userRoutes); 
 

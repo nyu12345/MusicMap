@@ -1,9 +1,11 @@
-import { Text, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
+import { Text, TextInput, SafeAreaView, ScrollView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
 import MapView from 'react-native-maps';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export function HomeScreen() {
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(true);
+    const [startRoadTripButtonVisible, setStartRoadTripButtonVisible] = useState(true);
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <MapView
@@ -23,22 +25,42 @@ export function HomeScreen() {
                 onRequestClose={() => {
                     Alert.alert("Modal has been closed.");
                     setModalVisible(!modalVisible);
-                }} c
+                }}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Hello World!</Text>
+                        <SafeAreaView>
+                            <Text style={styles.modalText}>Roadtrip Name</Text>
+                            <TextInput
+                                style={styles.modalTextInput}
+                            />
+                            <Text style={styles.modalText}>Start Location</Text>
+                            <TextInput
+                                style={styles.modalTextInput}
+                            />
+                            <Text style={styles.modalText}>Destination</Text>
+                            <TextInput
+                                style={styles.modalTextInput}
+                            />
+                        </SafeAreaView>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}
+                            onPress={() => {
+                                { setModalVisible(false) };
+                                { setStartRoadTripButtonVisible(false) };
+                            }
+                            }
+                            onRequestClose={() => setStartRoadTripButtonVisible(false)}
                         >
-                            <Text style={styles.textStyle}>Hide Modal</Text>
+                            <Text style={styles.whiteBoldTextrStyle}>Confirm</Text>
                         </Pressable>
                     </View>
                 </View>
+
             </Modal>
             <Pressable
                 style={styles.button}
+                visible={startRoadTripButtonVisible}
                 onPress={() => setModalVisible(true)}
             >
                 <Text title='Start Roadtrip' style={styles.text}>Start Roadtrip Session</Text>
@@ -69,6 +91,14 @@ const styles = StyleSheet.create({
         letterSpacing: 0.25,
         color: 'white',
     },
+    modalText: {
+        fontSize: 16,
+        lineHeight: 21,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        position: 'centered',
+        color: 'black',
+    },
     centeredView: {
         flex: 1,
         justifyContent: "center",
@@ -79,7 +109,7 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
-        padding: 35,
+        padding: 75,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
@@ -96,7 +126,7 @@ const styles = StyleSheet.create({
     buttonClose: {
         backgroundColor: "#2196F3",
     },
-    textStyle: {
+    whiteBoldTextStyle: {
         color: "white",
         fontWeight: "bold",
         textAlign: "center"
@@ -104,5 +134,12 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
-    }
+    },
+    modalTextInput: {
+        height: 40,
+        width: 200,
+        margin: 12,
+        borderWidth: 1,
+        padding: 10,
+    },
 });

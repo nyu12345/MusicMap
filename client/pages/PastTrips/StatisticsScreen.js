@@ -1,4 +1,3 @@
-//require('dotenv').config()
 import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, StyleSheet, Image, Button, FlatList } from 'react-native';
 import axios from 'axios';

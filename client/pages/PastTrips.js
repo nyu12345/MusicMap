@@ -5,7 +5,6 @@ import lazyfair from './../assets/lazyfair.jpg';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import ExpoConstants from 'expo-constants'; 
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const Tab = createMaterialTopTabNavigator();
 

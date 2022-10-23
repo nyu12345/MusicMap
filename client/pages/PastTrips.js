@@ -5,6 +5,7 @@ import lazyfair from './../assets/lazyfair.jpg';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import ExpoConstants from 'expo-constants'; 
+import { StatisticsScreen } from './PastTrips/StatisticsScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -117,14 +118,6 @@ function MapScreen() {
                     contentContainerStyle={styles.contentContainer}
                 />
             </BottomSheet>
-        </View>
-    );
-}
-
-function StatisticsScreen() {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>There are graphs and Statistics here</Text>
         </View>
     );
 }

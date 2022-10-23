@@ -4,8 +4,10 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import lazyfair from './../assets/lazyfair.jpg'; 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+//import getRoadtrips from './../api/roadtripApis'; 
 import ExpoConstants from 'expo-constants'; 
 import { StatisticsScreen } from './PastTrips/StatisticsScreen';
+import { useEffect, useState } from "react"; 
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -21,6 +23,11 @@ export function PastTripsScreen() {
 function MapScreen() {
     const bottomSheetRef = useRef(null); 
 
+    // let roadtrips = await axios.get(`http://${ apiConfig.ipv4Address }:${ apiConfig.port}/roadtrips/`);
+    // console.log('below is roadtrips'); 
+    // console.log(roadtrips); 
+
+
     // Points for the bottom sheet to snap to, sorted from bottom to top
     const snapPoints = useMemo(() => ['13%', '50%', '95%'], []);
 
@@ -32,6 +39,9 @@ function MapScreen() {
             .map((_, index) => `index-${index}`),
         []
     );
+    // await const data = getRoadtrips(); 
+    // console.log('below is data'); 
+    // console.log(data); 
 
     // const data = {
     //     [
@@ -50,15 +60,9 @@ function MapScreen() {
     //     ]
     // }
 
-    //console.log(data)
-    //console.log(typeof(data))
-
     // callbacks
     const handleSheetChange = useCallback((index) => {
         console.log("handleSheetChange", index);
-    }, []);
-    const handleClosePress = useCallback(() => {
-        bottomSheetRef.current?.close();
     }, []);
     const handleRefresh = useCallback(() => {
         console.log("handleRefresh");
@@ -73,6 +77,16 @@ function MapScreen() {
         ),
         []
     );
+    // renderItem = (data) => {
+    //     return (
+    //         <TouchableOpacity style={styles.list}>
+    //             <Text style={styles.lightText}>{data.item.name}</Text>
+    //             <Text style={styles.lightText}>{data.item.startLocatoin}</Text>
+    //             <Text style={styles.lightText}>{data.item.destination}</Text>
+    //             <Text style={styles.lightText}>{data.item.startDate}</Text>
+    //             <Text style={styles.lightText}>{data.item.endDate}</Text></TouchableOpacity>
+    //     )
+    // }
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

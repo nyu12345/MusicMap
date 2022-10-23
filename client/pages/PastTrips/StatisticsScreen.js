@@ -36,7 +36,7 @@ export function StatisticsScreen() {
             {
                 statistics.length == 0 ? <Text></Text> :
                 statistics.map((statistic) => (
-                    <Text>{statistic.name} has a username {statistic.spotifyUsername}</Text>
+                    <Text key={statistic._id}>{statistic.name} has a username {statistic.spotifyUsername}</Text>
                 )
                 )
             }

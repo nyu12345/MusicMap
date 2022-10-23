@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import axios from 'axios';
@@ -11,42 +11,21 @@ export function MapScreen() {
     const [roadtrips, setRoadtrips] = useState([]); 
     const base_url = `${REACT_APP_BASE_URL}/users/`; 
 
-    axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
-        console.log("Tried to get data");
-        console.log(response.data);
-        setStatistics(response.data);
-    });
+    // TODO: change logic to make get request when we pull to refresh
+    if (roadtrips.length == 0) {
+        axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
+            console.log("Tried to get data");
+            console.log(response.data);
+            setRoadtrips(response.data);
+        });
+    } else {
+        console.log('printing'); 
+    }
 
     const bottomSheetRef = useRef(null); 
 
     // Points for the bottom sheet to snap to, sorted from bottom to top
     const snapPoints = useMemo(() => ['13%', '50%', '95%'], []);
-
-    // variables
-    const data = useMemo(
-        () =>
-        Array(50)
-            .fill(0)
-            .map((_, index) => `index-${index}`),
-        []
-    );
-
-    // const data = {
-    //     [
-    //         name: 'the first roadtrip', 
-    //         startLocation: 'San Francisco', 
-    //         destination: 'Monterrey',
-    //         startDate: '2020-01-01', 
-    //         endDate: '2020-01-09', 
-    //     ], 
-    //     [
-    //         name: 'the second roadtrip', 
-    //         startLocation: 'San Francisco', 
-    //         destination: 'Durham',
-    //         startDate: '2020-03-01', 
-    //         endDate: '2020-03-20', 
-    //     ]
-    // }
 
     // callbacks
     const handleSheetChange = useCallback((index) => {
@@ -57,36 +36,24 @@ export function MapScreen() {
     }, []);
 
     // render
-    const renderItem = useCallback(
-        ({ item }) => (
-        <View style={styles.itemContainer}>
-            <Text>{item}</Text>
-        </View>
-        ),
-        []
-    );
-    // renderItem = (data) => {
-    //     return (
-    //         <TouchableOpacity style={styles.list}>
-    //             <Text style={styles.lightText}>{data.item.name}</Text>
-    //             <Text style={styles.lightText}>{data.item.startLocatoin}</Text>
-    //             <Text style={styles.lightText}>{data.item.destination}</Text>
-    //             <Text style={styles.lightText}>{data.item.startDate}</Text>
-    //             <Text style={styles.lightText}>{data.item.endDate}</Text></TouchableOpacity>
-    //     )
-    // }
-
-    // return (
-    //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //         {
-    //             roadtrips.length == 0 ? <Text></Text> :
-    //             roadtrips.map((roadtrip) => (
-    //                 <Text>{roadtrip.name} started at {roadtrip.startLocation}</Text>
-    //             )
-    //             )
-    //         }
+    // const renderItem = useCallback(
+    //     ({ item }) => (
+    //     <View style={styles.itemContainer}>
+    //         <Text>{item}</Text>
     //     </View>
+    //     ),
+    //     []
     // );
+    renderItem = (data) => {
+        return (
+            <TouchableOpacity style={styles.list}>
+                <Text style={styles.lightText}>{data.item.name}</Text>
+                <Text style={styles.lightText}>{data.item.startLocatoin}</Text>
+                <Text style={styles.lightText}>{data.item.destination}</Text>
+                <Text style={styles.lightText}>{data.item.startDate}</Text>
+                <Text style={styles.lightText}>{data.item.endDate}</Text></TouchableOpacity>
+        )
+    }
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -124,7 +91,7 @@ export function MapScreen() {
                     style={styles.textInput}
                 />
                 <BottomSheetFlatList
-                    data={data}
+                    data={roadtrips}
                     keyExtractor={(i) => i}
                     renderItem={renderItem}
                     refreshing={false}

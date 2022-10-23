@@ -4,29 +4,18 @@ import axios from 'axios';
 import { set } from 'react-native-reanimated';
 import { REACT_APP_BASE_URL } from '@env';
 
-const overallStatistics = {
-    _id: 'ba236b264f3ff33bd',
-    name: "jeffreyzl",
-    numTrips: 6
-};
-
-const wait = (timeout) => {
-    return new Promise(resolve => setTimeout(resolve, timeout));
-}
-
 export function StatisticsScreen() {
     const [statistics, setStatistics] = useState([]);
     const [search, onChangeSearch] = React.useState("");
-    const [refreshing, setRefreshing] = React.useState(false);
 
     const onRefresh = React.useCallback(() => {
         setStatistics([]);
     }, []);
 
-    if (statistics.length == 0 || refreshing) {
+    if (statistics.length == 0) {
         axios.get(`${REACT_APP_BASE_URL}/statistics/`).then((response) => {
-            console.log("Tried to get data");
-            console.log(response.data);
+            // console.log("Tried to get data");
+            // console.log(response.data);
             setStatistics(response.data);
         });
     }

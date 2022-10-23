@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View } from 'react-native';
 import { HomeScreen } from './pages/Home';
-import { PastTripsScreen } from './pages/PastTrips';
+import { PastTripsScreen } from './pages/PastTrips/PastTripsScreen';
 import { MemoriesScreen } from './pages/Memories';
 import { ProfileScreen } from './pages/Profile';
 import { Ionicons } from '@expo/vector-icons';

@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, TurboModuleRegistry } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import axios from 'axios';
@@ -8,10 +8,11 @@ import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/
 import { REACT_APP_BASE_URL } from '@env'; 
 
 export function MapScreen() {
-    // get roadtrip data from API
-    const [roadtrips, setRoadtrips] = useState([]); 
     const base_url = `${REACT_APP_BASE_URL}/users/`; 
+    const [roadtrips, setRoadtrips] = useState([]); 
+    const [searchInput, setSearchInput] = useState(""); 
 
+    // get roadtrip data from API
     if (roadtrips.length == 0) {
         axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
             console.log("Tried to get data");
@@ -35,6 +36,36 @@ export function MapScreen() {
         setRoadtrips([]); 
         console.log("handleRefresh");
     }, []);
+
+    // handle search
+    const filter = (roadtrips) => {
+        console.log(searchInput); 
+        if (searchInput == "") {
+            return roadtrips; 
+        }
+        return roadtrips.filter(function({ name, startLocation, destination }) {
+            let input = searchInput.toLowerCase();
+            const nameArr = name.split(' '); 
+            const startLocationArr = startLocation.split(' '); 
+            const destinationArr = destination.split(' '); 
+            for ( const roadtripName of nameArr ) {
+                if (roadtripName.toLowerCase().indexOf(input) == 0) {
+                    return true; 
+                }
+            }
+            for ( const location of startLocationArr ) {
+                if (location.toLowerCase().indexOf(input) == 0) {
+                    return true; 
+                }
+            }
+            for ( const destination of destinationArr) {
+                if (destination.toLowerCase().indexOf(input) == 0) {
+                    return true; 
+                }
+            }
+            //return lcName.includes(input) || lcStartLocation.includes(input) || lcDestination.includes(input); 
+        }); 
+    }; 
 
     // render
     const renderItem = ({ item }) => (
@@ -79,11 +110,12 @@ export function MapScreen() {
             >
                 <BottomSheetTextInput
                     placeholder='Search by date, song, people, or location'
-                    //onChangeText={setSearchInput} // look into for setting states
+                    onChangeText={setSearchInput} // look into for setting states
+                    value={searchInput}
                     style={styles.textInput}
                 />
                 <BottomSheetFlatList
-                    data={roadtrips}
+                    data={filter(roadtrips, searchInput)}
                     renderItem={renderItem}
                     keyExtractor={(item) => item._id}
                     refreshing={roadtrips.length == 0}
@@ -107,7 +139,7 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 12,
         backgroundColor: "rgba(151, 151, 151, 0.25)",
-        color: "white",
+        color: "black",
         textAlign: "left",
     },
 }); 

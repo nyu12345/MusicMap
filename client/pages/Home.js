@@ -1,10 +1,30 @@
-import { Text, TextInput, SafeAreaView, ScrollView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
+import { Text, TextInput, SafeAreaView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
 import MapView from 'react-native-maps';
 import React, { useEffect, useState } from "react";
 
 export function HomeScreen() {
-    const [modalVisible, setModalVisible] = useState(true);
-    const [startRoadTripButtonVisible, setStartRoadTripButtonVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [startRoadtripButtonVisible, setStartRoadtripButtonVisible] = useState(true);
+    const [roadtripName, setRoadtripName] = useState('');
+    const [roadtripStartLocation, setRoadtripStartLocation] = useState('');
+    const [roadtripDestination, setRoadTripDestination] = useState('');
+
+    // useEffect(() => {
+    //     setModalVisible(!modalVisible); // This will always use latest value of count
+    // }, [modalVisible]);
+
+    const startRoadtripClickHandler = () => {
+        setModalVisible(true);
+        setStartRoadtripButtonVisible(false);
+    }
+    const modalConfirmClickHandler = () => {
+        console.log(`name: ${roadtripName}, start: ${roadtripStartLocation}, end: ${roadtripDestination}`);
+        // TODO: MAKE POST REQUEST HERE
+        setModalVisible(false);
+        // this shits async or smth i hate react
+        console.log(`modal visible: ${modalVisible}`);
+        setStartRoadtripButtonVisible(false);
+    }
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -22,10 +42,6 @@ export function HomeScreen() {
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
-                onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
-                }}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
@@ -33,24 +49,22 @@ export function HomeScreen() {
                             <Text style={styles.modalText}>Roadtrip Name</Text>
                             <TextInput
                                 style={styles.modalTextInput}
+                                onChangeText={name => setRoadtripName(name)}
                             />
                             <Text style={styles.modalText}>Start Location</Text>
                             <TextInput
                                 style={styles.modalTextInput}
+                                onChangeText={startLocation => setRoadtripStartLocation(startLocation)}
                             />
                             <Text style={styles.modalText}>Destination</Text>
                             <TextInput
                                 style={styles.modalTextInput}
+                                onChangeText={destination => setRoadTripDestination(destination)}
                             />
                         </SafeAreaView>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
-                            onPress={() => {
-                                { setModalVisible(false) };
-                                { setStartRoadTripButtonVisible(false) };
-                            }
-                            }
-                            onRequestClose={() => setStartRoadTripButtonVisible(false)}
+                            onPress={modalConfirmClickHandler}
                         >
                             <Text style={styles.whiteBoldTextrStyle}>Confirm</Text>
                         </Pressable>
@@ -60,10 +74,13 @@ export function HomeScreen() {
             </Modal>
             <Pressable
                 style={styles.button}
-                visible={startRoadTripButtonVisible}
-                onPress={() => setModalVisible(true)}
+                visible={startRoadtripButtonVisible}
+                onPress={startRoadtripClickHandler}
             >
-                <Text title='Start Roadtrip' style={styles.text}>Start Roadtrip Session</Text>
+                <Text title='Start Roadtrip'
+                    style={styles.text}>
+                    Start Roadtrip Session
+                </Text>
             </Pressable>
         </View>
     );

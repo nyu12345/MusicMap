@@ -37,11 +37,26 @@ router.post("/create-roadtrip", async (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
+
+router.put("/update-roadtrip/:id", (req, res) => {
+  console.log("Updating roadtrip");
+  Roadtrip.findByIdAndUpdate(req.params.id, {
+    name: req.body.name,
+    startLocation: req.body.startLocation,
+    destination: 'jeff',
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+  }).then((doc) => {
+    res.status(200).json(doc);
+  }).catch((err) => {
+    res.status(500).json({ error: err });
+  })
+});
+
 router.delete("/delete-roadtrip/:id", (req, res) => {
-  console.log("Deleting roadtrip");
-  Roadtrip.findByIdAndDelete(mongoose.Types.ObjectId(req.params.id)).then((doc) => {
-    res.redirect("/");
-    console.log("Deleted");
+  console.log("Delete roadtrip");
+  Roadtrip.findByIdAndDelete(req.params.id).then((doc) => {
+    res.status(200).json(doc);
   }).catch((err) => {
     res.status(500).json({ error: err });
   })

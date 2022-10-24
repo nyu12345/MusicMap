@@ -10,8 +10,9 @@ const Tab = createMaterialTopTabNavigator();
 export function PastTripsScreen() {
     return (
         <Tab.Navigator style={{ marginTop: ExpoConstants.statusBarHeight}} >
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Statistics" component={StatisticsScreen} />
+                <Tab.Screen name="Map" component={MapScreen} />
+                <Tab.Screen name="Statistics" component={StatisticsScreen} />
+                {/* Bottom sheet goes here */}
         </Tab.Navigator>
     );
 }

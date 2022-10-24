@@ -132,6 +132,15 @@ export function HomeScreen() {
                 </ScrollView>
             </Modal>
             <Pressable
+                style={styles.cancelRoadtripButton}
+                onPress={startRoadtripClickHandler}
+            >
+                <Text title='Cancel Roadtrip'
+                    style={styles.text}>
+                    {startRoadtripButtonText}
+                </Text>
+            </Pressable>
+            <Pressable
                 style={styles.startButton}
                 onPress={startRoadtripClickHandler}
             >
@@ -157,6 +166,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         position: 'absolute',
         bottom: 30,
+    },
+    cancelRoadtripButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 4,
+        backgroundColor: 'red',
+        position: 'absolute',
+        bottom: 80,
     },
     createButton: {
         alignItems: 'center',

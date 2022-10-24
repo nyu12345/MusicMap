@@ -2,14 +2,14 @@ import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import axios from 'axios';
-import lazyfair from 'musicmap/assets/lazyfair.jpg'; 
+import lazyfair from 'musicmap/assets/lazyfair.jpg';
 import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { REACT_APP_BASE_URL } from '@env'; 
+import { REACT_APP_BASE_URL } from '@env';
 
 export function MapScreen() {
     // get roadtrip data from API
-    const [roadtrips, setRoadtrips] = useState([]); 
-    const base_url = `${REACT_APP_BASE_URL}/users/`; 
+    const [roadtrips, setRoadtrips] = useState([]);
+    const base_url = `${REACT_APP_BASE_URL}/users/`;
 
     // TODO: change logic to make get request when we pull to refresh
     if (roadtrips.length == 0) {
@@ -19,10 +19,10 @@ export function MapScreen() {
             setRoadtrips(response.data);
         });
     } else {
-        console.log('printing'); 
+        console.log('printing');
     }
 
-    const bottomSheetRef = useRef(null); 
+    const bottomSheetRef = useRef(null);
 
     // Points for the bottom sheet to snap to, sorted from bottom to top
     const snapPoints = useMemo(() => ['13%', '50%', '95%'], []);
@@ -73,8 +73,8 @@ export function MapScreen() {
                     <Callout>
                         <Image style={{ alignSelf: 'center', width: 50, height: 50 }}
                             source={require('musicmap/assets/lazyfair.jpg')} />
-                        <Text style={{textAlign: 'center'}}>Sour Patch Kids</Text>
-                        <Text style={{textAlign: 'center'}}>Bryce Vine</Text>
+                        <Text style={{ textAlign: 'center' }}>Sour Patch Kids</Text>
+                        <Text style={{ textAlign: 'center' }}>Bryce Vine</Text>
                     </Callout>
                 </Marker>
             </MapView>

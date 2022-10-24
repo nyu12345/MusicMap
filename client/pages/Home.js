@@ -1,6 +1,8 @@
 import { Text, TextInput, SafeAreaView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
+import React, { useState, useEffect } from "react";
 import MapView from 'react-native-maps';
-import React, { useEffect, useState } from "react";
+import axios from 'axios';
+import { REACT_APP_BASE_URL } from '@env';
 
 export function HomeScreen() {
     const [modalVisible, setModalVisible] = useState(false);
@@ -8,6 +10,8 @@ export function HomeScreen() {
     const [roadtripName, setRoadtripName] = useState('');
     const [roadtripStartLocation, setRoadtripStartLocation] = useState('');
     const [roadtripDestination, setRoadTripDestination] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     // useEffect(() => {
     //     setModalVisible(!modalVisible); // This will always use latest value of count
@@ -17,14 +21,41 @@ export function HomeScreen() {
         setModalVisible(true);
         setStartRoadtripButtonVisible(false);
     }
+
+    const handleSubmit = () => {
+        const roadtrip = {
+            name: roadtripName,
+            startLocation: roadtripStartLocation,
+            destination: roadtripDestination,
+            startDate: '11/20/2002',
+            endDate: '11/21/2002',
+        };
+        axios.post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip).then((response) => {
+            console.log(response);
+        }).catch(function (error) {
+            if (error.response) {
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        });
+    };
+
     const modalConfirmClickHandler = () => {
         console.log(`name: ${roadtripName}, start: ${roadtripStartLocation}, end: ${roadtripDestination}`);
         // TODO: MAKE POST REQUEST HERE
+        handleSubmit();
         setModalVisible(false);
         // this shits async or smth i hate react
         console.log(`modal visible: ${modalVisible}`);
         setStartRoadtripButtonVisible(false);
     }
+
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -42,6 +73,10 @@ export function HomeScreen() {
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setModalVisible(!modalVisible);
+                }}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>

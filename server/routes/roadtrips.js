@@ -15,16 +15,16 @@ router.get("/", (req, res) => {
     });
 });
 
-router.post("/", async (req, res, next) => {
-  console.log("inside post"); 
-  console.log(req.body.name); 
+router.post("/create-roadtrip", async (req, res, next) => {
+  console.log("inside post");
+  console.log(req.body.name);
   const roadtrip = new Roadtrip({
-    name: req.body.name, 
-    startLocation: req.body.startLocation, 
-    destination: req.body.destination, 
-    startDate: req.body.startDate, 
-    endDate: req.body.endDate, 
-  }); 
+    name: req.body.name,
+    startLocation: req.body.startLocation,
+    destination: req.body.destination,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+  });
 
   roadtrip
     .save()
@@ -35,6 +35,6 @@ router.post("/", async (req, res, next) => {
       })
     })
     .catch((err) => res.status(500).json(err));
-}); 
+});
 
 module.exports = router;

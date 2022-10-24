@@ -44,26 +44,37 @@ export function MapScreen() {
             return roadtrips; 
         }
         return roadtrips.filter(function({ name, startLocation, destination }) {
-            let input = searchInput.toLowerCase();
+            let input = searchInput.toLowerCase().replace(/\s/g, '');
             const nameArr = name.split(' '); 
             const startLocationArr = startLocation.split(' '); 
             const destinationArr = destination.split(' '); 
-            for ( const roadtripName of nameArr ) {
-                if (roadtripName.toLowerCase().indexOf(input) == 0) {
+
+            nameArr.forEach((element, idx) => {
+                nameArr[idx] = element.toLowerCase(); 
+                if (nameArr[idx].indexOf(input) == 0) {
                     return true; 
                 }
-            }
-            for ( const location of startLocationArr ) {
-                if (location.toLowerCase().indexOf(input) == 0) {
+            }); 
+
+            startLocationArr.forEach((element, idx) => {
+                startLocationArr[idx] = element.toLowerCase(); 
+                if (startLocationArr[idx].indexOf(input) == 0) {
                     return true; 
                 }
-            }
-            for ( const destination of destinationArr) {
-                if (destination.toLowerCase().indexOf(input) == 0) {
+            }); 
+
+            destinationArr.forEach((element, idx) => {
+                destinationArr[idx] = element.toLowerCase(); 
+                if (destinationArr[idx].indexOf(input) == 0) {
                     return true; 
                 }
-            }
-            //return lcName.includes(input) || lcStartLocation.includes(input) || lcDestination.includes(input); 
+            }); 
+
+            return (
+                nameArr.join('').indexOf(input)==0 ||
+                startLocationArr.join('').indexOf(input)==0 || 
+                destinationArr.join('').indexOf(input)==0
+            ); 
         }); 
     }; 
 

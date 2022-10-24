@@ -1,4 +1,4 @@
-import { Text, TextInput, SafeAreaView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
+import { Text, TextInput, SafeAreaView, ScrollView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
 import React, { useState, useEffect } from "react";
 import MapView from 'react-native-maps';
 import axios from 'axios';
@@ -27,8 +27,8 @@ export function HomeScreen() {
             name: roadtripName,
             startLocation: roadtripStartLocation,
             destination: roadtripDestination,
-            startDate: '11/20/2002',
-            endDate: '11/21/2002',
+            startDate: startDate,
+            endDate: endDate,
         };
         axios.post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip).then((response) => {
             console.log(response);
@@ -78,7 +78,7 @@ export function HomeScreen() {
                     setModalVisible(!modalVisible);
                 }}
             >
-                <View style={styles.centeredView}>
+                <ScrollView style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <SafeAreaView>
                             <Text style={styles.modalText}>Roadtrip Name</Text>
@@ -96,6 +96,16 @@ export function HomeScreen() {
                                 style={styles.modalTextInput}
                                 onChangeText={destination => setRoadTripDestination(destination)}
                             />
+                            <Text style={styles.modalText}>Start Date</Text>
+                            <TextInput
+                                style={styles.modalTextInput}
+                                onChangeText={startDate => setStartDate(startDate)}
+                            />
+                            <Text style={styles.modalText}>End Date</Text>
+                            <TextInput
+                                style={styles.modalTextInput}
+                                onChangeText={endDate => setEndDate(endDate)}
+                            />
                         </SafeAreaView>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
@@ -104,7 +114,7 @@ export function HomeScreen() {
                             <Text style={styles.whiteBoldTextrStyle}>Confirm</Text>
                         </Pressable>
                     </View>
-                </View>
+                </ScrollView>
 
             </Modal>
             <Pressable

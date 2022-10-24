@@ -3,6 +3,7 @@ import React, { useCallback, useState, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import axios from 'axios';
 import lazyfair from 'musicmap/assets/lazyfair.jpg'; 
+import PastTrip from 'musicmap/pages/PastTrips/PastTrip';
 import BottomSheet, { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { REACT_APP_BASE_URL } from '@env'; 
 
@@ -11,7 +12,6 @@ export function MapScreen() {
     const [roadtrips, setRoadtrips] = useState([]); 
     const base_url = `${REACT_APP_BASE_URL}/users/`; 
 
-    // TODO: change logic to make get request when we pull to refresh
     if (roadtrips.length == 0) {
         axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
             console.log("Tried to get data");
@@ -32,28 +32,20 @@ export function MapScreen() {
         console.log("handleSheetChange", index);
     }, []);
     const handleRefresh = useCallback(() => {
+        setRoadtrips([]); 
         console.log("handleRefresh");
     }, []);
 
     // render
-    // const renderItem = useCallback(
-    //     ({ item }) => (
-    //     <View style={styles.itemContainer}>
-    //         <Text>{item}</Text>
-    //     </View>
-    //     ),
-    //     []
-    // );
-    renderItem = (data) => {
-        return (
-            <TouchableOpacity style={styles.list}>
-                <Text style={styles.lightText}>{data.item.name}</Text>
-                <Text style={styles.lightText}>{data.item.startLocatoin}</Text>
-                <Text style={styles.lightText}>{data.item.destination}</Text>
-                <Text style={styles.lightText}>{data.item.startDate}</Text>
-                <Text style={styles.lightText}>{data.item.endDate}</Text></TouchableOpacity>
-        )
-    }
+    const renderItem = ({ item }) => (
+        <PastTrip 
+            name={item.name} 
+            startLocation={item.startLocation}
+            destination={item.destination}
+            startDate={item.startDate}
+            endDate={item.endDate}
+        />
+    );
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -92,11 +84,12 @@ export function MapScreen() {
                 />
                 <BottomSheetFlatList
                     data={roadtrips}
-                    keyExtractor={(i) => i}
                     renderItem={renderItem}
-                    refreshing={false}
+                    keyExtractor={(item) => item._id}
+                    refreshing={roadtrips.length == 0}
                     onRefresh={handleRefresh}
-                    contentContainerStyle={styles.contentContainer}
+                    style={{ backgroundColor: "white" }}
+                    contentContainerStyle={{ backgroundColor: "white" }}
                 />
             </BottomSheet>
         </View>
@@ -104,14 +97,6 @@ export function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-    itemContainer: {
-        padding: 10,
-        margin: 10,
-        backgroundColor: "#eee",
-    },
-    contentContainer: {
-        backgroundColor: "white",
-    },
     map: {
         ...StyleSheet.absoluteFillObject,
     },

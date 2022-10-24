@@ -1,5 +1,4 @@
 import { Text, TextInput, SafeAreaView, ScrollView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
-// import { HStack, VStack } from 'react-native-flex-layout';
 import React, { useState } from "react";
 import MapView from 'react-native-maps';
 import axios from 'axios';
@@ -18,14 +17,8 @@ export function HomeScreen() {
         setModalVisible(true);
     }
 
-    const modalConfirmClickHandler = () => {
+    const createHandler = () => {
         console.log(`name: ${roadtripName}, start: ${roadtripStartLocation}, end: ${roadtripDestination}`);
-        handleSubmit();
-        setModalVisible(false);
-        setStartRoadtripButtonText('End Roadtrip Session');
-    }
-
-    const handleSubmit = () => {
         const roadtrip = {
             name: roadtripName,
             startLocation: roadtripStartLocation,
@@ -48,6 +41,27 @@ export function HomeScreen() {
             }
             console.log(error.config);
         });
+        setModalVisible(false);
+        setStartRoadtripButtonText('End Roadtrip Session');
+    };
+
+    const cancelHandler = () => {
+        // should add check to see if these fields are valid here and present alert if not
+        axios.delete(`${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip`).then((response) => {
+            console.log(response);
+        }).catch(function (error) {
+            if (error.response) {
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        });
+        setModalVisible(false);
     };
 
     return (
@@ -100,25 +114,25 @@ export function HomeScreen() {
                                 onChangeText={endDate => setEndDate(endDate)}
                             />
                         </SafeAreaView>
-                        {/* <Vstack> */}
+                        <View style={[styles.formButtonContainer]}>
                             <Pressable
-                                style={[styles.button, styles.buttonClose]}
-                                onPress={modalConfirmClickHandler}
+                                style={[styles.cancelButton]}
+                                onPress={cancelHandler}
                             >
-                                <Text style={styles.whiteBoldTextStyle}>Confirm</Text>
+                                <Text style={styles.blackBoldTextStyle}>Cancel</Text>
                             </Pressable>
-                            {/* <Pressable
-                                style={[styles.button, styles.buttonClose]}
-                                onPress={modalConfirmClickHandler}
+                            <Pressable
+                                style={[styles.createButton]}
+                                onPress={createHandler}
                             >
-                                <Text style={styles.whiteBoldTextStyle}>Cancel</Text>
-                            </Pressable> */}
-                        {/* </Vstack> */}
+                                <Text style={styles.whiteBoldTextStyle}>Create</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </ScrollView>
             </Modal>
             <Pressable
-                style={styles.button}
+                style={styles.startButton}
                 onPress={startRoadtripClickHandler}
             >
                 <Text title='Start Roadtrip'
@@ -134,16 +148,43 @@ const styles = StyleSheet.create({
     map: {
         ...StyleSheet.absoluteFillObject,
     },
-    button: {
+    startButton: {
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 12,
         paddingHorizontal: 32,
         borderRadius: 4,
-        elevation: 3,
         backgroundColor: 'black',
         position: 'absolute',
         bottom: 30,
+    },
+    createButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        marginHorizontal: 5,
+        borderRadius: 4,
+        borderColor: 'black',
+        borderWidth: 1,
+        backgroundColor: 'black',
+        width: 100,
+    },
+    cancelButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginHorizontal: 5,
+        paddingVertical: 12,
+        borderRadius: 4,
+        borderColor: 'black',
+        borderWidth: 1,
+        elevation: 3,
+        backgroundColor: 'white',
+        width: 100,
+    },
+    formButtonContainer: {
+        flexDirection: "row",
+        alignItems: 'center',
+        marginTop: 20,
     },
     text: {
         fontSize: 16,
@@ -179,14 +220,13 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5
     },
-    buttonOpen: {
-        backgroundColor: "#F194FF",
-    },
-    buttonClose: {
-        backgroundColor: "#2196F3",
-    },
     whiteBoldTextStyle: {
         color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    blackBoldTextStyle: {
+        color: "black",
         fontWeight: "bold",
         textAlign: "center"
     },

@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/create-roadtrip", async (req, res, next) => {
-  console.log("inside post");
+  console.log("Posting roadtrip");
   console.log(req.body.name);
   const roadtrip = new Roadtrip({
     name: req.body.name,
@@ -35,6 +35,16 @@ router.post("/create-roadtrip", async (req, res, next) => {
       })
     })
     .catch((err) => res.status(500).json(err));
+});
+
+router.delete("/delete-roadtrip/:id", (req, res) => {
+  console.log("Deleting roadtrip");
+  Roadtrip.findByIdAndDelete(mongoose.Types.ObjectId(req.params.id)).then((doc) => {
+    res.redirect("/");
+    console.log("Deleted");
+  }).catch((err) => {
+    res.status(500).json({ error: err });
+  })
 });
 
 module.exports = router;

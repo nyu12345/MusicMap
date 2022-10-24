@@ -1,4 +1,5 @@
 import { Text, TextInput, SafeAreaView, ScrollView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
+import { HStack, VStack } from 'react-native-flex-layout';
 import React, { useState, useEffect } from "react";
 import MapView from 'react-native-maps';
 import axios from 'axios';
@@ -48,7 +49,6 @@ export function HomeScreen() {
 
     const modalConfirmClickHandler = () => {
         console.log(`name: ${roadtripName}, start: ${roadtripStartLocation}, end: ${roadtripDestination}`);
-        // TODO: MAKE POST REQUEST HERE
         handleSubmit();
         setModalVisible(false);
         // this shits async or smth i hate react
@@ -107,12 +107,20 @@ export function HomeScreen() {
                                 onChangeText={endDate => setEndDate(endDate)}
                             />
                         </SafeAreaView>
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={modalConfirmClickHandler}
-                        >
-                            <Text style={styles.whiteBoldTextrStyle}>Confirm</Text>
-                        </Pressable>
+                        <Vstack>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={modalConfirmClickHandler}
+                            >
+                                <Text style={styles.whiteBoldTextStyle}>Confirm</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={modalConfirmClickHandler}
+                            >
+                                <Text style={styles.whiteBoldTextStyle}>Cancel</Text>
+                            </Pressable>
+                        </Vstack>
                     </View>
                 </ScrollView>
 
@@ -163,8 +171,6 @@ const styles = StyleSheet.create({
     },
     centeredView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
         marginTop: 22
     },
     modalView: {

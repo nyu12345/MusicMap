@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, StyleSheet, ScrollView, RefreshControl, FlatList, TextInput } from 'react-native';
 import axios from 'axios';
-import { set } from 'react-native-reanimated';
 import { REACT_APP_BASE_URL } from '@env';
 
 const overallStatistics = {

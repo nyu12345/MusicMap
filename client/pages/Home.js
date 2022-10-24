@@ -6,15 +6,22 @@ import { REACT_APP_BASE_URL } from '@env';
 
 export function HomeScreen() {
     const [modalVisible, setModalVisible] = useState(false);
-    const [startRoadtripButtonText, setStartRoadtripButtonText] = useState('Start Roadtrip Session');
     const [roadtripName, setRoadtripName] = useState('');
     const [roadtripStartLocation, setRoadtripStartLocation] = useState('');
     const [roadtripDestination, setRoadTripDestination] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
+    const START_ROADTRIP_TEXT = 'Start Roadtrip Session';
+    const CANCEL_ROADTRIP_TEXT = 'Cancel Roadtrip Session';
 
     const startRoadtripClickHandler = () => {
         setModalVisible(true);
+    }
+
+    const cancelRoadtripClickHandler = () => {
+        setButtonIsStartRoadtrip(true);
+        // CALL DELETE HERE
     }
 
     const createHandler = () => {
@@ -42,7 +49,7 @@ export function HomeScreen() {
             console.log(error.config);
         });
         setModalVisible(false);
-        setStartRoadtripButtonText('End Roadtrip Session');
+        setButtonIsStartRoadtrip(false);
     };
 
     const cancelHandler = () => {
@@ -131,24 +138,30 @@ export function HomeScreen() {
                     </View>
                 </ScrollView>
             </Modal>
-            <Pressable
-                style={styles.cancelRoadtripButton}
-                onPress={startRoadtripClickHandler}
-            >
-                <Text title='Cancel Roadtrip'
-                    style={styles.text}>
-                    {startRoadtripButtonText}
-                </Text>
-            </Pressable>
+            {
+                buttonIsStartRoadtrip ?
             <Pressable
                 style={styles.startButton}
                 onPress={startRoadtripClickHandler}
             >
                 <Text title='Start Roadtrip'
                     style={styles.text}>
-                    {startRoadtripButtonText}
+                    {START_ROADTRIP_TEXT}
                 </Text>
-            </Pressable>
+            </Pressable> : null
+            }
+            {
+                !buttonIsStartRoadtrip ?
+            <Pressable
+                style={styles.cancelRoadtripButton}
+                onPress={cancelRoadtripClickHandler}
+            >
+                <Text title='Cancel Roadtrip'
+                    style={styles.text}>
+                    {CANCEL_ROADTRIP_TEXT}
+                </Text>
+            </Pressable> : null
+            }
         </View>
     );
 }

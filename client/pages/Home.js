@@ -22,9 +22,10 @@ export function HomeScreen() {
     const cancelRoadtripClickHandler = () => {
         setButtonIsStartRoadtrip(true);
         // CALL DELETE HERE
+        // cancelHandler();
     }
 
-    const createHandler = () => {
+    const createHandler = async () => {
         console.log(`name: ${roadtripName}, start: ${roadtripStartLocation}, end: ${roadtripDestination}`);
         const roadtrip = {
             name: roadtripName,
@@ -34,7 +35,7 @@ export function HomeScreen() {
             endDate: endDate,
         };
         // should add check to see if these fields are valid here and present alert if not
-        axios.post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip).then((response) => {
+        let currentRoadTripResponse = await axios.post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip).then((response) => {
             console.log(response);
         }).catch(function (error) {
             if (error.response) {
@@ -48,13 +49,16 @@ export function HomeScreen() {
             }
             console.log(error.config);
         });
+
         setModalVisible(false);
         setButtonIsStartRoadtrip(false);
+
+        console.log("poo" + currentRoadTripResponse.data);
     };
 
     const cancelHandler = () => {
         // should add check to see if these fields are valid here and present alert if not
-        axios.delete(`${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip`).then((response) => {
+        axios.delete(`${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip/`).then((response) => {
             console.log(response);
         }).catch(function (error) {
             if (error.response) {
@@ -140,27 +144,27 @@ export function HomeScreen() {
             </Modal>
             {
                 buttonIsStartRoadtrip ?
-            <Pressable
-                style={styles.startButton}
-                onPress={startRoadtripClickHandler}
-            >
-                <Text title='Start Roadtrip'
-                    style={styles.text}>
-                    {START_ROADTRIP_TEXT}
-                </Text>
-            </Pressable> : null
+                    <Pressable
+                        style={styles.startButton}
+                        onPress={startRoadtripClickHandler}
+                    >
+                        <Text title='Start Roadtrip'
+                            style={styles.text}>
+                            {START_ROADTRIP_TEXT}
+                        </Text>
+                    </Pressable> : null
             }
             {
                 !buttonIsStartRoadtrip ?
-            <Pressable
-                style={styles.cancelRoadtripButton}
-                onPress={cancelRoadtripClickHandler}
-            >
-                <Text title='Cancel Roadtrip'
-                    style={styles.text}>
-                    {CANCEL_ROADTRIP_TEXT}
-                </Text>
-            </Pressable> : null
+                    <Pressable
+                        style={styles.cancelRoadtripButton}
+                        onPress={cancelRoadtripClickHandler}
+                    >
+                        <Text title='Cancel Roadtrip'
+                            style={styles.text}>
+                            {CANCEL_ROADTRIP_TEXT}
+                        </Text>
+                    </Pressable> : null
             }
         </View>
     );

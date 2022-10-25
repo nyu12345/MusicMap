@@ -1,6 +1,5 @@
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
-import {Stack, createStackNavigator} from '@react-navigation/stack'
 import {LoginScreen} from './Login'
 import { FriendsScreen } from './FriendsView';
 import ExpoConstants from 'expo-constants'; 
@@ -10,7 +9,6 @@ const Tab = createMaterialTopTabNavigator();
 
 export function ProfileScreen() {
     const [loginStatus, setLogin] = useState(false); 
-    const Stack = createStackNavigator();
 
     const handleCallback = (loginData) =>{
       setLogin(loginData);

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { REACT_APP_BASE_URL } from '@env';
 import axios from 'axios';
 
-export function ProfileScreen() {
+export function FriendsScreen() {
   const [username, setUsername] = useState("");
   const [friends, setFriends] = useState([]);
   const [newFriend, setNewFriend] = useState("");

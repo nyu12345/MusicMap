@@ -18,7 +18,6 @@ export function LoginScreen() {
         .catch(function (error) {
           console.log(error);
         });
-        this.props.navigation.navigate('Signup');
     }
 
     return (
@@ -35,6 +34,7 @@ export function LoginScreen() {
     color: 'white',
     margin: 20,
     marginLeft: 0,
+    backgroundColor: 'white',
   },
   button: {
     marginTop: 40,
@@ -47,6 +47,5 @@ export function LoginScreen() {
     flex: 1,
     justifyContent: 'center',
     padding: 8,
-    backgroundColor: '#0e101c',
   },
 });

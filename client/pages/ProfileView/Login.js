@@ -11,6 +11,7 @@ export function LoginScreen() {
         axios.post(`${REACT_APP_BASE_URL}/users/`, {
           name: user,
           spotifyUsername: username,
+          friends: []
         })
         .then(function (response) {
           console.log(response);

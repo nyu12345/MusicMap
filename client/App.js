@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { HomeScreen } from './pages/Home';
 import { PastTripsScreen } from './pages/PastTrips/PastTripsScreen';
 import { MemoriesScreen } from './pages/Memories';
-import { ProfileScreen } from './pages/Profile';
+import { ProfileScreen } from './pages/ProfileView/Profile';
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

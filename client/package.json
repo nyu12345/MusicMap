@@ -17,6 +17,7 @@
     "@rneui/base": "^4.0.0-rc.6",
     "@rneui/themed": "^4.0.0-rc.6",
     "axios": "^1.1.3",
+    "dayjs": "^1.11.6",
     "expo": "~46.0.13",
     "expo-constants": "~13.2.4",
     "expo-status-bar": "~1.4.0",

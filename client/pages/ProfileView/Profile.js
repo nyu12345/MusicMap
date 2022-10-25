@@ -2,7 +2,7 @@ import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
 import {Stack, createStackNavigator} from '@react-navigation/stack'
 import {LoginScreen} from './Login'
-import { MemoriesScreen } from '../Memories';
+import { FriendsScreen } from './FriendsView';
 import ExpoConstants from 'expo-constants'; 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
@@ -19,7 +19,7 @@ export function ProfileScreen() {
     return (
       <Tab.Navigator style={{ marginTop: ExpoConstants.statusBarHeight}} >
                 <Tab.Screen name="Login" component={LoginScreen} />
-                <Tab.Screen name="Memories" component={MemoriesScreen} />
+                <Tab.Screen name="Friends" component={FriendsScreen} />
         </Tab.Navigator>
     );
   }

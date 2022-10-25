@@ -38,12 +38,12 @@ router.post("/create-roadtrip", async (req, res, next) => {
 });
 
 
-router.put("/update-roadtrip/:id", (req, res) => {
+router.patch("/update-roadtrip/:id", (req, res) => {
   console.log("Updating roadtrip");
   Roadtrip.findByIdAndUpdate(req.params.id, {
     name: req.body.name,
     startLocation: req.body.startLocation,
-    destination: 'jeff',
+    destination: req.body.destination,
     startDate: req.body.startDate,
     endDate: req.body.endDate,
   }).then((doc) => {

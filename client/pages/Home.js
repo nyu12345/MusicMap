@@ -1,6 +1,8 @@
 import { Text, TextInput, SafeAreaView, ScrollView, View, StyleSheet, Pressable, Alert, Modal } from 'react-native';
 import React, { useState } from "react";
 import MapView from 'react-native-maps';
+import Marker from 'react-native-maps';
+// import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import { REACT_APP_BASE_URL } from '@env';
 
@@ -12,11 +14,24 @@ export function HomeScreen() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
-    const START_ROADTRIP_TEXT = 'Start Roadtrip Session';
-    const CANCEL_ROADTRIP_TEXT = 'Cancel Roadtrip Session';
+    const START_ROADTRIP_BUTTON_TEXT = 'Start Roadtrip Session';
+    const CANCEL_ROADTRIP_BUTTON_TEXT = 'Cancel Roadtrip Session';
+    const END_ROADTRIP_BUTTON_TEXT = 'End Roadtrip Session';
+
+    const location = {
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+    }
 
     const startRoadtripClickHandler = () => {
         setModalVisible(true);
+    }
+
+    const endRoadtripClickHandler = () => {
+        setButtonIsStartRoadtrip(true);
+        // CALL UPDATE HERE
     }
 
     const cancelRoadtripClickHandler = () => {
@@ -79,14 +94,13 @@ export function HomeScreen() {
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <MapView
                 style={styles.map}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
+                initialRegion={location}
                 showsUserLocation={true}
-            />
+            >
+            {/* <Marker coordinate={location}
+              pinColor="red"
+            />     */}
+            </MapView>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -144,27 +158,39 @@ export function HomeScreen() {
             </Modal>
             {
                 buttonIsStartRoadtrip ?
-                    <Pressable
-                        style={styles.startButton}
-                        onPress={startRoadtripClickHandler}
-                    >
-                        <Text title='Start Roadtrip'
-                            style={styles.text}>
-                            {START_ROADTRIP_TEXT}
-                        </Text>
-                    </Pressable> : null
+            <Pressable
+                style={styles.startButton}
+                onPress={startRoadtripClickHandler}
+            >
+                <Text title='Start Roadtrip'
+                    style={styles.text}>
+                    {START_ROADTRIP_BUTTON_TEXT}
+                </Text>
+            </Pressable> : null
             }
             {
                 !buttonIsStartRoadtrip ?
-                    <Pressable
-                        style={styles.cancelRoadtripButton}
-                        onPress={cancelRoadtripClickHandler}
-                    >
-                        <Text title='Cancel Roadtrip'
-                            style={styles.text}>
-                            {CANCEL_ROADTRIP_TEXT}
-                        </Text>
-                    </Pressable> : null
+            <Pressable
+                style={styles.startButton}
+                onPress={endRoadtripClickHandler}
+            >
+                <Text title='End Roadtrip'
+                    style={styles.text}>
+                    {END_ROADTRIP_BUTTON_TEXT}
+                </Text>
+            </Pressable> : null
+            }
+            {
+                !buttonIsStartRoadtrip ?
+            <Pressable
+                style={styles.cancelRoadtripButton}
+                onPress={cancelRoadtripClickHandler}
+            >
+                <Text title='Cancel Roadtrip'
+                    style={styles.text}>
+                    {CANCEL_ROADTRIP_BUTTON_TEXT}
+                </Text>
+            </Pressable> : null
             }
         </View>
     );

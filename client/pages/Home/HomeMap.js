@@ -22,25 +22,23 @@ export function HomeMap() {
     })();
   }, []);
 
-  const getLocation = async () => {
+  const getLocation = () => {
     console.log("CLICKED");
     console.log(permission);
     if (permission.status === "granted") {
       console.log("I HAVE PERMISSION");
-      let location = await Location.watchPositionAsync(
+      let location = Location.getCurrentPositionAsync(
         {
           accuracy: Location.Accuracy.High,
-          timeInterval: 1,
-          distanceInterval: 1,
+          timeInterval: 200,
+          distanceInterval: 0,
         },
         false,
         (location) => {
           setCurrentLocation(location);
           console.log("update location!", location.coords);
         }
-      ).then((response) => {
-        console.log(`response: ${response}`);
-      });
+      )
     }
   };
 
@@ -52,29 +50,14 @@ export function HomeMap() {
   };
 
   return (
-    // <>
-    //   {/* <Pressable
-    //     style={[styles.cancelButton]}
-    //     onPress={watch_location}
-    //   ></Pressable> */}
-    <MapView
-      style={styles.map}
-      initialRegion={location}
-      showsUserLocation={true}
-    ></MapView>
-    // </>
-    // <View style={styles.container}>
-    //   <TouchableOpacity onPress={() => getLocation} style={styles.button}>
-    //     <Text style={styles.buttonLabel}>Get Location</Text>
-    //   </TouchableOpacity>
-
-    //   {currentLocation && currentLocation.latitude && (
-    //     <Text>{currentLocation.latitude}</Text>
-    //   )}
-
-    //   {currentLocation && currentLocation.longitude && (
-    //     <Text>{currentLocation.longitude}</Text>
-    //   )}
-    // </View>
+    <Pressable
+        style={[styles.cancelButton]}
+        onPress={getLocation}
+      ></Pressable>
+    // <MapView
+    //   style={styles.map}
+    //   initialRegion={location}
+    //   showsUserLocation={true}
+    // ></MapView>
   );
 }

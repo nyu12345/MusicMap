@@ -9,6 +9,11 @@ export function HomeMap() {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [permissionStatus, setStatus] = useState(null);
 
+  // map size parameters
+  const LATITUDE_DELTA = 0.0922;
+  const LONGITUDE_DELTA = 0.0421;
+
+  // requests permission if needed and sets up initial location
   useEffect(() => {
     (async () => {
       permission = await Location.requestForegroundPermissionsAsync();
@@ -18,60 +23,39 @@ export function HomeMap() {
       } else {
         console.log("Access granted!!");
         setStatus(permission);
-        let location = await Location.getCurrentPositionAsync({
+        let initialLocation = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Highest,
           timeInterval: 200,
           distanceInterval: 0,
         });
-        setCurrentLocation(location);
+        updateLocation(initialLocation);
       }
     })();
   }, []);
 
-  // const getLocation = async () => {
-  //   console.log("CLICKED");
-  //   console.log(permissionStatus);
-  //   if (permissionStatus.status === "granted") {
-  //     console.log("I HAVE PERMISSION");
-  //     let location = await Location.getCurrentPositionAsync(
-  //       {
-  //         accuracy: Location.Accuracy.Highest,
-  //         timeInterval: 200,
-  //         distanceInterval: 0,
-  //       },
-  //       true,
-  //       (location) => {
-  //         setCurrentLocation(location);
-  //         console.log("update location!", location.coords);
-  //       }
-  //     );
-  //   }
-  // };
-
-  const location = {
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+  const updateLocation = (newLocation) => {
+    if (newLocation) {
+      setCurrentLocation({
+        latitude: newLocation.coords.latitude,
+        longitude: newLocation.coords.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      });
+    }
   };
 
   let text = currentLocation
-    ? `coords: ${currentLocation.coords.latitude}, ${currentLocation.coords.longitude}`
+    ? `coords: ${currentLocation.latitude}, ${currentLocation.longitude}`
     : "waiting...";
 
   return (
     <>
-      {/* <Pressable
-        style={[styles.cancelButton]}
-        onPress={getLocation}
-      ></Pressable> */}
+      <MapView
+        style={styles.map}
+        initialRegion={currentLocation}
+        showsUserLocation={true}
+      ></MapView>
       <Text style={styles.modalText}>{text}</Text>
     </>
-
-    // <MapView
-    //   style={styles.map}
-    //   initialRegion={location}
-    //   showsUserLocation={true}
-    // ></MapView>
   );
 }

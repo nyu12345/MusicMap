@@ -50,14 +50,14 @@ export function HomeMap() {
   };
 
   return (
-    <Pressable
-        style={[styles.cancelButton]}
-        onPress={getLocation}
-      ></Pressable>
-    // <MapView
-    //   style={styles.map}
-    //   initialRegion={location}
-    //   showsUserLocation={true}
-    // ></MapView>
+    // <Pressable
+    //     style={[styles.cancelButton]}
+    //     onPress={getLocation}
+    //   ></Pressable>
+    <MapView
+      style={styles.map}
+      initialRegion={location}
+      showsUserLocation={true}
+    ></MapView>
   );
 }

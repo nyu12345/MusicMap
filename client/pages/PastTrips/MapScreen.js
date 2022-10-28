@@ -2,7 +2,7 @@ import { Text, View, StyleSheet, Image } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import lazyfair from 'musicmap/assets/lazyfair.jpg'; 
-import { PastTripsList } from 'musicmap/pages/PastTrips/PastTripsList'; 
+import { PastTripsList } from 'musicmap/pages/PastTrips/PastTripsList';
 
 export function MapScreen() {
     return (

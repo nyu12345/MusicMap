@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Text, View } from 'react-native';
-import { HomeScreen } from './pages/Home';
+import { HomeScreen } from './pages/Home/HomeScreen';
 import { PastTripsScreen } from './pages/PastTrips/PastTripsScreen';
 import { MemoriesScreen } from './pages/Memories';
 import { ProfileScreen } from './pages/ProfileView/Profile';

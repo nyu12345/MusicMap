@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const userSchema = new mongoose.Schema({
     name: { type: String }, 
     spotifyUsername: { type: String }, 
+    // profileImg: { }, what type is this? 
     friends: [{ type: Schema.Types.ObjectId, ref: 'User', optional: true}], 
 });
 

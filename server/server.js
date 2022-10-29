@@ -1,16 +1,16 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const http = require('http');
-const app = require('./app');
-const mongoose = require('mongoose');
+const http = require("http");
+const app = require("./app");
+const mongoose = require("mongoose");
 
 mongoose
   .connect(process.env.ATLAS_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    dbName: 'MusicMap',
+    dbName: "MusicMap",
   })
-  .then(() => console.log('Connected to database'))
+  .then(() => console.log("Connected to database"))
   .catch((err) => console.log(err));
 
 const port = process.env.PORT || 6000;
@@ -18,5 +18,5 @@ const port = process.env.PORT || 6000;
 const server = http.createServer(app);
 
 server.listen(port, () => {
-  console.log(`Server is running on port ${port}`); 
+  console.log(`Server is running on port ${port}`);
 });

@@ -13,11 +13,10 @@ export function HomeMap() {
     (async () => {
       permission = await Location.requestForegroundPermissionsAsync();
       if (!permission.granted) {
-        setStatus("Permission to access location was denied");
+        console.log("ERROR: Permission Not Granted")
         return;
       } else {
-        console.log("Access granted!!");
-        setStatus(permission);
+        //console.log("Access granted!!");
       }
     })();
   }, []);

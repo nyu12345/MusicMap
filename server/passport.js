@@ -2,8 +2,8 @@ const session = require("express-session");
 const cookieparser = require("cookie-parser");
 const passport = require("passport");
 const SpotifyStrategy = require("passport-spotify").Strategy;
-const User = require("server/models/userSchema");
-const Membership = require("server/models/membershipSchema");
+const User = require("./models/userSchema");
+const Membership = require("./models/membershipSchema");
 
 // export a function that receives the Express app we will configure for Passport
 module.exports = (app) => {

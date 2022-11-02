@@ -16,7 +16,7 @@ export function StatisticsScreen() {
             // console.log("Tried to get data");
             // console.log(response.data);
             setStatistics(response.data);
-        });
+        }).catch(error => console.log(error));
     }
     return (
         <ScrollView

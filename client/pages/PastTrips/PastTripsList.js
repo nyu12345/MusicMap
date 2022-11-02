@@ -16,7 +16,7 @@ export function PastTripsList() {
             console.log("Tried to get data");
             console.log(response.data);
             setRoadtrips(response.data);
-        });
+        }).catch(error => console.log(error));
     } else {
         console.log('printing'); 
     }

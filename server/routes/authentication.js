@@ -12,16 +12,16 @@ const router = express.Router();
 // }
 
 // initiate the spotify login
-router.get("/auth/spotify", passport.authenticate("spotify"), (req, res) => {
+router.get("/spotify", passport.authenticate("spotify"), (req, res) => {
   res.end();
 });
 
 // Spotify callback to finish logging in
 router.get(
-  "/auth/spotify/callback",
+  "/spotify/callback",
   passport.authenticate("spotify", {
-    failureRedirect: `${baseUrl}/auth/failed`, 
-    successRedirect: `${baseUrl}/testspotify`, 
+    failureRedirect: `${process.env.REACT_APP_BASE_URL}/auth/spotify`, 
+    successRedirect: `${process.env.REACT_APP_BASE_URL}`, 
   })
 );
 

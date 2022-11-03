@@ -1,52 +1,56 @@
-import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
-import React, { useCallback, useState, useMemo, useRef, useContext } from 'react';
-import axios from 'axios';
-import { REACT_APP_BASE_URL } from '@env'; 
+import React, { useState, useEffect } from "react";
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { Button } from 'react-native';
+import { REACT_APP_BASE_URL, CLIENT_ID } from "@env";
+
+WebBrowser.maybeCompleteAuthSession();
+
+// Endpoint
+const discovery = {
+  authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+  tokenEndpoint: 'https://accounts.spotify.com/api/token',
+};
 
 export function LoginScreen() {
-    const [user, setUser] = useState(''); 
-    const [username, setUsername] = useState('');
-  
-    function registerUser() {
-        axios.post(`${REACT_APP_BASE_URL}/users/`, {
-          name: user,
-          spotifyUsername: username,
-          friends: []
-        })
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+  const [token, setToken] = useState("");
+  console.log(makeRedirectUri({scheme: "MusicMap"})); 
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: CLIENT_ID, 
+      scopes: [
+        "user-read-private",
+        "user-read-email",
+        "playlist-read-private",
+        "playlist-read-collaborative",
+        "user-follow-read",
+        "user-read-currently-playing",
+        "user-top-read",
+      ],
+      // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
+      // this must be set to false
+      usePKCE: false,
+      redirectUri: makeRedirectUri({
+        scheme: "MusicMap", 
+      }),
+    },
+    discovery
+  );
+
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      const { access_token } = response.params;
+      setToken(access_token);
     }
+  }, [response]);
 
-    return (
-      <View style={styles.container}>
-        <TextInput styles = {styles.label} onChangeText={setUser} placeholder = 'Name: '/>
-        <TextInput styles = {styles.label} onChangeText={setUsername} placeholder = 'Username:' />
-        <Button styles = {styles.button} onPress = {registerUser} title = 'Submit'/>
-    </View>
-    );
-  }
-
-  const styles = StyleSheet.create({
-  label: {
-    color: 'white',
-    margin: 20,
-    marginLeft: 0,
-    backgroundColor: 'white',
-  },
-  button: {
-    marginTop: 40,
-    color: 'white',
-    height: 40,
-    backgroundColor: '#ec5990',
-    borderRadius: 4,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 8,
-  },
-});
+  return (
+    <Button
+      disabled={!request}
+      title="Login"
+      onPress={() => {
+        promptAsync({ useProxy: false });
+      }}
+    />
+  );
+}

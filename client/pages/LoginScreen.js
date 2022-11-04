@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import { Button } from 'react-native';
-import { REACT_APP_BASE_URL, CLIENT_ID, CLIENT_SECRET } from "@env";
+import { REACT_APP_BASE_URL, CLIENT_ID } from "@env";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -19,11 +20,18 @@ const discovery = {
 // API calls for your client and passes the data back.
 
 export function LoginScreen() {
-  const [token, setToken] = useState("");
+  const [authCode, setAuthCode] = useState("");
+  //const [userInfo, setUserInfo] = useState();
+
+  // need to move this somewhere else 
+  // async function setToken(value) {
+  //   await SecureStore.setItemAsync("AUTH_TOKEN", value);
+  // }
+
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: CLIENT_ID, 
-      clientSecret: CLIENT_SECRET, 
+      //clientSecret: CLIENT_SECRET, 
       scopes: [
         "user-read-private",
         "user-read-email",
@@ -42,18 +50,23 @@ export function LoginScreen() {
 
   React.useEffect(() => {
     if (response?.type === 'success') {
-      const { access_token } = response.params;
-      setToken(access_token);
+      // use authorization code to grab API access token
+      setAuthCode(response.params.code); 
+      console.log("success"); 
+      console.log("below is auth code: "); 
+      console.log(response.params.code); 
     }
   }, [response]);
 
   return (
-    <Button
-      disabled={!request}
-      title="Login"
-      onPress={() => {
-        promptAsync({ useProxy: false });
-      }}
-    />
+    <SafeAreaView>
+      <Button
+        disabled={!request}
+        title="Login"
+        onPress={() => {
+          promptAsync({ useProxy: false });
+        }}
+      />
+    </SafeAreaView>
   );
 }

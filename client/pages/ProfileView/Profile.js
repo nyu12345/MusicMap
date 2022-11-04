@@ -1,6 +1,6 @@
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 import React, { useCallback, useState, useMemo, useRef } from 'react';
-import {LoginScreen} from './Login'
+import {LoginScreen} from '../LoginScreen'
 import { FriendsScreen } from './FriendsView';
 import ExpoConstants from 'expo-constants'; 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';

@@ -1,8 +1,7 @@
 import MapView from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import * as TaskManager from "expo-task-manager";
+import { Text } from "react-native";
 import * as Location from "expo-location";
 
 export function HomeMap() {
@@ -14,7 +13,7 @@ export function HomeMap() {
   const LONGITUDE_DELTA = 0.0421;
 
   /**
-   * requests permission if needed and sets up initial location
+   * requests permission if needed
    */
   useEffect(() => {
     (async () => {
@@ -32,7 +31,7 @@ export function HomeMap() {
         } else {
           let location = await Location.getCurrentPositionAsync({
             accuracy: Location.Accuracy.Highest,
-            timeInterval: 2000,
+            timeInterval: 0,
             distanceInterval: 0,
           });
           if (location) {
@@ -47,11 +46,6 @@ export function HomeMap() {
    * @param {Location.LocationObject} newLocation the new location
    */
   const updateLocation = (newLocation) => {
-    if (currentLocation) {
-      console.log(
-          `dX: ${newLocation.coords.latitude - currentLocation.latitude}, dY: ${newLocation.coords.longitude - currentLocation.longitude}`
-          );
-    }
     setCurrentLocation({
       latitude: newLocation.coords.latitude,
       longitude: newLocation.coords.longitude,

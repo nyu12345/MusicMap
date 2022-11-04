@@ -1,44 +1,39 @@
-import * as React from 'react';
-import { Text, View } from 'react-native';
-import { HomeScreen } from './pages/Home/HomeScreen';
-import { PastTripsScreen } from './pages/PastTrips/PastTripsScreen';
-import { MemoriesScreen } from './pages/Memories';
-import { ProfileScreen } from './pages/ProfileView/Profile';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { LoginScreen } from 'musicmap/pages/LoginScreen'; 
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen'; 
+import { createStackNavigator } from '@react-navigation/stack';
+import * as SecureStore from 'expo-secure-store';
 
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default function App() {
+  const [initialRoute, setInitialRoute] = useState(""); 
+
+  useEffect(() => {
+    async function checkTokensAndSetNavigation() {
+      try {
+        // setItemAsync still needs to be implemented in the app
+        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+
+        if (token !== null) {
+          setInitialRoute("loggedin");
+        } else {
+          setInitialRoute("login");
+        }
+      } catch (error) {
+        setInitialRoute("login");
+      }
+    }
+    checkTokensAndSetNavigation();
+  }, []);
+
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
-            if (route.name === 'Home') {
-              iconName = focused ? 'ios-home' : 'ios-home-outline';
-            } else if (route.name === 'Past Trips') {
-              iconName = focused ? 'ios-list-circle' : 'ios-list-circle-outline';
-            } else if (route.name === 'Memories') {
-              iconName = focused ? 'eye-sharp' : 'eye-outline';
-            } else if (route.name === 'Profile') {
-              iconName = focused ? 'ios-person-circle-sharp' : 'ios-person-circle-outline';
-            }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: 'black',
-          tabBarInactiveTintColor: 'gray',
-        })}
-      >
-        <Tab.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
-        <Tab.Screen options={{ headerShown: false }} name="Past Trips" component={PastTripsScreen} />
-        <Tab.Screen options={{ headerShown: false }} name="Memories" component={MemoriesScreen} />
-        <Tab.Screen options={{ headerShown: false }} name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
+      <Stack.Navigator initialRouteName={"login"}>
+        <Stack.Screen options={{ headerShown: false }} name="login" component={LoginScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="loggedin" component={LoggedInScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 } 

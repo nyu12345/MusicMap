@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import { Button } from 'react-native';
-import { REACT_APP_BASE_URL, CLIENT_ID } from "@env";
+import { REACT_APP_BASE_URL, CLIENT_ID, CLIENT_SECRET } from "@env";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -12,12 +12,18 @@ const discovery = {
   tokenEndpoint: 'https://accounts.spotify.com/api/token',
 };
 
+// NOTE (WARNING): 
+// read "Security Considerations" in https://docs.expo.dev/versions/latest/sdk/auth-session/#it-makes-redirect-url-allowlists-easier-to
+// Never put any secret keys inside of your app, there is no secure way to do this! 
+// Instead, you should store your secret key(s) on a server and expose an endpoint that makes 
+// API calls for your client and passes the data back.
+
 export function LoginScreen() {
   const [token, setToken] = useState("");
-  console.log(makeRedirectUri({scheme: "MusicMap"})); 
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: CLIENT_ID, 
+      clientSecret: CLIENT_SECRET, 
       scopes: [
         "user-read-private",
         "user-read-email",
@@ -27,12 +33,9 @@ export function LoginScreen() {
         "user-read-currently-playing",
         "user-top-read",
       ],
-      // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
-      // this must be set to false
-      usePKCE: false,
       redirectUri: makeRedirectUri({
-        scheme: "MusicMap", 
-      }),
+        useProxy: false, 
+      })
     },
     discovery
   );

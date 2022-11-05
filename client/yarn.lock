@@ -3209,7 +3209,7 @@
     "@expo/config" "~7.0.0"
     "uuid" "^3.3.2"
 
-"expo-crypto@~11.0.0":
+"expo-crypto@^11.0.0", "expo-crypto@~11.0.0":
   "integrity" "sha512-EH1Ikcy/HxfLJpo+zVRic4Igl6AovZEksAheKfeM2u+2TfL3FEBiQo+cGkuIa8NQ9ui3xYqQcyMk+IIZ6AO0Xg=="
   "resolved" "https://registry.npmjs.org/expo-crypto/-/expo-crypto-11.0.0.tgz"
   "version" "11.0.0"

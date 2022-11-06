@@ -3,7 +3,7 @@ import { LoginScreen } from 'musicmap/pages/LoginScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen'; 
 import { createStackNavigator } from '@react-navigation/stack';
-import * as SecureStore from 'expo-secure-store';
+import { save, getValueFor } from "musicmap/SecureStore"; 
 
 const Stack = createStackNavigator();
 
@@ -14,9 +14,11 @@ export default function App() {
     async function checkTokensAndSetNavigation() {
       try {
         // setItemAsync still needs to be implemented in the app
-        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        const token = await getValueFor("ACCESS_TOKEN");
+        console.log("token: " + token); 
 
         if (token !== null) {
+          console.log('inside token != null'); 
           setInitialRoute("loggedin");
         } else {
           setInitialRoute("login");
@@ -27,6 +29,8 @@ export default function App() {
     }
     checkTokensAndSetNavigation();
   }, []);
+
+  console.log("initialRoute: " + initialRoute)
 
   return (
     <NavigationContainer>

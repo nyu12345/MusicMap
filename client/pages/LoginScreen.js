@@ -6,6 +6,7 @@ import { Buffer } from "buffer";
 import queryString from 'query-string'
 import { REACT_APP_BASE_URL, CLIENT_ID, CLIENT_SECRET } from "@env";
 import axios from "axios";
+import { save, getValueFor } from "musicmap/SecureStore"; 
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -47,8 +48,7 @@ export function LoginScreen() {
   );
 
   // get Spotify API access token using authorization code
-  async function getToken() {
-    
+  async function getAccessToken() {
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
@@ -67,20 +67,65 @@ export function LoginScreen() {
       access_token: accessToken,
       refresh_token: refreshToken,
       expires_in: expiresIn,
-    } = responseJson;
+    } = await responseJson;
 
-    const expirationTime = new Date().getTime() + expiresIn * 1000;
-    console.log(accessToken); 
-    console.log(refreshToken); 
-    console.log(expiresIn); 
-    console.log(expirationTime); 
+    const expirationTime = await (new Date().getTime() + expiresIn * 1000).toString();
+    // console.log("access token: " + typeof(accessToken) + " " + accessToken); 
+    // console.log("refresh token: " + typeof(refreshToken) + " " + refreshToken); 
+    // console.log("expiration time: " + typeof(expirationTime) + " " + expirationTime); 
+
+    await save("ACCESS_TOKEN", accessToken); 
+    await save("REFRESH_TOKEN", refreshToken); 
+    await save("EXPIRATION_TIME", expirationTime); 
+
+    const secureStoreToken = getValueFor("ACCESS_TOKEN"); 
+    console.log("secureStoreToken: " + secureStoreToken); 
   }
 
+  // async function getRefreshTokens() {
+  //   try {
+  //     const credentials = await getSpotifyCredentials() //we wrote this function above
+  //     const credsB64 = btoa(`${credentials.clientId}:${credentials.clientSecret}`);
+  //     const refreshToken = await getUserData('refreshToken');
+  //     const response = await fetch('https://accounts.spotify.com/api/token', {
+  //       method: 'POST',
+  //       headers: {
+  //         Authorization: `Basic ${credsB64}`,
+  //         'Content-Type': 'application/x-www-form-urlencoded',
+  //       },
+  //       body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
+  //     });
+  //     const responseJson = await response.json();
+  //     if (responseJson.error) {
+  //       await getTokens();
+  //     } else {
+  //       const {
+  //         access_token: newAccessToken,
+  //         refresh_token: newRefreshToken,
+  //         expires_in: expiresIn,
+  //       } = responseJson;
+  
+  //       const expirationTime = new Date().getTime() + expiresIn * 1000;
+  //       await setUserData('accessToken', newAccessToken);
+  //       if (newRefreshToken) {
+  //         await setUserData('refreshToken', newRefreshToken);
+  //       }
+  //       await setUserData('expirationTime', expirationTime);
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  // }
+
   useEffect(() => {
+    console.log("below is auth response: "); 
+    console.log(response); 
     if (response?.type === "success") {
+      console.log("setting auth code"); 
       setAuthCode(response.params.code);
-      getToken(); 
-    } 
+    }
+    if (authCode !== "") {
+      getAccessToken(); 
+    }
   });
 
   return (

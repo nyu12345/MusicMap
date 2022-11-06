@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as WebBrowser from "expo-web-browser";
-import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import { makeRedirectUri, useAuthRequest, startAsync } from "expo-auth-session";
 import { Button, SafeAreaView } from "react-native";
 import { Buffer } from "buffer";
 import queryString from 'query-string'
@@ -17,7 +17,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 export function LoginScreen() {
   const [authCode, setAuthCode] = useState("");
-  
 
   // need to move this somewhere else
   // async function setToken(value) {
@@ -47,119 +46,42 @@ export function LoginScreen() {
     }
   );
 
-  useEffect(() => {
-    //generateCodeVerifier();
-    if (response?.type === "success") {
-      setAuthCode(response.params.code);
-      console.log("success");
-      console.log(response.params);
-      const tokenResponse = getToken(authCode);
-      console.log("response: "); 
-      console.log(tokenResponse); 
-      // console.log("token response: ");
-      // console.log()
-    }
-  }, [response]);
-
-  // const getTokens = async (authCode) => {
-  //   try {
-  //     //const credentials = await getSpotifyCredentials() //we wrote this function above (could also run this outside of the functions and store the credentials in local scope)
-  //     const credsB64 = new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')
-  //     const response = await fetch('https://accounts.spotify.com/api/token', {
-  //       method: 'POST',
-  //       headers: {
-  //         Authorization: `Basic ${credsB64}`,
-  //         'Content-Type': 'application/x-www-form-urlencoded',
-  //       },
-  //       body: `grant_type=authorization_code&code=${authCode}&redirect_uri=${
-  //         redirectUri
-  //       }`,
-  //     });
-  //     const responseJson = await response.json();
-  //     // destructure the response and rename the properties to be in camelCase to satisfy my linter ;)
-  //     const {
-  //       access_token: accessToken,
-  //       refresh_token: refreshToken,
-  //       expires_in: expiresIn,
-  //     } = responseJson;
-
-  //     const expirationTime = new Date().getTime() + expiresIn * 1000;
-  //     console.log(responseJson);
-  //     // await setUserData('accessToken', accessToken);
-  //     // await setUserData('refreshToken', refreshToken);
-  //     // await setUserData('expirationTime', expirationTime);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }
-
   // get Spotify API access token using authorization code
-  const getToken = (authCode) => {
-    axios({
-      method: 'post',
-      url: 'https://accounts.spotify.com/api/token',
-      data: queryString.stringify({
-        grant_type: 'authorization_code',
-        code: authCode,
-        redirect_uri: makeRedirectUri({
+  async function getToken() {
+    
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `grant_type=authorization_code&code=${authCode}&redirect_uri=${
+        makeRedirectUri({
           useProxy: false,
         })
-      }),
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-      },
-    }).then(function(response) {
-        console.log(response);
-    }).catch(function(error) {
-      console.log(error); 
+      }`,
     });
 
-    // axios(`https://accounts.spotify.com/api/token`, {
-    //   method: "POST", 
-    //   headers: {
-    //     Authorization: "Basic " + new Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
-    //     "Content-Type": "application/x-www-form-urlencoded",
-    //   }, 
-    //   data: qs.stringify({
-    //     grant_type: "authorization_code", 
-    //     code: authCode, 
-    //     redirect_uri: makeRedirectUri({
-    //       useProxy: false, 
-    //     }), 
-    //   }), 
-    // }).then((response) => {
-    //   console.log("here is the response: "); 
-    //   console.log(response); 
-    // }).catch((error) => {
-    //   console.log("Here is the error: "); 
-    //   console.log(error); 
-    // })
-    // axios
-    //   .post(
-    //     "https://accounts.spotify.com/api/token",
-    //     qs.stringify({
-    //       grant_type: "authorization_code",
-    //       code: authCode,
-    //       redirect_uri: makeRedirectUri({
-    //         useProxy: false,
-    //       }),
-    //     }),
-    //     {
-    //       headers: {
-    //         "Authorization": 
-    //         "Authorization": "Basic " + new Buffer(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
-    //         "Content-Type": "application/x-www-form-urlencoded",
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     return response; 
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.response);
-    //   });
-  };
+    const responseJson = await response.json(); 
+    const {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: expiresIn,
+    } = responseJson;
+
+    const expirationTime = new Date().getTime() + expiresIn * 1000;
+    console.log(accessToken); 
+    console.log(refreshToken); 
+    console.log(expiresIn); 
+    console.log(expirationTime); 
+  }
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      setAuthCode(response.params.code);
+      getToken(); 
+    } 
+  });
 
   return (
     <SafeAreaView>

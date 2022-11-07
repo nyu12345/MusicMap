@@ -7,6 +7,7 @@ import queryString from 'query-string'
 import { REACT_APP_BASE_URL, CLIENT_ID, CLIENT_SECRET } from "@env";
 import axios from "axios";
 import { save, getValueFor } from "musicmap/SecureStore"; 
+//import { useNavigation } from '@react-navigation/native';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -16,13 +17,19 @@ WebBrowser.maybeCompleteAuthSession();
 // Instead, you should store your secret key(s) on a server and expose an endpoint that makes
 // API calls for your client and passes the data back.
 
-export function LoginScreen() {
+const LoginScreen = props => {
   const [authCode, setAuthCode] = useState("");
+  //const navigation = useNavigation();
 
   // need to move this somewhere else
   // async function setToken(value) {
   //   await SecureStore.setItemAsync("AUTH_TOKEN", value);
   // }
+
+  const checkLoginState = async() => {
+    const accessToken = await getValueFor("ACCESS_TOKEN"); 
+    props.navigation.navigate(accessToken ? "loggedin" : "login"); 
+  }
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -126,6 +133,7 @@ export function LoginScreen() {
     if (authCode !== "") {
       getAccessToken(); 
     }
+    checkLoginState(); 
   });
 
   return (
@@ -140,3 +148,9 @@ export function LoginScreen() {
     </SafeAreaView>
   );
 }
+
+LoginScreen.navigationOptions = {
+  title: "Log In"
+}; 
+
+export default LoginScreen; 

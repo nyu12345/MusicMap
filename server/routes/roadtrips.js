@@ -43,9 +43,9 @@ router.patch("/update-roadtrip/:id", (req, res) => {
   Roadtrip.findByIdAndUpdate(req.params.id, {
     name: req.body.name,
     startLocation: req.body.startLocation,
-    destination: req.body.destination,
+    destination: 'sdf',
     startDate: req.body.startDate,
-    endDate: req.body.endDate,
+    endDate: 'sdfs',
   }).then((doc) => {
     res.status(200).json(doc);
   }).catch((err) => {

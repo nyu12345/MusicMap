@@ -14,16 +14,14 @@ import styles from "./HomeStyles";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";
+import * as Location from "expo-location";
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [roadtripName, setRoadtripName] = useState("");
-  const [roadtripStartLocation, setRoadtripStartLocation] = useState("");
-  const [roadtripDestination, setRoadTripDestination] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState({});
+  const [currentLocation, setCurrentLocation] = useState(null);
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
@@ -48,14 +46,12 @@ export function HomeScreen() {
 
   const createHandler = () => {
     console.log(
-      `name: ${roadtripName}, start: ${roadtripStartLocation}, end: ${roadtripDestination}`
+      `name: ${roadtripName}`
     );
     const roadtrip = {
       name: roadtripName,
-      startLocation: roadtripStartLocation,
-      destination: roadtripDestination,
-      startDate: startDate,
-      endDate: endDate,
+      startLocation: currentLocation.name,
+      startDate: new Date().toDateString(),
     };
     // should add check to see if these fields are valid here and present alert if not
     axios
@@ -103,9 +99,26 @@ export function HomeScreen() {
       });
   };
 
+  // map size parameters
+  const LATITUDE_DELTA = 0.0922;
+  const LONGITUDE_DELTA = 0.0421;
+  /**
+   * update's the current location of the user
+   * @param {Location.LocationObject} newLocation the new location
+   */
+  const updateLocationHandler = (newLocation, regionName) => {
+    setCurrentLocation({
+      latitude: newLocation.coords.latitude,
+      longitude: newLocation.coords.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+      name: regionName[0]["city"] + ', ' + regionName[0]["region"],
+    });
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <HomeMap></HomeMap>
+      <HomeMap updateLocationHandler={updateLocationHandler} currentLocation={currentLocation} />
       <Modal
         animationType="slide"
         transparent={true}
@@ -123,30 +136,6 @@ export function HomeScreen() {
                 style={styles.modalTextInput}
                 onChangeText={(name) => setRoadtripName(name)}
               />
-              <Text style={styles.modalText}>Start Location</Text>
-              <TextInput
-                style={styles.modalTextInput}
-                onChangeText={(startLocation) =>
-                  setRoadtripStartLocation(startLocation)
-                }
-              />
-              <Text style={styles.modalText}>Destination</Text>
-              <TextInput
-                style={styles.modalTextInput}
-                onChangeText={(destination) =>
-                  setRoadTripDestination(destination)
-                }
-              />
-              <Text style={styles.modalText}>Start Date</Text>
-              <TextInput
-                style={styles.modalTextInput}
-                onChangeText={(startDate) => setStartDate(startDate)}
-              />
-              <Text style={styles.modalText}>End Date</Text>
-              <TextInput
-                style={styles.modalTextInput}
-                onChangeText={(endDate) => setEndDate(endDate)}
-              />
             </SafeAreaView>
             <View style={[styles.formButtonContainer]}>
               <Pressable
@@ -162,33 +151,39 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
-      {buttonIsStartRoadtrip ? (
-        <Pressable
-          style={styles.startButton}
-          onPress={startRoadtripClickHandler}
-        >
-          <Text title="Start Roadtrip" style={styles.text}>
-            {START_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
-      ) : null}
-      {!buttonIsStartRoadtrip ? (
-        <Pressable style={styles.startButton} onPress={endRoadtripClickHandler}>
-          <Text title="End Roadtrip" style={styles.text}>
-            {END_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
-      ) : null}
-      {!buttonIsStartRoadtrip ? (
-        <Pressable
-          style={styles.cancelRoadtripButton}
-          onPress={cancelRoadtripClickHandler}
-        >
-          <Text title="Cancel Roadtrip" style={styles.text}>
-            {CANCEL_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
-      ) : null}
-    </View>
+      {
+        buttonIsStartRoadtrip ? (
+          <Pressable
+            style={styles.startButton}
+            onPress={startRoadtripClickHandler}
+          >
+            <Text title="Start Roadtrip" style={styles.text}>
+              {START_ROADTRIP_BUTTON_TEXT}
+            </Text>
+          </Pressable>
+        ) : null
+      }
+      {
+        !buttonIsStartRoadtrip ? (
+          <Pressable style={styles.startButton} onPress={endRoadtripClickHandler}>
+            <Text title="End Roadtrip" style={styles.text}>
+              {END_ROADTRIP_BUTTON_TEXT}
+            </Text>
+          </Pressable>
+        ) : null
+      }
+      {
+        !buttonIsStartRoadtrip ? (
+          <Pressable
+            style={styles.cancelRoadtripButton}
+            onPress={cancelRoadtripClickHandler}
+          >
+            <Text title="Cancel Roadtrip" style={styles.text}>
+              {CANCEL_ROADTRIP_BUTTON_TEXT}
+            </Text>
+          </Pressable>
+        ) : null
+      }
+    </View >
   );
 }

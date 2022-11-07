@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LoginScreen } from 'musicmap/pages/LoginScreen'; 
+import LoginScreen from 'musicmap/pages/LoginScreen'; 
 import { NavigationContainer } from '@react-navigation/native';
 import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen'; 
 import { createStackNavigator } from '@react-navigation/stack';
@@ -34,7 +34,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={"login"}>
+      <Stack.Navigator initialRouteName={"Login"}>
         <Stack.Screen options={{ headerShown: false }} name="login" component={LoginScreen} />
         <Stack.Screen options={{ headerShown: false }} name="loggedin" component={LoggedInScreen} />
       </Stack.Navigator>

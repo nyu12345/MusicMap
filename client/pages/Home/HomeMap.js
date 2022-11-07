@@ -1,17 +1,11 @@
 import MapView from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import * as TaskManager from "expo-task-manager";
+import { Text } from "react-native";
 import * as Location from "expo-location";
 
-export function HomeMap() {
-  const [currentLocation, setCurrentLocation] = useState(null);
+export function HomeMap({ updateLocationHandler, currentLocation }) {
   const [permissionStatus, setStatus] = useState(null);
-
-  // map size parameters
-  const LATITUDE_DELTA = 0.0922;
-  const LONGITUDE_DELTA = 0.0421;
 
   /**
    * requests permission if needed and sets up initial location
@@ -27,38 +21,23 @@ export function HomeMap() {
     (async () => {
       if (permissionStatus == null) return;
       if (!permissionStatus.granted) {
-          console.log("Permission to access location was denied");
-          return;
-        } else {
-          let location = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Highest,
-            timeInterval: 2000,
-            distanceInterval: 0,
-          });
-          if (location) {
-            updateLocation(location);
+        console.log("Permission to access location was denied");
+        return;
+      } else {
+        let location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest,
+          timeInterval: 2000,
+          distanceInterval: 0,
+        });
+        if (location) {
+          let regionName = await Location.reverseGeocodeAsync({ longitude: location.coords.longitude, latitude: location.coords.latitude });
+          if (regionName) {
+            updateLocationHandler(location, regionName);
           }
         }
+      }
     })()
   });
-
-  /**
-   * update's the current location of the user
-   * @param {Location.LocationObject} newLocation the new location
-   */
-  const updateLocation = (newLocation) => {
-    if (currentLocation) {
-      console.log(
-          `dX: ${newLocation.coords.latitude - currentLocation.latitude}, dY: ${newLocation.coords.longitude - currentLocation.longitude}`
-          );
-    }
-    setCurrentLocation({
-      latitude: newLocation.coords.latitude,
-      longitude: newLocation.coords.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    });
-  };
 
   return (
     <>
@@ -69,8 +48,8 @@ export function HomeMap() {
       ></MapView>
       <Text style={styles.modalText}>{
         currentLocation
-        ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude})`
-        : "Retrieving your location..."
+          ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude}) \n ${currentLocation.name}`
+          : "Retrieving your location..."
       }</Text>
     </>
   );

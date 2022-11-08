@@ -6,7 +6,12 @@ import * as Location from "expo-location";
 
 export function HomeMap({ updateLocationHandler, currentLocation }) {
   const [permissionStatus, setStatus] = useState(null);
-
+  const [songLocations, setSongLocations] = useState([]);
+  const [currentSong, setCurrentSong] = useState({
+    image: "musicmap/assets/lazyfair.jpg",
+    title: "Sour Patch Kids",
+    artist: "Bryce Vine"
+  });
   /**
    * requests permission if needed
    */
@@ -39,6 +44,15 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
     })()
   });
 
+  const addSongLocation = () => {
+    setSongLocations((prevSongLocations) => {
+        const newSongLocations = Array.from(prevSongLocations);
+        newSongLocations.push(currentSong);
+        return newSongLocations;
+      }
+    );
+  }
+
   return (
     <>
       <MapView
@@ -55,9 +69,9 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
           >
             <Callout>
               <Image style={{ alignSelf: 'center', width: 50, height: 50 }}
-                source={require('musicmap/assets/lazyfair.jpg')} />
-              <Text style={{ textAlign: 'center' }}>Sour Patch Kids</Text>
-              <Text style={{ textAlign: 'center' }}>Bryce Vine</Text>
+                source={require(currentSong.image)} />
+              <Text style={{ textAlign: 'center' }}>currentSong.title</Text>
+              <Text style={{ textAlign: 'center' }}>currentSong.artist</Text>
             </Callout>
           </Marker>
         )

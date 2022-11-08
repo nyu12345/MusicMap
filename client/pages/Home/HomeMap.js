@@ -6,7 +6,7 @@ import * as Location from "expo-location";
 
 export function HomeMap({ updateLocationHandler, currentLocation }) {
   const [permissionStatus, setStatus] = useState(null);
-  const [offset, incrementOffset] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [songLocations, setSongLocations] = useState([]);
 
   /**
@@ -45,6 +45,9 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
   });
 
   const addPinHandler = () => {
+    if (currentLocation == null) {
+      return;
+    }
     const currentSongLocation = {
       source: require("musicmap/assets/lazyfair.jpg"),
       title: "Sour Patch Kids",
@@ -61,7 +64,12 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
       ...prevSongLocations,
       currentSongLocation,
     ]);
-    incrementOffset((prevOffset) => prevOffset + 0.01);
+    setOffset((prevOffset) => prevOffset + 0.005);
+  };
+
+  const clearPinsHandler = () => {
+    setSongLocations([]);
+    setOffset(0);
   };
 
   return (
@@ -98,6 +106,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
           : "Retrieving your location..."}
       </Text>
       <Button onPress={addPinHandler} title="ADD PIN" color="#841584" />
+      <Button onPress={clearPinsHandler} title="CLEAR PINS" color="#841584" />
     </>
   );
 }

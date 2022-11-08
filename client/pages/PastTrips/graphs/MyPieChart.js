@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo, useRef } from 'react';
-import { Dimensions, Text, View, StyleSheet } from 'react-native';
+import { Dimensions, Text, View, StyleSheet, SafeAreaView } from 'react-native';
 import { REACT_APP_BASE_URL } from '@env';
 import axios from 'axios';
 import {
@@ -15,7 +15,8 @@ export function MyPieChart() {
     const base_url = `${REACT_APP_BASE_URL}/users/`;
     const [roadtrips, setRoadtrips] = useState([]);
     const randColor = () =>  {
-        return "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0').toUpperCase();
+        console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
+        return "#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase();
     }
 
     // get roadtrip data from API
@@ -46,8 +47,8 @@ export function MyPieChart() {
 
 
     return (
-        <View>
-            <Text>Start Locations</Text>
+        <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{fontWeight: "bold"}}>Start Locations</Text>
             <PieChart
                 data={datab}
                 width={Dimensions.get("window").width}
@@ -56,7 +57,7 @@ export function MyPieChart() {
                 accessor={"num"}
                 backgroundColor={"transparent"}
             />
-        </View>
+        </SafeAreaView>
         // <View>
         //     <Text>Bezier Line Chart</Text>
         //     <LineChart

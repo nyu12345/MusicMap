@@ -15,7 +15,7 @@ export function MyPieChart() {
     const base_url = `${REACT_APP_BASE_URL}/users/`;
     const [roadtrips, setRoadtrips] = useState([]);
     const randColor = () =>  {
-        console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
+        //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
         return "#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase();
     }
 

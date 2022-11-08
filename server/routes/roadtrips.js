@@ -41,11 +41,8 @@ router.post("/create-roadtrip", async (req, res, next) => {
 router.patch("/update-roadtrip/:id", (req, res) => {
   console.log("Updating roadtrip");
   Roadtrip.findByIdAndUpdate(req.params.id, {
-    name: req.body.name,
-    startLocation: req.body.startLocation,
-    destination: 'sdf',
-    startDate: req.body.startDate,
-    endDate: 'sdfs',
+    destination: req.body.destination,
+    endDate: req.body.endDate,
   }).then((doc) => {
     res.status(200).json(doc);
   }).catch((err) => {

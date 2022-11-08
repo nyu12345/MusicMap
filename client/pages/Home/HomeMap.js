@@ -30,29 +30,14 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
           distanceInterval: 0,
         });
         if (location) {
-          updateLocation(location);
+          let regionName = await Location.reverseGeocodeAsync({ longitude: location.coords.longitude, latitude: location.coords.latitude });
+          if (regionName) {
+            updateLocationHandler(location, regionName);
+          }
         }
       }
     })()
   });
-
-  /**
-   * update's the current location of the user
-   * @param {Location.LocationObject} newLocation the new location
-   */
-  const updateLocation = (newLocation) => {
-    if (currentLocation) {
-      console.log(
-        `dX: ${newLocation.coords.latitude - currentLocation.latitude}, dY: ${newLocation.coords.longitude - currentLocation.longitude}`
-      );
-    }
-    setCurrentLocation({
-      latitude: newLocation.coords.latitude,
-      longitude: newLocation.coords.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    });
-  };
 
   return (
     <>

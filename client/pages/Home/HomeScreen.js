@@ -32,6 +32,7 @@ export function HomeScreen() {
 
   const endRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
+    updateRoadtrip();
   };
 
   const cancelRoadtripClickHandler = () => {
@@ -98,6 +99,32 @@ export function HomeScreen() {
         console.log(error.config);
       });
   };
+
+  const updateRoadtrip = () => {
+    const endDetails = {
+      destination: currentLocation.name,
+      endDate: new Date().toDateString(),
+    };
+    axios
+      .patch(
+        `${REACT_APP_BASE_URL}/roadtrips/update-roadtrip/${currentRoadTripData.createdReview._id}`, endDetails
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  }
 
   // map size parameters
   const LATITUDE_DELTA = 0.0922;

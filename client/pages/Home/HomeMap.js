@@ -28,7 +28,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
       } else {
         let location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Highest,
-          timeInterval: 2000,
+          timeInterval: 10000,
           distanceInterval: 0,
         });
         if (location) {

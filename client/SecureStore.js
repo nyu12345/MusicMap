@@ -20,3 +20,7 @@ export async function deleteValue(key) {
         console.log(err); 
     })
 }
+
+export async function isAvailable() {
+    return SecureStore.isAvailableAsync(); 
+}

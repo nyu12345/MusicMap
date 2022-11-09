@@ -12,7 +12,7 @@ import {
 import React, { useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import { save, getValueFor, deleteValue } from "musicmap/SecureStore"; 
+import { save, getValueFor, deleteValue, isAvailable } from "musicmap/SecureStore"; 
 
 const ProfileScreen = (props) => {
   const [username, setUsername] = useState("");
@@ -48,8 +48,6 @@ const ProfileScreen = (props) => {
           setFriends(["You have no friends!"]);
         }
       });
-  } else {
-    console.log("printing");
   }
 
   const submitForm = async (e) => {
@@ -68,15 +66,16 @@ const ProfileScreen = (props) => {
     }
   };
 
-  const logOut = () => {
+  const logOut = async() => {
     // remove token and navigate to login screen
-    deleteValue("ACCESS_TOKEN").then(
-      deleteValue("REFRESH_TOKEN").then(
-        deleteValue("EXPIRATION_TIME").then(
-          props.navigation.navigate("login")
-        )
-      )
-    ); 
+    console.log(isAvailable()); 
+    await deleteValue("ACCESS_TOKEN"); 
+    await deleteValue("REFRESH_TOKEN"); 
+    await deleteValue("EXPIRATION_TIME"); 
+    const accessToken = await getValueFor("ACCESS_TOKEN"); 
+    const refreshToken = await getValueFor("REFRESH_TOKEN"); 
+    const expirationTime = await getValueFor("EXPIRATION_TIME"); 
+    props.navigation.navigate("login"); 
   }
 
   return (

@@ -3,11 +3,9 @@ import * as WebBrowser from "expo-web-browser";
 import { makeRedirectUri, useAuthRequest, startAsync } from "expo-auth-session";
 import { Button, SafeAreaView } from "react-native";
 import { Buffer } from "buffer";
-import queryString from 'query-string'
 import { REACT_APP_BASE_URL, CLIENT_ID, CLIENT_SECRET } from "@env";
 import axios from "axios";
-import { save, getValueFor } from "musicmap/SecureStore"; 
-//import { useNavigation } from '@react-navigation/native';
+import { save, getValueFor, isAvailable } from "musicmap/SecureStore"; 
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -47,6 +45,7 @@ const LoginScreen = props => {
       redirectUri: makeRedirectUri({
         useProxy: false,
       }), 
+      show_dialog: true, 
     },
     {
       authorizationEndpoint: "https://accounts.spotify.com/authorize",
@@ -70,6 +69,8 @@ const LoginScreen = props => {
     });
 
     const responseJson = await response.json(); 
+    console.log("access token fetch response: "); 
+    console.log(responseJson); 
     const {
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -77,16 +78,13 @@ const LoginScreen = props => {
     } = await responseJson;
 
     const expirationTime = await (new Date().getTime() + expiresIn * 1000).toString();
-    // console.log("access token: " + typeof(accessToken) + " " + accessToken); 
-    // console.log("refresh token: " + typeof(refreshToken) + " " + refreshToken); 
-    // console.log("expiration time: " + typeof(expirationTime) + " " + expirationTime); 
 
     await save("ACCESS_TOKEN", accessToken); 
     await save("REFRESH_TOKEN", refreshToken); 
     await save("EXPIRATION_TIME", expirationTime); 
 
     const secureStoreToken = getValueFor("ACCESS_TOKEN"); 
-    console.log("secureStoreToken: " + secureStoreToken); 
+    props.navigation.navigate(accessToken ? "loggedin" : "login"); 
   }
 
   // async function getRefreshTokens() {
@@ -124,16 +122,17 @@ const LoginScreen = props => {
   // }
 
   useEffect(() => {
-    console.log("below is auth response: "); 
-    console.log(response); 
     if (response?.type === "success") {
       console.log("setting auth code"); 
+      console.log(response); 
       setAuthCode(response.params.code);
     }
     if (authCode !== "") {
-      getAccessToken(); 
+      getAccessToken();  
     }
-    checkLoginState(); 
+    // if (getValueFor("ACCESS_TOKEN") !== null) {
+    //   checkLoginState();
+    // }
   });
 
   return (

@@ -18,9 +18,9 @@ export function PastTripsList() {
     axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
       console.log(response.data);
       setRoadtrips(response.data);
+    }).catch((err) => {
+      console.log(err); 
     });
-  } else {
-    console.log("printing");
   }
 
   const bottomSheetRef = useRef(null);

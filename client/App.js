@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen'; 
 import { createStackNavigator } from '@react-navigation/stack';
 import { save, getValueFor } from "musicmap/SecureStore"; 
+//import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
 const Stack = createStackNavigator();
 
@@ -15,29 +17,35 @@ export default function App() {
       try {
         // setItemAsync still needs to be implemented in the app
         const token = await getValueFor("ACCESS_TOKEN");
-        console.log("token: " + token); 
+        console.log("in App level"); 
+        console.log(token); 
 
-        if (token !== null) {
-          console.log('inside token != null'); 
+        if (token !== undefined) {
+          console.log('non-null token, set route to loggedin'); 
           setInitialRoute("loggedin");
         } else {
+          console.log('null token, set route to login'); 
           setInitialRoute("login");
         }
       } catch (error) {
         setInitialRoute("login");
       }
+
+      // if (initialRoute === "loggedin") {
+      //   props.navigation.navigate("loggedin"); 
+      // }
     }
-    checkTokensAndSetNavigation();
-  }, []);
+    checkTokensAndSetNavigation();  
+  }); 
 
   console.log("initialRoute: " + initialRoute)
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={"Login"}>
+      <Stack.Navigator initialRouteName={"login"}>
         <Stack.Screen options={{ headerShown: false }} name="login" component={LoginScreen} />
         <Stack.Screen options={{ headerShown: false }} name="loggedin" component={LoggedInScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-} 
+}

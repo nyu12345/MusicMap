@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
-import { MyPieChart } from "./graphs/MyPieChart";
 import {
   LineChart,
   BarChart,
@@ -20,8 +19,10 @@ import {
   ContributionGraph,
   StackedBarChart,
 } from "react-native-chart-kit";
+import { MyProgressRing } from "./graphs/MyProgressRing";
+import { MyPieChart } from "./graphs/MyPieChart";
 
-export function StatisticsGraphs({myStatistics, myRoadtrips}) {
+export function StatisticsGraphs({myStatistics, myRoadtrips, fadeAnim}) {
     const[search, onChangeSearch] = React.useState("");
     return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     {/* <TextInput
@@ -44,7 +45,8 @@ export function StatisticsGraphs({myStatistics, myRoadtrips}) {
         )
       )
     )} */}
-    <MyPieChart roadtrips={myRoadtrips}/>
+    <MyProgressRing fadeAnim={fadeAnim}/>
+    <MyPieChart roadtrips={myRoadtrips} fadeAnim={fadeAnim}/>
   </View>);
 }
 

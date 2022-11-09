@@ -3,6 +3,7 @@ import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
 import { Text, Image, Button } from "react-native";
 import * as Location from "expo-location";
+import { getValueFor } from "../../SecureStore";
 
 export function HomeMap({ updateLocationHandler, currentLocation }) {
   const [permissionStatus, setStatus] = useState(null);
@@ -43,6 +44,27 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
       }
     })();
   });
+
+  const getSongHandler = async () => {
+    let access_token = await getValueFor("ACCESS_TOKEN");
+    const response = await fetch(
+      "https://api.spotify.com/v1/me/player/currently-playing",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+    const responseJson = await response.json();
+    console.log(responseJson.item.name);
+    console.log(responseJson.item.album.images[0].url);
+    console.log(responseJson.item.artists[0].name);
+  };
+
+  // useEffect(() => {
+
+  // });
 
   const addPinHandler = () => {
     if (currentLocation == null) {
@@ -113,6 +135,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
       </Text>
       <Button onPress={addPinHandler} title="ADD PIN" color="#841584" />
       <Button onPress={clearPinsHandler} title="CLEAR PINS" color="#841584" />
+      <Button onPress={getSongHandler} title="GET SONG" color="#841584" />
     </>
   );
 }

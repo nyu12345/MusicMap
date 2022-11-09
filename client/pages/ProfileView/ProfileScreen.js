@@ -13,6 +13,7 @@ import React, { useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import { save, getValueFor, deleteValue, isAvailable } from "musicmap/SecureStore"; 
+import { Linking, Networking } from "react-native";
 
 const ProfileScreen = (props) => {
   const [username, setUsername] = useState("");
@@ -76,6 +77,9 @@ const ProfileScreen = (props) => {
     const accessToken = await getValueFor("ACCESS_TOKEN"); 
     const refreshToken = await getValueFor("REFRESH_TOKEN"); 
     const expirationTime = await getValueFor("EXPIRATION_TIME"); 
+    Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects? 
+    Networking.clearCookies(() => {});
+
     props.navigation.navigate("login"); 
   }
 

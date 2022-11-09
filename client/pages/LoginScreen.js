@@ -16,7 +16,7 @@ WebBrowser.maybeCompleteAuthSession();
 // API calls for your client and passes the data back.
 
 const LoginScreen = props => {
-  const [authCode, setAuthCode] = useState(null);
+  const [authCode, setAuthCode] = useState("");
   //const navigation = useNavigation();
 
   // need to move this somewhere else
@@ -45,7 +45,7 @@ const LoginScreen = props => {
       redirectUri: makeRedirectUri({
         useProxy: false,
       }),  
-      show_dialog: true, 
+      //show_dialog: true, 
     },
     {
       authorizationEndpoint: "https://accounts.spotify.com/authorize",
@@ -85,12 +85,12 @@ const LoginScreen = props => {
     await save("REFRESH_TOKEN", refreshToken); 
     await save("EXPIRATION_TIME", expirationTime); 
 
-    const secureStoreToken = getValueFor("ACCESS_TOKEN"); 
+    const secureStoreToken = getValueFor("ACCESS_TOKEN");
     props.navigation.navigate(accessToken ? "loggedin" : "login"); 
     // } else {
     //   console.log("access token response failed"); 
     // }
-  }
+  } 
 
   // async function getRefreshTokens() {
   //   try {
@@ -134,8 +134,8 @@ const LoginScreen = props => {
       setAuthCode(response.params.code);
     }
     if (authCode !== null) {
-      getAccessToken();
-      setAuthCode(null); 
+      getAccessToken(); 
+      //setAuthCode(null); 
     }
     // if (getValueFor("ACCESS_TOKEN") !== null) {
     //   checkLoginState();

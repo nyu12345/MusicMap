@@ -61,6 +61,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
         longitudeDelta: 0.0421,
         name: "Durham, NC",
       },
+      datestamp: new Date().toLocaleString("en-GB"),
     };
     setSongLocations((prevSongLocations) => [
       ...prevSongLocations,
@@ -99,6 +100,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
                 />
                 <Text style={{ textAlign: "center" }}>{item.title}</Text>
                 <Text style={{ textAlign: "center" }}>{item.artist}</Text>
+                <Text style={{ textAlign: "center" }}>{item.datestamp}</Text>
               </Callout>
             </Marker>
           );

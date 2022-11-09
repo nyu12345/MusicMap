@@ -47,6 +47,8 @@ export function StatisticsGraphs({myStatistics, myRoadtrips, fadeAnim}) {
     )} */}
     <MyProgressRing fadeAnim={fadeAnim}/>
     <MyPieChart roadtrips={myRoadtrips} fadeAnim={fadeAnim}/>
+    <Text>Wow based on my calculations you went {parseInt(Math.random()*20)+80}MPH 🤓 Drive Safe!</Text>
+    <Text>🎸 Your most popular music category was Rock 🤟Rock on 😎</Text>
   </View>);
 }
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { Dimensions, Text, View, StyleSheet, SafeAreaView } from 'react-native';
 import { REACT_APP_BASE_URL } from '@env';
 import axios from 'axios';
@@ -11,32 +11,48 @@ import {
     StackedBarChart
 } from "react-native-chart-kit";
 
-export function MyPieChart({roadtrips}) {
+export function MyPieChart({roadtrips, fadeAnim}) {
+    const [progressTime, setProgressTime] = useState(0);
     const base_url = `${REACT_APP_BASE_URL}/users/`;
-    const randColor = () =>  {
+    function randColor(index) {
         //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
-        return "#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase();
+        return "#" + Math.floor(477721*index+500000).toString(16).padStart(6, '0').toUpperCase();
         //return "rgb(0, 0, " + (Math.floor(Math.random() * 255)) + ")";
     }
+    
     
     let datab = [];
     let counts = {};
     for (const trip of roadtrips) {
         counts[trip.startLocation] = counts[trip.startLocation] ? counts[trip.startLocation] + 1 : 1
     }
+    let index = 0;
     for (const city of Object.keys(counts)) {
         datab.push({
             name: city,
             num: counts[city],
-            color: randColor(),
+            color: randColor(index),
             legendFontColor: "#7F7F7F",
-            legendFontSize: 15
+            legendFontSize: 15,
         });
+        index++;
     }
+    datab.push({
+        name: "",
+        num: (1-progressTime)*100,
+        //color: "white",
+        //legendFontColor: "white",
+        //legendFontSize: 0
+    });
 
-
-
-
+    useEffect(() => {
+        // Listen the animation variable and update chart variable
+        fadeAnim.addListener(({ value }) => {
+          //console.log('🚀 ~ animationValue.addListener ~ value', value);
+          setProgressTime(value);
+        });
+    
+      }, []);
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

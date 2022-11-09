@@ -5,7 +5,8 @@ import { Button, SafeAreaView } from "react-native";
 import { Buffer } from "buffer";
 import { REACT_APP_BASE_URL, CLIENT_ID, CLIENT_SECRET } from "@env";
 import axios from "axios";
-import { save, getValueFor, isAvailable } from "musicmap/SecureStore"; 
+import { save, getValueFor, isAvailable } from "musicmap/util/SecureStore"; 
+import { getAccessToken, getRefreshTokens } from "musicmap/util/TokenRequests"; 
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -17,17 +18,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = props => {
   const [authCode, setAuthCode] = useState("");
-  //const navigation = useNavigation();
-
-  // need to move this somewhere else
-  // async function setToken(value) {
-  //   await SecureStore.setItemAsync("AUTH_TOKEN", value);
-  // }
-
-  const checkLoginState = async() => {
-    const accessToken = await getValueFor("ACCESS_TOKEN"); 
-    props.navigation.navigate(accessToken ? "loggedin" : "login"); 
-  }
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -53,93 +43,16 @@ const LoginScreen = props => {
     }
   );
 
-  // get Spotify API access token using authorization code
-  async function getAccessToken() {
-    //const authCode = await getValueFor("AUTH_CODE"); 
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `grant_type=authorization_code&code=${authCode}&redirect_uri=${
-        makeRedirectUri({
-          useProxy: false,
-        })
-      }`,
-    });
-
-    //if (response) {
-    const responseJson = await response.json(); 
-    console.log("access token fetch response: "); 
-    console.log(responseJson); 
-    const {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: expiresIn,
-    } = await responseJson;
-
-    const expirationTime = await (new Date().getTime() + expiresIn * 1000).toString();
-
-    await save("ACCESS_TOKEN", accessToken); 
-    await save("REFRESH_TOKEN", refreshToken); 
-    await save("EXPIRATION_TIME", expirationTime); 
-
-    const secureStoreToken = getValueFor("ACCESS_TOKEN");
-    props.navigation.navigate(accessToken ? "loggedin" : "login"); 
-    // } else {
-    //   console.log("access token response failed"); 
-    // }
-  } 
-
-  // async function getRefreshTokens() {
-  //   try {
-  //     const credentials = await getSpotifyCredentials() //we wrote this function above
-  //     const credsB64 = btoa(`${credentials.clientId}:${credentials.clientSecret}`);
-  //     const refreshToken = await getUserData('refreshToken');
-  //     const response = await fetch('https://accounts.spotify.com/api/token', {
-  //       method: 'POST',
-  //       headers: {
-  //         Authorization: `Basic ${credsB64}`,
-  //         'Content-Type': 'application/x-www-form-urlencoded',
-  //       },
-  //       body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
-  //     });
-  //     const responseJson = await response.json();
-  //     if (responseJson.error) {
-  //       await getTokens();
-  //     } else {
-  //       const {
-  //         access_token: newAccessToken,
-  //         refresh_token: newRefreshToken,
-  //         expires_in: expiresIn,
-  //       } = responseJson;
-  
-  //       const expirationTime = new Date().getTime() + expiresIn * 1000;
-  //       await setUserData('accessToken', newAccessToken);
-  //       if (newRefreshToken) {
-  //         await setUserData('refreshToken', newRefreshToken);
-  //       }
-  //       await setUserData('expirationTime', expirationTime);
-  //   } catch (err) {
-  //     console.error(err)
-  //   }
-  // }
-
   useEffect(() => {
     if (response?.type === "success") {
       console.log("setting auth code"); 
       console.log(response); 
-      save("AUTH_CODE", response.params.data); // save auth code to Secure Store
+      //save("AUTH_CODE", response.params.data); // save auth code to Secure Store
       setAuthCode(response.params.code);
     }
     if (authCode !== null) {
-      getAccessToken(); 
-      //setAuthCode(null); 
+      getAccessToken(authCode, props); 
     }
-    // if (getValueFor("ACCESS_TOKEN") !== null) {
-    //   checkLoginState();
-    // }
   });
 
   return (

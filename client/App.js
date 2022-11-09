@@ -3,7 +3,7 @@ import LoginScreen from 'musicmap/pages/LoginScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen'; 
 import { createStackNavigator } from '@react-navigation/stack';
-import { save, getValueFor } from "musicmap/SecureStore"; 
+import { save, getValueFor } from "musicmap/util/SecureStore"; 
 //import { createAppContainer } from 'react-navigation';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 

@@ -8,7 +8,7 @@ dayjs.extend(relativeTime);
 const PastTrip = ({ name, startLocation, destination, startDate, endDate }) => {
   return (
     <Pressable
-      onPress={console.log('selected roadtrip')} // this thing ain't working
+      onPress={()=>{console.log('selected roadtrip')}} // this thing ain't working
       style={styles.roadtripContainer}
     >
       <Image source={require('musicmap/assets/sample_pfp.png')} style={styles.image} />

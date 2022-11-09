@@ -12,7 +12,7 @@ import {
 import React, { useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import { save, getValueFor, deleteValue, isAvailable } from "musicmap/SecureStore"; 
+import { save, getValueFor, deleteValue, isAvailable } from "musicmap/util/SecureStore"; 
 import { Linking, Networking } from "react-native";
 
 const ProfileScreen = (props) => {
@@ -69,11 +69,10 @@ const ProfileScreen = (props) => {
 
   const logOut = async() => {
     // remove token and navigate to login screen
-    console.log(isAvailable()); 
     await deleteValue("ACCESS_TOKEN"); 
     await deleteValue("REFRESH_TOKEN"); 
     await deleteValue("EXPIRATION_TIME"); 
-    await deleteValue("AUTH_CODE"); 
+    // await deleteValue("AUTH_CODE"); 
     const accessToken = await getValueFor("ACCESS_TOKEN"); 
     const refreshToken = await getValueFor("REFRESH_TOKEN"); 
     const expirationTime = await getValueFor("EXPIRATION_TIME"); 

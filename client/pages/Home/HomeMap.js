@@ -9,13 +9,14 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
   const [songLocations, setSongLocations] = useState([]);
+  const [currentSongID, setCurrentSongID] = useState(0);
 
   /**
    * requests permission if needed
    */
   useEffect(() => {
     (async () => {
-      permission = await Location.requestForegroundPermissionsAsync();
+      let permission = await Location.requestForegroundPermissionsAsync();
       setStatus(permission);
     })();
   }, []);
@@ -45,6 +46,12 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
     })();
   });
 
+  useEffect(() => {
+    (async () => {
+      addPinHandler();
+    })();
+  });
+
   const getSong = async () => {
     let accessToken = await getValueFor("ACCESS_TOKEN");
     const response = await fetch(
@@ -59,6 +66,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
     if (response) {
       const responseJson = await response.json();
       return {
+        id: responseJson.item.id,
         title: responseJson.item.name,
         artist: responseJson.item.artists[0].name,
         imageURL: responseJson.item.album.images[0].url,
@@ -68,26 +76,24 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
     return null;
   };
 
-  // useEffect(() => {
-
-  // });
-
   const addPinHandler = async () => {
     if (currentLocation == null) {
       return;
     }
     const song = await getSong();
-    if (song == null) {
-      console.log("NO SONG CURRENTLY :(");
+    if (song == null || song.id == currentSongID) {
+      console.log("NO NEW SONG CURRENTLY :(");
       return;
     }
+    setCurrentSongID(song.id);
     const currentSongLocation = {
-      imageURL: song.imageURL,
+      id: song.id,
       title: song.title,
       artist: song.artist,
+      imageURL: song.imageURL,
       location: {
         latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude - offset,
+        longitude: currentLocation.longitude /*+ offset*/,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
         name: "Durham, NC",
@@ -104,6 +110,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
   const clearPinsHandler = () => {
     setSongLocations([]);
     setOffset(0);
+    setCurrentSongID(0);
   };
 
   return (

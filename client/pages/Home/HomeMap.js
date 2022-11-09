@@ -49,7 +49,9 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
       return;
     }
     const currentSongLocation = {
-      source: require("musicmap/assets/lazyfair.jpg"),
+      source: {
+        uri: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+      },
       title: "Sour Patch Kids",
       artist: "Bryce Vine",
       location: {
@@ -91,7 +93,9 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
               <Callout>
                 <Image
                   style={{ alignSelf: "center", width: 50, height: 50 }}
-                  source={require("musicmap/assets/lazyfair.jpg")}
+                  source={{
+                    uri: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+                  }}
                 />
                 <Text style={{ textAlign: "center" }}>{item.title}</Text>
                 <Text style={{ textAlign: "center" }}>{item.artist}</Text>

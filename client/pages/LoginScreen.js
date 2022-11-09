@@ -16,7 +16,7 @@ WebBrowser.maybeCompleteAuthSession();
 // API calls for your client and passes the data back.
 
 const LoginScreen = props => {
-  const [authCode, setAuthCode] = useState("");
+  const [authCode, setAuthCode] = useState(null);
   //const navigation = useNavigation();
 
   // need to move this somewhere else
@@ -44,7 +44,7 @@ const LoginScreen = props => {
       usePKCE: false,
       redirectUri: makeRedirectUri({
         useProxy: false,
-      }), 
+      }),  
       show_dialog: true, 
     },
     {
@@ -55,6 +55,7 @@ const LoginScreen = props => {
 
   // get Spotify API access token using authorization code
   async function getAccessToken() {
+    //const authCode = await getValueFor("AUTH_CODE"); 
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
@@ -68,6 +69,7 @@ const LoginScreen = props => {
       }`,
     });
 
+    //if (response) {
     const responseJson = await response.json(); 
     console.log("access token fetch response: "); 
     console.log(responseJson); 
@@ -85,6 +87,9 @@ const LoginScreen = props => {
 
     const secureStoreToken = getValueFor("ACCESS_TOKEN"); 
     props.navigation.navigate(accessToken ? "loggedin" : "login"); 
+    // } else {
+    //   console.log("access token response failed"); 
+    // }
   }
 
   // async function getRefreshTokens() {
@@ -125,10 +130,12 @@ const LoginScreen = props => {
     if (response?.type === "success") {
       console.log("setting auth code"); 
       console.log(response); 
+      save("AUTH_CODE", response.params.data); // save auth code to Secure Store
       setAuthCode(response.params.code);
     }
-    if (authCode !== "") {
-      getAccessToken();  
+    if (authCode !== null) {
+      getAccessToken();
+      setAuthCode(null); 
     }
     // if (getValueFor("ACCESS_TOKEN") !== null) {
     //   checkLoginState();

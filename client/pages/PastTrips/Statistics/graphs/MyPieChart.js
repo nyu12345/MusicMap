@@ -11,22 +11,14 @@ import {
     StackedBarChart
 } from "react-native-chart-kit";
 
-export function MyPieChart() {
+export function MyPieChart({roadtrips}) {
     const base_url = `${REACT_APP_BASE_URL}/users/`;
-    const [roadtrips, setRoadtrips] = useState([]);
     const randColor = () =>  {
         //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
         return "#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase();
+        //return "rgb(0, 0, " + (Math.floor(Math.random() * 255)) + ")";
     }
-
-    // get roadtrip data from API
-    if (roadtrips.length == 0) {
-        axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
-            setRoadtrips(response.data);
-        });
-    } else {
-        // console.log('printing');
-    }
+    
     let datab = [];
     let counts = {};
     for (const trip of roadtrips) {

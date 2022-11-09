@@ -45,37 +45,46 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
     })();
   });
 
-  const getSongHandler = async () => {
-    let access_token = await getValueFor("ACCESS_TOKEN");
+  const getSong = async () => {
+    let accessToken = await getValueFor("ACCESS_TOKEN");
     const response = await fetch(
       "https://api.spotify.com/v1/me/player/currently-playing",
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${access_token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
-    const responseJson = await response.json();
-    console.log(responseJson.item.name);
-    console.log(responseJson.item.album.images[0].url);
-    console.log(responseJson.item.artists[0].name);
+    if (response) {
+      const responseJson = await response.json();
+      return {
+        title: responseJson.item.name,
+        artist: responseJson.item.artists[0].name,
+        imageURL: responseJson.item.album.images[0].url,
+      };
+    }
+    console.log("COULD NOT GET SONG :(");
+    return null;
   };
 
   // useEffect(() => {
 
   // });
 
-  const addPinHandler = () => {
+  const addPinHandler = async () => {
     if (currentLocation == null) {
       return;
     }
+    const song = await getSong();
+    if (song == null) {
+      console.log("NO SONG CURRENTLY :(");
+      return;
+    }
     const currentSongLocation = {
-      source: {
-        uri: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
-      },
-      title: "Sour Patch Kids",
-      artist: "Bryce Vine",
+      imageURL: song.imageURL,
+      title: song.title,
+      artist: song.artist,
       location: {
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude - offset,
@@ -116,9 +125,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
               <Callout>
                 <Image
                   style={{ alignSelf: "center", width: 50, height: 50 }}
-                  source={{
-                    uri: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
-                  }}
+                  source={{ uri: item.imageURL }}
                 />
                 <Text style={{ textAlign: "center" }}>{item.title}</Text>
                 <Text style={{ textAlign: "center" }}>{item.artist}</Text>
@@ -135,7 +142,6 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
       </Text>
       <Button onPress={addPinHandler} title="ADD PIN" color="#841584" />
       <Button onPress={clearPinsHandler} title="CLEAR PINS" color="#841584" />
-      <Button onPress={getSongHandler} title="GET SONG" color="#841584" />
     </>
   );
 }

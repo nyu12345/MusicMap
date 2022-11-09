@@ -72,6 +72,7 @@ const ProfileScreen = (props) => {
     await deleteValue("ACCESS_TOKEN"); 
     await deleteValue("REFRESH_TOKEN"); 
     await deleteValue("EXPIRATION_TIME"); 
+    await deleteValue("AUTH_CODE"); 
     const accessToken = await getValueFor("ACCESS_TOKEN"); 
     const refreshToken = await getValueFor("REFRESH_TOKEN"); 
     const expirationTime = await getValueFor("EXPIRATION_TIME"); 

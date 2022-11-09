@@ -3,7 +3,7 @@ import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
 import { Text, Image, Button } from "react-native";
 import * as Location from "expo-location";
-import { getValueFor } from "../../SecureStore";
+import { getValueFor } from "musicmap/util/SecureStore";
 
 export function HomeMap({ updateLocationHandler, currentLocation }) {
   const [permissionStatus, setStatus] = useState(null);

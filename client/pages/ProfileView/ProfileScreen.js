@@ -1,26 +1,17 @@
 import {
   Text,
   View,
-  Button,
-  TouchableOpacity,
   StyleSheet,
   Image,
   TextInput,
   ScrollView,
-  RefreshControl,
   SafeAreaView,
   Pressable, 
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import {
-  save,
-  getValueFor,
-  deleteValue,
-  isAvailable,
-} from "musicmap/util/SecureStore";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { deleteValue } from "musicmap/util/SecureStore";
 import { Linking, Networking } from "react-native";
 import { getAccessTokenFromSecureStorage } from "../../util/TokenRequests";
 
@@ -98,16 +89,6 @@ const ProfileScreen = (props) => {
           </View>
         </View>
 
-        {/* <View style={styles.buttons}>
-          <Icon.Button
-            name="sign-out"
-            backgroundColor="#3b5998"
-            onPress={logOut}
-            {...iconStyles}
-          >
-            Log Out
-          </Icon.Button>
-        </View> */}
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>
         </Pressable>
@@ -125,9 +106,9 @@ const styles = StyleSheet.create({
     borderRadius: 75,
   },
   userName: {
-    fontSize: 18,
+    fontSize: 23,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 15,
     marginBottom: 10,
   },
   userInfoWrapper: {
@@ -150,12 +131,6 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-  // buttons: {
-  //   justifyContent: "space-between",
-  //   flexDirection: "row",
-  //   margin: 20,
-  //   marginBottom: 30,
-  // },
   logoutButton: {
     marginTop: 10, 
     alignItems: 'center',

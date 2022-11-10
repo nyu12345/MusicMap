@@ -1,9 +1,9 @@
 import { Text, View, Image, StyleSheet } from "react-native";
 
-export const FriendCard = ({ name, numFriends }) => {
+export const FriendCard = ({ name, numFriends, profilePic }) => {
   return (
     <View style={styles.friendCardContainer}>
-      <Image source={require('musicmap/assets/sample_pfp.png')} style={styles.image} />
+      <Image source={{ uri: profilePic }} style={styles.image} />
       <View style={styles.friendCardContent}>
         <View style={styles.row}>
           <Text style={styles.name} numberOfLines={1}>{name}</Text>

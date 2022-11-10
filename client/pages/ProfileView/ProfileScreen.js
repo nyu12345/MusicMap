@@ -8,27 +8,23 @@ import {
   SafeAreaView,
   Pressable, 
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import {
-  save,
-  getValueFor,
-  deleteValue,
-  isAvailable,
-} from "musicmap/util/SecureStore";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { Linking, Networking } from "react-native";
+import { AntDesign } from '@expo/vector-icons';
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
-import { FriendList } from "musicmap/pages/ProfileView/FriendList"; 
+import { deleteValue } from "musicmap/util/SecureStore"; 
 import { FriendCard } from "musicmap/pages/ProfileView/FriendCard"; 
+import { AddFriendBottomSheet } from "musicmap/pages/ProfileView/AddFriendBottomSheet";
+import { FriendSectionHeader } from "./FriendSectionHeader";
 
 const ProfileScreen = (props) => {
   const [name, setName] = useState("");
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
-  const emptyProfilePic = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixabay.com%2Fvectors%2Fblank-profile-picture-mystery-man-973460%2F&psig=AOvVaw0BBwqa30flyHoktGHTS7N1&ust=1668122174024000&source=images&cd=vfe&ved=0CA4QjRxqFwoTCKjJvL6dovsCFQAAAAAdAAAAABAE"; 
+  const emptyProfilePic = "abc_dummy.com"; 
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -73,18 +69,22 @@ const ProfileScreen = (props) => {
     props.navigation.navigate("login");
   };
 
+  // define bottom sheet modal properties
+  const bottomSheetModalRef = useRef(null);
+
+  // dummy data
   const friends = [
     {
         name: "Jeffrey Liu", 
         numFriends: 30, 
         friends: [], 
-        profilePic: "https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg", 
+        profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
     }, 
     {
         name: "Nathan Huang", 
         numFriends: 29, 
         friends: [], 
-        profilePic: "", 
+        profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
     }, 
   ]
 
@@ -116,14 +116,17 @@ const ProfileScreen = (props) => {
           </View>
         </View>
 
+        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef}/>
+
         {friends.map((item) => (
-          <FriendCard name={item.name} numFriends={item.numFriends} />
+          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} />
         ))}
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>
         </Pressable>
       </ScrollView>
+      <AddFriendBottomSheet bottomSheetModalRef={bottomSheetModalRef} />
     </SafeAreaView>
   );
 };
@@ -161,6 +164,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
+  },
+  friendName: {
+    flex: 1,
+    fontWeight: "bold",
+    fontSize: 20, 
+  },
+  friendSectionRow: {
+    flexDirection: "row",
+    marginBottom: 10,
   },
   logoutButton: {
     marginTop: 10, 

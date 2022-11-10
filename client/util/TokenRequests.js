@@ -22,8 +22,6 @@ export async function getAccessToken(authCode, props) {
   });
 
   const responseJson = await response.json();
-  console.log("access token fetch response: ");
-  console.log(responseJson);
   const {
     access_token: accessToken,
     refresh_token: refreshToken,
@@ -57,6 +55,7 @@ export async function getRefreshTokens() {
       },
       body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
     });
+
     const responseJson = await response.json();
     if (responseJson.error) {
       await getAccessToken();
@@ -78,4 +77,16 @@ export async function getRefreshTokens() {
   } catch (err) {
     console.error(err);
   }
+}
+
+export async function getAccessTokenFromSecureStorage() {
+  const expirationTime = await getValueFor("EXPIRATION_TIME"); 
+
+  const curTime = new Date().getTime();
+  if (curTime > expirationTime) {
+    await getRefreshTokens(); 
+  }
+
+  const accessToken = await getValueFor("ACCESS_TOKEN"); 
+  return accessToken; 
 }

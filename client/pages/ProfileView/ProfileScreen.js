@@ -20,7 +20,9 @@ import {
 } from "musicmap/util/SecureStore";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Linking, Networking } from "react-native";
-import { getAccessTokenFromSecureStorage } from "../../util/TokenRequests";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import { FriendList } from "musicmap/pages/ProfileView/FriendList"; 
+import { FriendCard } from "musicmap/pages/ProfileView/FriendCard"; 
 
 const ProfileScreen = (props) => {
   const [name, setName] = useState("");
@@ -71,6 +73,21 @@ const ProfileScreen = (props) => {
     props.navigation.navigate("login");
   };
 
+  const friends = [
+    {
+        name: "Jeffrey Liu", 
+        numFriends: 30, 
+        friends: [], 
+        profilePic: "https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg", 
+    }, 
+    {
+        name: "Nathan Huang", 
+        numFriends: 29, 
+        friends: [], 
+        profilePic: "", 
+    }, 
+  ]
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView
@@ -98,6 +115,10 @@ const ProfileScreen = (props) => {
             <Text style={styles.userInfoSubTitle}>Roadtrips</Text>
           </View>
         </View>
+
+        {friends.map((item) => (
+          <FriendCard name={item.name} numFriends={item.numFriends} />
+        ))}
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>

@@ -1,13 +1,10 @@
 import {
   Text,
   View,
-  Button,
-  TouchableOpacity,
   StyleSheet,
   Image,
   TextInput,
   ScrollView,
-  RefreshControl,
   SafeAreaView,
   Pressable, 
 } from "react-native";
@@ -102,16 +99,6 @@ const ProfileScreen = (props) => {
           </View>
         </View>
 
-        {/* <View style={styles.buttons}>
-          <Icon.Button
-            name="sign-out"
-            backgroundColor="#3b5998"
-            onPress={logOut}
-            {...iconStyles}
-          >
-            Log Out
-          </Icon.Button>
-        </View> */}
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>
         </Pressable>
@@ -129,9 +116,9 @@ const styles = StyleSheet.create({
     borderRadius: 75,
   },
   userName: {
-    fontSize: 18,
+    fontSize: 23,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 15,
     marginBottom: 10,
   },
   userInfoWrapper: {
@@ -154,12 +141,6 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-  // buttons: {
-  //   justifyContent: "space-between",
-  //   flexDirection: "row",
-  //   margin: 20,
-  //   marginBottom: 30,
-  // },
   logoutButton: {
     marginTop: 10, 
     alignItems: 'center',

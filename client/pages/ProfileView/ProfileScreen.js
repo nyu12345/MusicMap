@@ -166,6 +166,15 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
+  friendName: {
+    flex: 1,
+    fontWeight: "bold",
+    fontSize: 20, 
+  },
+  friendSectionRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
   logoutButton: {
     marginTop: 10,
     alignItems: 'center',

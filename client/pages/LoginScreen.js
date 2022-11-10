@@ -18,7 +18,7 @@ WebBrowser.maybeCompleteAuthSession();
 // API calls for your client and passes the data back.
 
 const LoginScreen = (props) => {
-  const [authCode, setAuthCode] = useState("");
+  //const [authCode, setAuthCode] = useState("");
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -49,10 +49,11 @@ const LoginScreen = (props) => {
       console.log("setting auth code");
       console.log(response);
       //save("AUTH_CODE", response.params.data); // save auth code to Secure Store
-      setAuthCode(response.params.code);
+      props.setAuthCode(response.params.code);
     }
-    if (authCode !== null) {
-      getAccessToken(authCode, props);
+    if (props.authCode !== null) {
+      console.log("access token got");
+      getAccessToken(props.authCode, props);
     }
   });
 

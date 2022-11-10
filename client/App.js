@@ -11,6 +11,12 @@ const Stack = createStackNavigator();
 
 export default function App() {
   const [initialRoute, setInitialRoute] = useState(""); 
+  const [authCode, setAuthCode] = useState("");
+
+  const loginToParent = () => {
+    console.log("TESTU TESTSTT");
+    setAuthCode("");
+  }
 
   useEffect(() => {
     async function checkTokensAndSetNavigation() {
@@ -43,8 +49,14 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={"login"}>
-        <Stack.Screen options={{ headerShown: false }} name="login" component={LoginScreen} />
-        <Stack.Screen options={{ headerShown: false }} name="loggedin" component={LoggedInScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="login" 
+        children = {props => <LoginScreen navigation = {props.navigation} authCode = {authCode} setAuthCode = {setAuthCode}/>}
+        //component={LoginScreen} 
+        />
+        <Stack.Screen options={{ headerShown: false }} name="loggedin" 
+        //component = {LoggedInScreen}
+        children = {props => <LoggedInScreen navigation = {props.navigation} loginToParent = {loginToParent}/>}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

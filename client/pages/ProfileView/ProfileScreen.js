@@ -14,6 +14,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
+import * as SecureStore from 'expo-secure-store';
 import {
   save,
   getValueFor,
@@ -60,6 +61,9 @@ const ProfileScreen = (props) => {
 
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {
+    props.loginToParent();
+    await SecureStore.deleteItemAsync("AUTH_CODE");
+    console.log("DELETED AUTH");
     await deleteValue("ACCESS_TOKEN");
     await deleteValue("REFRESH_TOKEN");
     await deleteValue("EXPIRATION_TIME");

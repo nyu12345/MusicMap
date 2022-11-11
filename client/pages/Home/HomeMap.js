@@ -183,8 +183,6 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
           ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude}) \n ${currentLocation.name}`
           : "Retrieving your location..."}
       </Text>
-      <Button onPress={addPinHandler} title="ADD PIN" color="#841584" />
-      <Button onPress={clearPinsHandler} title="CLEAR PINS" color="#841584" />
     </>
   );
 }

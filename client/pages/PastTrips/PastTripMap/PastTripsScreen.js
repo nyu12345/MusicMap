@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import ExpoConstants from 'expo-constants';
-import { StatisticsScreen } from './Statistics/StatisticsScreen';
-import { MapScreen } from './MapScreen';
-import { PastTripsList } from 'musicmap/pages/PastTrips/PastTripsList';
+import { StatisticsScreen } from 'musicmap/pages/PastTrips/Statistics/StatisticsScreen';
+import { MapScreen } from 'musicmap/pages/PastTrips/PastTripMap/MapScreen';
+import { PastTripsList } from 'musicmap/pages/PastTrips/PastTripMap/PastTripsList';
 import { Text, View, StyleSheet, Image, Animated, Pressable } from 'react-native';
 
 const Tab = createMaterialTopTabNavigator();

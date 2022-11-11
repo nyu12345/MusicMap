@@ -25,7 +25,6 @@ const ProfileScreen = (props) => {
   const [username, setUsername] = useState(""); 
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
-  const [userExists, setUserExists] = useState(false); 
   const emptyProfilePic = "abc_dummy.com"; 
 
   async function getUserInfo() {

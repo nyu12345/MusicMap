@@ -6,7 +6,7 @@ import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
-import PastTrip from "musicmap/pages/PastTrips/PastTrip";
+import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
 export function PastTripsList() {
   const base_url = `${REACT_APP_BASE_URL}/users/`;

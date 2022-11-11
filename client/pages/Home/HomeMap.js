@@ -4,12 +4,15 @@ import React, { useState, useEffect } from "react";
 import { Text, Image, Button } from "react-native";
 import * as Location from "expo-location";
 import { getValueFor } from "musicmap/util/SecureStore";
+import axios from "axios";
+import { REACT_APP_BASE_URL } from "@env";
 
-export function HomeMap({ updateLocationHandler, currentLocation }) {
+export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTripData }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
-  const [songLocations, setSongLocations] = useState([]);
-  const [currentSongID, setCurrentSongID] = useState(0);
+  const [songs, setSongs] = useState([]);
+  const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
+  const [isOngoingSession, setIsOngoingSession] = useState(false);
 
   /**
    * requests permission if needed
@@ -48,11 +51,23 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
 
   useEffect(() => {
     (async () => {
-      addPinHandler();
+      if (currentRoadTripData != null) {
+        setIsOngoingSession(true);
+        addPinHandler();
+      } else if (isOngoingSession) {
+        setIsOngoingSession(false);
+        clearPinsHandler();
+      }
     })();
   });
 
-  const getSong = async () => {
+  useEffect(() => {
+    if (currentSong.spotifyId != null) {
+      postSongHandler();
+    }
+  }, [currentSong])
+
+  const getSongFromSpotify = async () => {
     let accessToken = await getValueFor("ACCESS_TOKEN");
     const response = await fetch(
       "https://api.spotify.com/v1/me/player/currently-playing",
@@ -76,41 +91,62 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
     return null;
   };
 
+  const postSongHandler = () => {
+    console.log(`name: ${currentSong.title}`);
+    // should add check to see if these fields are valid here and present alert if not
+    axios
+      .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
   const addPinHandler = async () => {
     if (currentLocation == null) {
       return;
     }
-    const song = await getSong();
-    if (song == null || song.id == currentSongID) {
+    const song = await getSongFromSpotify();
+    if (song == null || song.id == currentSong.spotifyId) {
       console.log("NO NEW SONG CURRENTLY :(");
       return;
     }
-    setCurrentSongID(song.id);
-    const currentSongLocation = {
-      id: song.id,
+    const newSong = {
+      tripId: currentRoadTripData.createdReview._id,
+      spotifyId: song.id,
       title: song.title,
       artist: song.artist,
       imageURL: song.imageURL,
       location: {
         latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude /*+ offset*/,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+        longitude: currentLocation.longitude + offset,
         name: "Durham, NC",
       },
       datestamp: new Date().toLocaleString("en-GB"),
     };
-    setSongLocations((prevSongLocations) => [
-      ...prevSongLocations,
-      currentSongLocation,
+    setCurrentSong(newSong);
+    setSongs((prevSongs) => [
+      ...prevSongs,
+      newSong,
     ]);
     setOffset((prevOffset) => prevOffset + 0.005);
   };
 
   const clearPinsHandler = () => {
-    setSongLocations([]);
+    setSongs([]);
     setOffset(0);
-    setCurrentSongID(0);
+    setCurrentSong({ title: "No song", spotifyId: null });
   };
 
   return (
@@ -120,7 +156,7 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
-        {songLocations.map((item, index) => {
+        {songs.map((item, index) => {
           return (
             <Marker
               key={index}
@@ -147,8 +183,6 @@ export function HomeMap({ updateLocationHandler, currentLocation }) {
           ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude}) \n ${currentLocation.name}`
           : "Retrieving your location..."}
       </Text>
-      <Button onPress={addPinHandler} title="ADD PIN" color="#841584" />
-      <Button onPress={clearPinsHandler} title="CLEAR PINS" color="#841584" />
     </>
   );
 }

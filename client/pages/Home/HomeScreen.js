@@ -20,7 +20,7 @@ export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [roadtripName, setRoadtripName] = useState("");
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
-  const [currentRoadsetCurrentLocationTripData, setCurrentRoadTripData] = useState({});
+  const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
@@ -33,12 +33,16 @@ export function HomeScreen() {
   const endRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
     updateRoadtrip();
+    setCurrentRoadTripData(null);
+    setRoadtripName("");
   };
 
   const cancelRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
     deleteRoadtrip();
     setModalVisible(false);
+    setCurrentRoadTripData(null);
+    setRoadtripName("");
   };
 
   const cancelCreateHandler = () => {
@@ -147,6 +151,7 @@ export function HomeScreen() {
       <HomeMap
         updateLocationHandler={updateLocationHandler}
         currentLocation={currentLocation}
+        currentRoadTripData={currentRoadTripData}
       />
       <Modal
         animationType="slide"

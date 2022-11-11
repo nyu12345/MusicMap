@@ -1,7 +1,9 @@
 {
   "expo": {
     "name": "MusicMap",
-    "slug": "MusicMap",
+    "slug": "musicmap",
+    "owner": "jasonshang",
+    "scheme": "musicmap", 
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

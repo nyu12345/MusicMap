@@ -6,7 +6,7 @@ import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
-import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
+import PastTrip from "musicmap/pages/PastTrips/PastTrip";
 
 export function PastTripsList() {
   const base_url = `${REACT_APP_BASE_URL}/users/`;
@@ -16,11 +16,12 @@ export function PastTripsList() {
   // get roadtrip data from API
   if (roadtrips.length == 0) {
     axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
-      console.log("roadtrip you poop: " + response.data);
+      //console.log("Tried to get data");
+      //console.log(response.data);
       setRoadtrips(response.data);
-    }).catch((err) => {
-      console.log(err); 
     });
+  } else {
+    //console.log("printing");
   }
 
   const bottomSheetRef = useRef(null);
@@ -30,11 +31,11 @@ export function PastTripsList() {
 
   // callbacks
   const handleSheetChange = useCallback((index) => {
-    console.log("handleSheetChange", index);
+    //console.log("handleSheetChange", index);
   }, []);
   const handleRefresh = useCallback(() => {
     setRoadtrips([]);
-    console.log("handleRefresh");
+    //console.log("handleRefresh");
   }, []);
 
   // handle search

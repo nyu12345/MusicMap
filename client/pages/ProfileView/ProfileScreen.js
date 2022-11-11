@@ -135,27 +135,28 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   profilePic: {
-    height: 150,
-    width: 150,
+    height: 130,
+    width: 130,
     borderRadius: 75,
   },
   userName: {
-    fontSize: 23,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginTop: 15,
-    marginBottom: 10,
+    marginTop: 10,
+    marginBottom: 5,
   },
   userInfoWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginVertical: 20,
+    marginTop: 10, 
+    marginBottom: 15, 
   },
   userInfoItem: {
     justifyContent: 'center',
   },
   userInfoTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
     textAlign: 'center',
@@ -164,15 +165,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
-  },
-  friendName: {
-    flex: 1,
-    fontWeight: "bold",
-    fontSize: 20, 
-  },
-  friendSectionRow: {
-    flexDirection: "row",
-    marginBottom: 10,
   },
   logoutButton: {
     marginTop: 10, 

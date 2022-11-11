@@ -3,7 +3,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -14,7 +14,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [searchInput, setSearchInput] = useState("");
 
   // Points for the bottom sheet to snap to, sorted from bottom to top
-  const snapPoints = useMemo(() => ["15%", "50%"], []);
+  const snapPoints = useMemo(() => ["15%", "50%", "75%"], []);
 
   // callbacks
   const handleSheetChange = useCallback((index) => {
@@ -23,20 +23,22 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   return (
     <BottomSheetModalProvider>
-      <BottomSheetModal
-        ref={bottomSheetModalRef}
-        index={0}
-        snapPoints={snapPoints}
-        onChange={handleSheetChange}
-        keyboardBehavior="fillParent"
-      >
-        <BottomSheetTextInput
-          placeholder="Enter your friend's Spotify username!"
-          onChangeText={setSearchInput} 
-          value={searchInput}
-          style={styles.textInput}
-        />
-      </BottomSheetModal>
+      <SafeAreaView>
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          index={0}
+          snapPoints={snapPoints}
+          onChange={handleSheetChange}
+          keyboardBehavior="fillParent"
+        >
+          <BottomSheetTextInput
+            placeholder="Enter your friend's Spotify username!"
+            onChangeText={setSearchInput} 
+            value={searchInput}
+            style={styles.textInput}
+          />
+        </BottomSheetModal>
+      </SafeAreaView>
     </BottomSheetModalProvider>
   );
 };

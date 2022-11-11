@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
   },
   name: {
     flex: 1,
+    fontSize: 15, 
     fontWeight: "bold",
   },
   subTitle: {

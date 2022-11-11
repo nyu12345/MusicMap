@@ -4,14 +4,38 @@ import { NavigationContainer } from '@react-navigation/native';
 import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen'; 
 import { createStackNavigator } from '@react-navigation/stack';
 import { save, getValueFor } from "musicmap/util/SecureStore"; 
+import { REACT_APP_BASE_URL } from "@env"; 
+import axios from "axios"; 
 //import { createAppContainer } from 'react-navigation';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests"; 
 
 const Stack = createStackNavigator();
 
 export default function App() {
   const [initialRoute, setInitialRoute] = useState(""); 
   const [authCode, setAuthCode] = useState("");
+
+  // get user's username from Spotify API
+
+  // async function getUserInfo() {
+  //   const accessToken = await getAccessTokenFromSecureStorage();
+
+  //   const response = await fetch("https://api.spotify.com/v1/me", {
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${accessToken}`,
+  //     },
+  //   });
+
+  //   if (response) {
+  //     const responseJson = await response.json();
+  //     console.log("poop: " + responseJson); 
+  //     return [responseJson.display_name, responseJson.id, responseJson.followers.total, responseJson.images[0].url];  
+  //   } else {
+  //     console.log("getUserInfo request returned no response");
+  //   }
+  // }
 
   const loginToParent = () => {
     console.log("TESTU TESTSTT");

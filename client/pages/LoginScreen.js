@@ -44,6 +44,19 @@ const LoginScreen = (props) => {
     }
   );
 
+  // useEffect(() => {
+  //   if (response?.type === "success") {
+  //     console.log("setting auth code");
+  //     console.log(response);
+  //     //save("AUTH_CODE", response.params.data); // save auth code to Secure Store
+  //     props.setAuthCode(response.params.code);
+  //   }
+  //   if (props.authCode !== null) {
+  //     console.log("access token got");
+  //     getAccessToken(props.authCode, props);
+  //   }
+  // });
+
   useEffect(() => {
     if (response?.type === "success") {
       console.log("setting auth code");

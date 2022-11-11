@@ -22,8 +22,10 @@ import { FriendSectionHeader } from "./FriendSectionHeader";
 
 const ProfileScreen = (props) => {
   const [name, setName] = useState("");
+  const [username, setUsername] = useState(""); 
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
+  const [userExists, setUserExists] = useState(false); 
   const emptyProfilePic = "abc_dummy.com"; 
 
   async function getUserInfo() {
@@ -39,18 +41,45 @@ const ProfileScreen = (props) => {
     if (response) {
       const responseJson = await response.json();
       setName(responseJson.display_name);
+      setUsername(responseJson.id); 
       setNumFollowers(responseJson.followers.total);
       setProfilePic(responseJson.images[0].url);
-
-      // TODO:  upload responseJson.id (userId), responseJson.display_name and list of friends to Mongo
     } else {
       console.log("getUserInfo request returned no response");
     }
   }
 
+  async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
+    const user = {
+      name: name, 
+      spotifyUsername: username, 
+      numFriends: numFollowers, 
+      profilePic: profilePicUrl, 
+      friends: [], 
+    }
+    axios.post(`${REACT_APP_BASE_URL}/users`, user).then((response) => {
+      console.log("success"); 
+    }).catch((err) => {
+      console.log(err); 
+    })
+  }
+
+  async function addUserIfNew(username) {
+    await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
+      console.log("response: " + response.data.length); 
+      if (response.data.length === 0) {
+        //setUserExists(false); 
+        addUserToMongoDB(name, username, numFollowers, profilePic)
+      }
+    }).catch((err) => {
+      console.log(err); 
+    });
+  }
+
   useEffect(() => {
     (async () => {
-      await getUserInfo();
+      await getUserInfo(); 
+      await addUserIfNew(username); 
     })();
   });
 
@@ -77,12 +106,14 @@ const ProfileScreen = (props) => {
     {
         name: "Jeffrey Liu", 
         numFriends: 30, 
+        spotifyUsername: "jzl", 
         friends: [], 
         profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
     }, 
     {
         name: "Nathan Huang", 
         numFriends: 29, 
+        spotifyUsername: "nhu", 
         friends: [], 
         profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
     }, 
@@ -119,7 +150,7 @@ const ProfileScreen = (props) => {
         <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef}/>
 
         {friends.map((item) => (
-          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} />
+          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername}/>
         ))}
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
@@ -184,8 +215,3 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
-
-const iconStyles = {
-  borderRadius: 10,
-  iconStyle: { paddingVertical: 5 },
-};

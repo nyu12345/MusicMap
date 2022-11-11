@@ -29,14 +29,17 @@ export function PastTripsList() {
   // Points for the bottom sheet to snap to, sorted from bottom to top
   const snapPoints = useMemo(() => ["13%", "50%", "95%"], []);
 
-  // callbacks
-  const handleSheetChange = useCallback((index) => {
-    //console.log("handleSheetChange", index);
-  }, []);
-  const handleRefresh = useCallback(() => {
-    setRoadtrips([]);
-    //console.log("handleRefresh");
-  }, []);
+    // Points for the bottom sheet to snap to, sorted from bottom to top
+    const snapPoints = useMemo(() => ['13%', '50%', '95%'], []);
+
+    // callbacks
+    const handleSheetChange = useCallback((index) => {
+        console.log("handleSheetChange", index);
+    }, []);
+    const handleRefresh = useCallback(() => {
+        setRoadtrips([]); 
+        console.log("handleRefresh");
+    }, []);
 
   // handle search
   const filter = (roadtrips) => {

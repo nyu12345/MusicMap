@@ -80,10 +80,10 @@ const LoginScreen = (props) => {
         MusicMap
       </Text>
       <Text style={styles.appDescriptionText}>
-        Roadtrip music and memories!
+        Roadtrip music and memories! 
       </Text>
-      <Pressable style={styles.loginButton} onPress={() => {
-        promptAsync({ useProxy: false });
+      <Pressable style={styles.loginButton} onPress={()=>{
+        promptAsync({useProxy: false}); 
       }}>
         <Text style={styles.loginButtonText}>LOG IN WITH SPOTIFY</Text>
       </Pressable>
@@ -99,13 +99,13 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   root: {
-    alignItems: "center",
+    alignItems: "center", 
     padding: 20
   },
   logo: {
-    marginTop: 50,
-    height: 150,
-    width: 150,
+    marginTop: 50, 
+    height: 150, 
+    width: 150, 
   },
   musicMapText: {
     fontSize: 25,
@@ -114,11 +114,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   appDescriptionText: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 18, 
+    marginBottom: 10, 
   },
   loginButton: {
-    marginTop: 10,
+    marginTop: 10, 
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,

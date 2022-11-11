@@ -6,7 +6,7 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
-  Pressable,
+  Pressable, 
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { REACT_APP_BASE_URL } from "@env";
@@ -15,8 +15,8 @@ import * as SecureStore from 'expo-secure-store';
 import { Linking, Networking } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
-import { deleteValue } from "musicmap/util/SecureStore";
-import { FriendCard } from "musicmap/pages/ProfileView/FriendCard";
+import { deleteValue } from "musicmap/util/SecureStore"; 
+import { FriendCard } from "musicmap/pages/ProfileView/FriendCard"; 
 import { AddFriendBottomSheet } from "musicmap/pages/ProfileView/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 
@@ -25,7 +25,7 @@ const ProfileScreen = (props) => {
   const [username, setUsername] = useState(""); 
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
-  const emptyProfilePic = "abc_dummy.com";
+  const emptyProfilePic = "abc_dummy.com"; 
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -92,7 +92,7 @@ const ProfileScreen = (props) => {
     await deleteValue("EXPIRATION_TIME");
 
     Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects?
-    Networking.clearCookies(() => { });
+    Networking.clearCookies(() => {});
 
     props.navigation.navigate("login");
   };
@@ -103,11 +103,6 @@ const ProfileScreen = (props) => {
   // dummy data
   const friends = [
     {
-      name: "Jeffrey Liu",
-      numFriends: 30,
-      friends: [],
-      profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
-    },
         name: "Jeffrey Liu", 
         numFriends: 30, 
         spotifyUsername: "jzl", 
@@ -124,9 +119,9 @@ const ProfileScreen = (props) => {
   ]
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <ScrollView
-        style={{ flex: 1, padding: 20 }}
+        style={{flex: 1, padding: 20}}
         contentContainerStyle={{
           justifyContent: "center",
           alignItems: "center",
@@ -151,7 +146,7 @@ const ProfileScreen = (props) => {
           </View>
         </View>
 
-        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
+        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef}/>
 
         {friends.map((item) => (
           <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername}/>
@@ -184,8 +179,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginTop: 10,
-    marginBottom: 15,
+    marginTop: 10, 
+    marginBottom: 15, 
   },
   userInfoItem: {
     justifyContent: 'center',
@@ -202,7 +197,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   logoutButton: {
-    marginTop: 10,
+    marginTop: 10, 
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,

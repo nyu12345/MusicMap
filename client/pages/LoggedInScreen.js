@@ -57,7 +57,7 @@ export function LoggedInScreen(props) {
         options={{ headerShown: true }}
         name="Profile"
         //component = {ProfileScreen}
-        children={props => <ProfileScreen navigation={props.navigation} loginToParent={loginToParent} />}
+        children={props => <ProfileScreen navigation = {props.navigation} loginToParent = {loginToParent}/>}
       />
     </Tab.Navigator>
   );

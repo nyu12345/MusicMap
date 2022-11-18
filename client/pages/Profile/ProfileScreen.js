@@ -16,8 +16,8 @@ import { Linking, Networking } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore"; 
-import { FriendCard } from "musicmap/pages/ProfileView/FriendCard"; 
-import { AddFriendBottomSheet } from "musicmap/pages/ProfileView/AddFriendBottomSheet";
+import { FriendCard } from "musicmap/pages/Profile/FriendCard"; 
+import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 
 const ProfileScreen = (props) => {

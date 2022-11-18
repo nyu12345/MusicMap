@@ -4,11 +4,11 @@ const User = require("../models/userSchema");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 
-router.get("/", async (req, res) => {
+router.get("/", (req, res) => {
   const filter = {};
     if (req.query.spotifyUsername) filter.spotifyUsername = req.query.spotifyUsername;
     if (req.query.id) filter._id = req.query.id;
-    await User.find(filter)
+    User.find(filter)
     .exec()
     .then((doc) => {
       console.log("doc:")
@@ -17,14 +17,6 @@ router.get("/", async (req, res) => {
     })
     .catch((err) => {
     res.status(500).json({ error: err });
-  // User.find()
-  //   .exec()
-  //   .then((docs) => {
-  //     res.status(200).json(docs);
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).json({ error: err });
-  //   });
 })
 });
 

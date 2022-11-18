@@ -3,12 +3,14 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { StyleSheet, SafeAreaView } from "react-native";
+import { StyleSheet, SafeAreaView, View, TouchableHighlight, Text } from "react-native";
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
+import { REACT_APP_BASE_URL } from '@env';
+import axios from 'axios';
 
 export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [searchInput, setSearchInput] = useState("");
@@ -20,6 +22,16 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const handleSheetChange = useCallback((index) => {
     console.log("handleSheetChange", index);
   }, []);
+
+  const onPress = async (e) => {
+    console.log("submitted")
+    console.log(searchInput)
+    const data = await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${searchInput}`);
+    console.log(data.data[0].length);
+    if (data.data[0] != null) {
+      console.log("valid");
+    }
+  }
 
   return (
     <BottomSheetModalProvider>
@@ -33,10 +45,17 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
         >
           <BottomSheetTextInput
             placeholder="Enter your friend's Spotify username!"
-            onChangeText={setSearchInput} 
+            onChangeText={setSearchInput}
             value={searchInput}
             style={styles.textInput}
           />
+          <View style={styles.container}>
+            <TouchableHighlight onPress={onPress}>
+              <View style={styles.button}>
+                <Text>Submit</Text>
+              </View>
+            </TouchableHighlight>
+          </View>
         </BottomSheetModal>
       </SafeAreaView>
     </BottomSheetModalProvider>
@@ -53,5 +72,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(151, 151, 151, 0.25)",
     color: "black",
     textAlign: "left",
+  },
+  container: {
+    justifyContent: "center",
+    paddingHorizontal: 160,
+    borderRadius: 12,
+  },
+  button: {
+    alignItems: "center",
+    backgroundColor: "#DDDDDD",
+    padding: 10,
   },
 });

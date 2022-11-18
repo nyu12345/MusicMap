@@ -26,37 +26,45 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
 
   useEffect(() => {
     (async () => {
-      if (permissionStatus == null) return;
-      if (!permissionStatus.granted) {
-        console.log("Permission to access location was denied");
-        return;
-      } else {
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Highest,
-          timeInterval: 10000,
-          distanceInterval: 0,
-        });
-        if (location) {
-          let regionName = await Location.reverseGeocodeAsync({
-            longitude: location.coords.longitude,
-            latitude: location.coords.latitude,
+      try {
+        if (permissionStatus == null) return;
+        if (!permissionStatus.granted) {
+          console.log("Permission to access location was denied");
+          return;
+        } else {
+          let location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Highest,
+            timeInterval: 10000,
+            distanceInterval: 0,
           });
-          if (regionName) {
-            updateLocationHandler(location, regionName);
+          if (location) {
+            let regionName = await Location.reverseGeocodeAsync({
+              longitude: location.coords.longitude,
+              latitude: location.coords.latitude,
+            });
+            if (regionName) {
+              updateLocationHandler(location, regionName);
+            }
           }
         }
+      }
+      catch {
       }
     })();
   });
 
   useEffect(() => {
     (async () => {
-      if (currentRoadTripData != null) {
-        setIsOngoingSession(true);
-        addPinHandler();
-      } else if (isOngoingSession) {
-        setIsOngoingSession(false);
-        clearPinsHandler();
+      try {
+        if (currentRoadTripData != null) {
+          setIsOngoingSession(true);
+          addPinHandler();
+        } else if (isOngoingSession) {
+          setIsOngoingSession(false);
+          clearPinsHandler();
+        }
+      }
+      catch {
       }
     })();
   });

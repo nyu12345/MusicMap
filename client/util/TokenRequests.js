@@ -80,13 +80,13 @@ export async function getRefreshTokens() {
 }
 
 export async function getAccessTokenFromSecureStorage() {
-  const expirationTime = await getValueFor("EXPIRATION_TIME");
+  const expirationTime = await getValueFor("EXPIRATION_TIME"); 
 
   const curTime = new Date().getTime();
   if (curTime > expirationTime) {
-    await getRefreshTokens();
+    await getRefreshTokens(); 
   }
 
-  const accessToken = await getValueFor("ACCESS_TOKEN");
-  return accessToken;
+  const accessToken = await getValueFor("ACCESS_TOKEN"); 
+  return accessToken; 
 }

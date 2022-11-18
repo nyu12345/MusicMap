@@ -16,7 +16,6 @@ export function PastTripsList() {
   // get roadtrip data from API
   if (roadtrips.length == 0) {
     axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
-      console.log(response.data);
       setRoadtrips(response.data);
     }).catch((err) => {
       console.log(err); 

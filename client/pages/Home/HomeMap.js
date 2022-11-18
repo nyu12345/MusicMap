@@ -1,7 +1,7 @@
 import MapView, { Marker, Callout } from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { Text, Image, Button } from "react-native";
+import { Text, Image } from "react-native";
 import * as Location from "expo-location";
 import { getValueFor } from "musicmap/util/SecureStore";
 import axios from "axios";

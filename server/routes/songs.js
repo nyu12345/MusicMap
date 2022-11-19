@@ -4,7 +4,7 @@ const Song = require("../models/songSchema");
 const mongoose = require("mongoose");
 
 router.get("/get-trip-songs/:tripId", (req, res) => {
-    console.log("Getting song for trip: %s", req.params.tripId);
+    console.log("Getting songs for trip: %s", req.params.tripId);
     Song.find({ tripId: req.params.tripId })
         .exec()
         .then((docs) => {

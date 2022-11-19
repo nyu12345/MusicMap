@@ -8,7 +8,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList() {
+export function PastTripsList({getSongs}) {
   const base_url = `${REACT_APP_BASE_URL}/users/`;
   const [roadtrips, setRoadtrips] = useState([]);
   const [searchInput, setSearchInput] = useState("");
@@ -80,11 +80,13 @@ export function PastTripsList() {
   // render
   const renderItem = ({ item }) => (
     <PastTrip
+      tripId={item._id}
       name={item.name}
       startLocation={item.startLocation}
       destination={item.destination}
       startDate={item.startDate}
       endDate={item.endDate}
+      getSongs={getSongs}
     />
   );
 

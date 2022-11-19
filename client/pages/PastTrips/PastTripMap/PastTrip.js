@@ -1,22 +1,50 @@
 import { Text, View, Image, StyleSheet, Pressable } from "react-native";
-
+import React, { useState } from "react"; 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-const PastTrip = ({ name, startLocation, destination, startDate, endDate }) => {
+const PastTrip = ({
+  tripId,
+  name,
+  startLocation,
+  destination,
+  startDate,
+  endDate,
+  getSongs, 
+}) => {
+  // const [songs, setSongs] = useState([]); 
+
+  // // get songs played in the selected roadtrip
+  // const getSongs = async (tripId) => {
+  //   await axios.get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${tripId}`).then((response) => {
+  //     setSongs(response.data); 
+  //   }).catch((err) => {
+  //     console.log(err); 
+  //   });
+  // };
+
   return (
     <Pressable
-      onPress={()=>{console.log('selected roadtrip')}}
+      onPress={() => {
+        console.log("selected roadtrip");
+        getSongs(tripId); 
+      }}
       style={styles.roadtripContainer}
     >
-      <Image source={require('musicmap/assets/sample_pfp.png')} style={styles.image} />
+      <Image
+        source={require("musicmap/assets/sample_pfp.png")}
+        style={styles.image}
+      />
       <View style={styles.roadtripContent}>
         <View style={styles.row}>
-          <Text style={styles.name} numberOfLines={1}>{name}</Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {name}
+          </Text>
           <Text style={styles.subTitle}>
-            {dayjs(startDate).format('MM/DD/YY')} - {dayjs(endDate).format('MM/DD/YY')}
+            {dayjs(startDate).format("MM/DD/YY")} -{" "}
+            {dayjs(endDate).format("MM/DD/YY")}
           </Text>
         </View>
         <Text numberOfLines={2} style={styles.subTitle}>

@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import styles from "./HomeStyles";
-// import Geolocation from 'react-native-geolocation-service';
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";

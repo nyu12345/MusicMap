@@ -1,7 +1,7 @@
 import MapView, { Marker, Callout } from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { Text, Image, Button } from "react-native";
+import { Text, Image } from "react-native";
 import * as Location from "expo-location";
 import { getValueFor } from "musicmap/util/SecureStore";
 import axios from "axios";
@@ -26,37 +26,47 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
 
   useEffect(() => {
     (async () => {
-      if (permissionStatus == null) return;
-      if (!permissionStatus.granted) {
-        console.log("Permission to access location was denied");
-        return;
-      } else {
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Highest,
-          timeInterval: 10000,
-          distanceInterval: 0,
-        });
-        if (location) {
-          let regionName = await Location.reverseGeocodeAsync({
-            longitude: location.coords.longitude,
-            latitude: location.coords.latitude,
+      try {
+        if (permissionStatus == null) return;
+        if (!permissionStatus.granted) {
+          console.log("Permission to access location was denied");
+          return;
+        } else {
+          let location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Highest,
+            timeInterval: 10000,
+            distanceInterval: 0,
           });
-          if (regionName) {
-            updateLocationHandler(location, regionName);
+          if (location) {
+            let regionName = await Location.reverseGeocodeAsync({
+              longitude: location.coords.longitude,
+              latitude: location.coords.latitude,
+            });
+            if (regionName) {
+              updateLocationHandler(location, regionName);
+            }
           }
         }
+      }
+      catch {
+        console.log("ERROR1");
       }
     })();
   });
 
   useEffect(() => {
     (async () => {
-      if (currentRoadTripData != null) {
-        setIsOngoingSession(true);
-        addPinHandler();
-      } else if (isOngoingSession) {
-        setIsOngoingSession(false);
-        clearPinsHandler();
+      try {
+        if (currentRoadTripData != null) {
+          setIsOngoingSession(true);
+          addPinHandler();
+        } else if (isOngoingSession) {
+          setIsOngoingSession(false);
+          clearPinsHandler();
+        }
+      }
+      catch {
+        console.log("ERROR2");
       }
     })();
   });

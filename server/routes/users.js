@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
   if (req.query.spotifyUsername)
     filter.spotifyUsername = req.query.spotifyUsername;
   if (req.query.id) filter._id = req.query.id;
-  await User.find(filter)
+  User.find(filter)
     .exec()
     .then((doc) => {
       console.log("doc:");

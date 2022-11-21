@@ -2,6 +2,7 @@ import React, {
   useState,
   useMemo,
   useCallback,
+  useEffect,
 } from "react";
 import { StyleSheet, SafeAreaView, View, TouchableHighlight, Text } from "react-native";
 import {
@@ -11,9 +12,42 @@ import {
 } from "@gorhom/bottom-sheet";
 import { REACT_APP_BASE_URL } from '@env';
 import axios from 'axios';
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
 export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [searchInput, setSearchInput] = useState("");
+  const [username, setUsername] = useState(""); 
+  const [userId, setUserId] = useState("");
+
+  async function getUserInfo() {
+    const accessToken = await getAccessTokenFromSecureStorage();
+
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setUsername(responseJson.id);
+      await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
+        console.log("response: " + response.data[0]["_id"]); 
+        setUserId(response.data[0]["_id"]);
+      }).catch((err) => {
+        console.log(err);
+      });
+    } else {
+      console.log("getUserInfo request returned no response");
+    }
+  }
+
+  useEffect(() => {
+    (async () => {
+      await getUserInfo();
+    })();
+  });
 
   // Points for the bottom sheet to snap to, sorted from bottom to top
   const snapPoints = useMemo(() => ["15%", "50%", "75%"], []);
@@ -27,9 +61,14 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     console.log("submitted")
     console.log(searchInput)
     const data = await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${searchInput}`);
-    console.log(data.data[0].length);
-    if (data.data[0] != null) {
+    if (data.data.length != 0) {
       console.log("valid");
+      console.log(data.data);
+      let newId = data.data[0]["_id"];
+      console.log(newId);
+      const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${newId}`);
+      console.log("data2:")
+      console.log(data2);
     }
   }
 

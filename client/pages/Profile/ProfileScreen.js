@@ -30,10 +30,10 @@ const ProfileScreen = (props) => {
   let friendsInfo = [];
   const emptyProfilePic = "abc_dummy.com"; 
 
-  const onRefresh = React.useCallback(() => {
-    console.log("refresh");
-    setFriends([]);
-  }, []);
+  // const onRefresh = React.useCallback(() => {
+  //   console.log("refresh"); 
+  //   setFriends([]);
+  // }, []);
  
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -51,53 +51,34 @@ const ProfileScreen = (props) => {
       setUsername(responseJson.id); 
       setNumFollowers(responseJson.followers.total);
       setProfilePic(responseJson.images[0].url);
-      if (friends.length == 0) { 
-        await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then((response2) => {
-          console.log("friends:")
-          console.log(response2.data[0]["friends"]);
-          if (response2.data[0]["friends"].length > 0) { 
-            response2.data[0]["friends"].map(userId =>
-                axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
-                  console.log("friends info");
-                  console.log(response.data[0]);
-                  friendsInfo.push(response.data[0])
-                })
-            );
-            console.log("after axios");
-            setFriends(friendsInfo); 
-            console.log(friendsInfo);
-          }
-        })
-      } else {
-        console.log("friends not null");
-        console.log(friends);
-      }
     } else {
       console.log("getUserInfo request returned no response");
     }
-  }
+  } 
 
-  // if (friends.length == 0) {
-  //   await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then((response2) => {
-  //     console.log("friends:")
-  //     console.log(response2.data[0]["friends"]);
-  //     if (response2.data[0]["friends"].length > 0) { 
-  //       response2.data[0]["friends"].map(userId =>
-  //           axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
-  //             console.log("friends info");
-  //             console.log(response.data[0]);
-  //             friendsInfo.push(response.data[0])
-  //           })
-  //       );
-  //       console.log("after axios");
-  //       setFriends(friendsInfo);
-  //       console.log(friendsInfo);
-  //     }
-  //   })
-  // } else {
-  //   console.log("friends not null");
-  //   console.log(friends);
-  // }
+  async function getFriends(username) { 
+    if (friends.length == 0) { 
+      await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then((response2) => {
+        console.log("friends:")
+        console.log(response2.data[0]["friends"]); 
+        if (response2.data[0]["friends"].length > 0) { 
+          response2.data[0]["friends"].map(async (userId) =>
+              await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
+                console.log("friends info");
+                console.log(response.data[0]);
+                friendsInfo.push(response.data[0]) 
+              })
+          ); 
+          console.log("after axios");
+          setFriends(friendsInfo);   
+          console.log(friendsInfo);
+        }
+      })
+    } else {
+      console.log("friends not null");
+      console.log(friends);
+    }
+  }
 
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
     const user = {
@@ -121,15 +102,16 @@ const ProfileScreen = (props) => {
         //setUserExists(false); 
         addUserToMongoDB(name, username, numFollowers, profilePic)
       }
-    }).catch((err) => {
+    }).catch((err) => { 
       console.log(err); 
     });
   }
 
   useEffect(() => {
-    (async () => {
+    (async () => { 
       await getUserInfo(); 
-      await addUserIfNew(username);
+      await addUserIfNew(username); 
+      await getFriends(username); 
     })();
   });
 
@@ -177,12 +159,12 @@ const ProfileScreen = (props) => {
           justifyContent: "center", 
           alignItems: "center",
         }}
-        refreshControl={
-          <RefreshControl
-            refreshing={friends.length == 0}
-            onRefresh={onRefresh}
-          />
-        }
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={friends.length == 0}
+        //     onRefresh={onRefresh}
+        //   />
+        // }
       >
         <Image
           style={styles.profilePic}

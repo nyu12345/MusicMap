@@ -57,6 +57,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     console.log("handleSheetChange", index);
   }, []);
 
+  // when the submit button is pressed, check to see if the searched username 
+  // is valid (in our database). if so, create a friend request
+  // with the current user as the requestor and the searched user as the requested
   const onPress = async (e) => {
     console.log("submitted")
     console.log(searchInput)
@@ -66,10 +69,30 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       console.log(data.data);
       let newId = data.data[0]["_id"];
       console.log(newId);
-      const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${newId}`);
-      console.log("data2:")
-      console.log(data2);
+      createFriendRequest(userId, newId); // await?
+
+      // below code is for later - when the requested accepts the request, we add to friends list (make sure to add to both)
+      // const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${newId}`);
+      // console.log("data2:")
+      // console.log(data2);
     }
+  }
+
+  async function createFriendRequest(requestorId, requestedId) {
+    console.log("creating friend request");
+    console.log("requestor:");
+    console.log(requestorId);
+    console.log("requested:");
+    console.log(requestedId);
+    const friendRequest = {
+      requestorId: requestorId,
+      requestedId: requestedId,
+    }
+    axios.post(`${REACT_APP_BASE_URL}/friendRequests`, friendRequest).then((response) => {
+      console.log("success"); 
+    }).catch((err) => {
+      console.log(err); 
+    })
   }
 
   return (

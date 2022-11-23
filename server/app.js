@@ -3,6 +3,7 @@ const roadtripRoutes = require("./routes/roadtrips");
 const songRoutes = require("./routes/songs");
 const userRoutes = require("./routes/users");
 const statisticRoutes = require("./routes/statistics");
+const friendRequestRoutes = require("./routes/friendRequests")
 
 const app = express();
 const cors = require('cors');
@@ -15,6 +16,7 @@ app.use("/roadtrips", roadtripRoutes);
 app.use("/songs", songRoutes);
 app.use("/users", userRoutes);
 app.use("/statistics", statisticRoutes);
+app.use("/friendRequests", friendRequestRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");

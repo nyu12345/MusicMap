@@ -18,14 +18,6 @@ router.get("/", (req, res) => {
     })
     .catch((err) => {
       res.status(500).json({ error: err });
-      // User.find()
-      //   .exec()
-      //   .then((docs) => {
-      //     res.status(200).json(docs);
-      //   })
-      //   .catch((err) => {
-      //     res.status(500).json({ error: err });
-      //   });
     });
 });
 
@@ -34,26 +26,7 @@ router.post("/", async (req, res, next) => {
   console.log(req.body.name);
   console.log("friends:");
   console.log(req.body.friends);
-  //console.log(req.body.friends[0]);
-  // find friends
   var friends = new Set();
-  // console.log(mongoose.Types.ObjectId.isValid(req.body.friends))
-  // if(req.body.friends.length > 0) {
-  //   await User.find({
-  //     _id: { $in: req.body.friends },
-  //   })
-  //     .exec()
-  //     .then((doc) => {
-  //       console.log("doc:")
-  //       console.log(doc)
-  //       for (const entry of doc) {
-  //         console.log("entry:")
-  //         console.log(entry)
-  //         friends.add(entry._id)
-  //       }
-  //     })
-  //     .catch((err) => console.log(err))
-  // }
   console.log(friends);
 
   const user = new User({

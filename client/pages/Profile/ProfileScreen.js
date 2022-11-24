@@ -21,7 +21,7 @@ import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomShee
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { set } from "react-native-reanimated";
 
-const ProfileScreen = (props) => {
+export function ProfileScreen(props) {
   const [name, setName] = useState("");
   const [username, setUsername] = useState(""); 
   const [numFollowers, setNumFollowers] = useState(0);
@@ -61,13 +61,13 @@ const ProfileScreen = (props) => {
       await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then((response2) => {
         console.log("friends:")
         console.log(response2.data[0]["friends"]); 
-        if (response2.data[0]["friends"].length > 0) { 
+        if (response2.data[0]["friends"].length > 0) {  
           response2.data[0]["friends"].map(async (userId) =>
               await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
                 console.log("friends info");
                 console.log(response.data[0]);
                 friendsInfo.push(response.data[0]) 
-              })
+              }) 
           ); 
           console.log("after axios");
           setFriends(friendsInfo);   
@@ -84,7 +84,7 @@ const ProfileScreen = (props) => {
     const user = {
       name: name, 
       spotifyUsername: username, 
-      numFriends: numFollowers, 
+      numFriends: numFollowers,  
       profilePic: profilePicUrl, 
       friends: [], 
     }

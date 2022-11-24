@@ -6,20 +6,35 @@ const { ObjectId } = require("mongodb");
 
 router.get("/", (req, res) => {
   console.log("Router working");
-  FriendRequest.find()
+  const filter = {};
+  if (req.query.requestedId)
+    filter.requestedId = req.query.requestedId;
+  if (req.query.requestorId) 
+    filter.requestorId = req.query.requestorId;
+  FriendRequest.find(filter)
     .exec()
-    .then((docs) => {
-      res.status(200).json(docs);
+    .then((doc) => {
+      res.status(200).json(doc);
     })
     .catch((err) => {
       res.status(500).json({ error: err });
     });
 });
 
-// get pending requests (where user is the requested)
+// get received requests (where user is the requested)
 router.get("/:requestedId", (req, res) => {
   console.log("finding request by requestedId"); 
   FriendRequest.find({ requestedId: req.params.requestedId }).then((doc) => {
+    res.status(200).json(doc); 
+  }).catch((err) => {
+    res.status(500).json({ error: err }); 
+  })
+}); 
+
+// get sent requests (where user is the requestor)
+router.get("/:requestorId", (req, res) => {
+  console.log("finding request by requestorId"); 
+  FriendRequest.find({ requestorId: req.params.requestorId }).then((doc) => {
     res.status(200).json(doc); 
   }).catch((err) => {
     res.status(500).json({ error: err }); 
@@ -52,5 +67,14 @@ router.post("/", async (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
+// delete a request - doesn't seem to work in postman lol idk anythign
+router.delete("/:id", (req, res) => {
+  console.log("deleting friend request");
+  FriendRequest.findByIdAndDelete(req.params.id).then((doc) => {
+    res.status(200).json(doc);
+  }).catch((err) => {
+    res.status(500).json({ error: err });
+  })
+});
 
 module.exports = router;

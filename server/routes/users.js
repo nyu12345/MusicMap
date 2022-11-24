@@ -83,4 +83,13 @@ router.patch("/:_id", (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
+router.delete("/:id", (req, res) => {
+  console.log("deleting user");
+  User.findByIdAndDelete(req.params.id).then((doc) => {
+    res.status(200).json(doc);
+  }).catch((err) => {
+    res.status(500).json({ error: err });
+  })
+});
+
 module.exports = router;

@@ -1,18 +1,19 @@
 import {
   Text,
-  View,
+  View, 
   StyleSheet,
   Image,
-  TextInput,
+  TextInput, 
   ScrollView,
   SafeAreaView,
   Pressable,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { FriendCard } from "musicmap/pages/Profile/FriendCard";
+import { ReceivedRequestCard } from "musicmap/pages/Profile/ReceivedRequestCard";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import { getUserInfo } from "musicmap/util/UserInfo";
 
 export function ReceivedScreen() {
 
@@ -20,29 +21,6 @@ export function ReceivedScreen() {
   const [userId, setUserId] = useState("");
   const [received, setReceived] = useState([]);
   let receivedInfo = [];
-
-  async function getUserInfo() {
-    const accessToken = await getAccessTokenFromSecureStorage();
-
-    const response = await fetch("https://api.spotify.com/v1/me", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`, 
-      }, 
-    });
-
-    if (response) {
-      const responseJson = await response.json();
-      setUsername(responseJson.id);
-      await axios.get(`${REACT_APP_BASE_URL}/users/${responseJson.id}`).then((response) => {
-        setUserId(response.data[0]["_id"]);
-      }).catch((err) => {
-        console.log(err);
-      });
-    } else {
-      console.log("getUserInfo request returned no response");
-    }
-  }
   
   async function getReceived(userId) {
     if (received.length == 0) { 
@@ -69,23 +47,27 @@ export function ReceivedScreen() {
     }
   } 
  
-  useEffect(() => {
+  useEffect(() => { 
     (async () => {
-      await getUserInfo();
-      if (userId != "") {
+      let userInfo = await getUserInfo();
+      if (userInfo) {
+        setUsername(userInfo[1]); 
+        setUserId(userInfo[4])
+      }
+      if (userId != "") { 
         await getReceived(userId);
       } 
-    })();
+    })(); 
   });
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
-        style={{ flex: 1, padding: 20 }}
+        style={{ flex: 1, padding: 20 }} 
         contentContainerStyle={{
           justifyContent: "center",
-          alignItems: "center",
-        }}
+          alignItems: "center", 
+        }}  
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
@@ -93,10 +75,10 @@ export function ReceivedScreen() {
           </View>
         </View>
         {received.length > 0 ? received.map((item) => (
-          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
+          <ReceivedRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
         )) : <Text>You have not received any friend requests!</Text>}
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView> 
   );
 };
 

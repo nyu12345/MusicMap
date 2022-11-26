@@ -13,6 +13,7 @@ import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import { getUserInfo } from "musicmap/util/UserInfo";
 
 export function SentScreen() {
 
@@ -20,30 +21,7 @@ export function SentScreen() {
   const [userId, setUserId] = useState("");
   const [sent, setSent] = useState([]);
   let sentInfo = [];
-
-  async function getUserInfo() {
-    const accessToken = await getAccessTokenFromSecureStorage();
-
-    const response = await fetch("https://api.spotify.com/v1/me", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response) {
-      const responseJson = await response.json();
-      setUsername(responseJson.id);
-      await axios.get(`${REACT_APP_BASE_URL}/users/${responseJson.id}`).then((response) => {
-        setUserId(response.data[0]["_id"]);
-      }).catch((err) => {
-        console.log(err);
-      });
-    } else {
-      console.log("getUserInfo request returned no response");
-    } 
-  } 
-
+  
   async function getSent(userId) {
     if (sent.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`).then((response) => {
@@ -72,8 +50,12 @@ export function SentScreen() {
 
   useEffect(() => {
     (async () => {
-      await getUserInfo();
-      if (userId != "") {
+      let userInfo = await getUserInfo();
+      if (userInfo) { 
+        setUsername(userInfo[1]);
+        setUserId(userInfo[4])
+      }
+      if (userId != "") { 
         await getSent(userId);
       }
     })();

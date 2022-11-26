@@ -6,7 +6,7 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
-  Pressable, 
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { REACT_APP_BASE_URL } from "@env";
@@ -15,62 +15,42 @@ import * as SecureStore from 'expo-secure-store';
 import { Linking, Networking, RefreshControl } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
-import { deleteValue } from "musicmap/util/SecureStore"; 
-import { FriendCard } from "musicmap/pages/Profile/FriendCard"; 
+import { getUserInfo } from "musicmap/util/UserInfo";
+import { deleteValue } from "musicmap/util/SecureStore";
+import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { set } from "react-native-reanimated";
 
 export function ProfileScreen(props) {
   const [name, setName] = useState("");
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
   const [friends, setFriends] = useState([]);
   let friendsInfo = [];
-  const emptyProfilePic = "abc_dummy.com"; 
+  const emptyProfilePic = "abc_dummy.com";
 
   // const onRefresh = React.useCallback(() => {
   //   console.log("refresh"); 
   //   setFriends([]);
   // }, []);
- 
-  async function getUserInfo() {
-    const accessToken = await getAccessTokenFromSecureStorage();
 
-    const response = await fetch("https://api.spotify.com/v1/me", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response) {
-      const responseJson = await response.json();
-      setName(responseJson.display_name); 
-      setUsername(responseJson.id); 
-      setNumFollowers(responseJson.followers.total);
-      setProfilePic(responseJson.images[0].url);
-    } else {
-      console.log("getUserInfo request returned no response");
-    }
-  } 
-
-  async function getFriends(username) { 
-    if (friends.length == 0) { 
+  async function getFriends(username) {
+    if (friends.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then((response2) => {
         console.log("friends:")
-        console.log(response2.data[0]["friends"]); 
-        if (response2.data[0]["friends"].length > 0) {  
+        console.log(response2.data[0]["friends"]);
+        if (response2.data[0]["friends"].length > 0) {
           response2.data[0]["friends"].map(async (userId) =>
-              await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
-                console.log("friends info");
-                console.log(response.data[0]);
-                friendsInfo.push(response.data[0]) 
-              }) 
-          ); 
+            await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
+              console.log("friends info");
+              console.log(response.data[0]);
+              friendsInfo.push(response.data[0])
+            })
+          );
           console.log("after axios");
-          setFriends(friendsInfo);   
+          setFriends(friendsInfo);
           console.log(friendsInfo);
         }
       })
@@ -82,38 +62,46 @@ export function ProfileScreen(props) {
 
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
     const user = {
-      name: name, 
-      spotifyUsername: username, 
-      numFriends: numFollowers,   
-      profilePic: profilePicUrl, 
-      friends: [], 
+      name: name,
+      spotifyUsername: username,
+      numFriends: numFollowers,
+      profilePic: profilePicUrl,
+      friends: [],
     }
     axios.post(`${REACT_APP_BASE_URL}/users`, user).then((response) => {
-      console.log("success"); 
+      console.log("success");
     }).catch((err) => {
-      console.log(err); 
+      console.log(err);
     })
   }
 
   async function addUserIfNew(username) {
     await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
-      console.log("response: " + response.data.length); 
+      console.log("response: " + response.data.length);
       if (response.data.length === 0) {
         //setUserExists(false); 
         addUserToMongoDB(name, username, numFollowers, profilePic)
       }
-    }).catch((err) => { 
-      console.log(err); 
+    }).catch((err) => {
+      console.log(err);
     });
   }
-
+ 
   useEffect(() => {
     (async () => { 
-      await getUserInfo(); 
-      await addUserIfNew(username); 
-      await getFriends(username); 
+      let userInfo = await getUserInfo();
+      if (userInfo != null) {
+        console.log("user info not null");
+        console.log(userInfo);
+        setName(userInfo[0]); 
+        setUsername(userInfo[1]); 
+        setNumFollowers(userInfo[2]);
+        setProfilePic(userInfo[3]);
+      }
+      await addUserIfNew(username);
+      await getFriends(username);
     })();
-  }); 
+  });
 
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {
@@ -125,7 +113,7 @@ export function ProfileScreen(props) {
     await deleteValue("EXPIRATION_TIME");
 
     Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects?
-    Networking.clearCookies(() => {});
+    Networking.clearCookies(() => { });
 
     props.navigation.navigate("login");
   };
@@ -152,19 +140,19 @@ export function ProfileScreen(props) {
   // ]
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
-        style={{flex: 1, padding: 20}}
+        style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{
-          justifyContent: "center", 
+          justifyContent: "center",
           alignItems: "center",
         }}
-        // refreshControl={
-        //   <RefreshControl
-        //     refreshing={friends.length == 0}
-        //     onRefresh={onRefresh}
-        //   />
-        // }
+      // refreshControl={
+      //   <RefreshControl
+      //     refreshing={friends.length == 0}
+      //     onRefresh={onRefresh}
+      //   />
+      // }
       >
         <Image
           style={styles.profilePic}
@@ -185,10 +173,10 @@ export function ProfileScreen(props) {
           </View>
         </View>
 
-        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef}/>
+        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
         {friends.length > 0 ? friends.map((item) => (
-        <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername}/>
-      )) : <Text>No friends!</Text>}
+          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
+        )) : <Text>No friends!</Text>}
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>
@@ -217,8 +205,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginTop: 10, 
-    marginBottom: 15, 
+    marginTop: 10,
+    marginBottom: 15,
   },
   userInfoItem: {
     justifyContent: 'center',
@@ -235,7 +223,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   logoutButton: {
-    marginTop: 10, 
+    marginTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,

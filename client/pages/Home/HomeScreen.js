@@ -52,12 +52,13 @@ export function HomeScreen() {
   };
 
   const createHandler = () => {
-    console.log(`name: ${roadtripName}`);
+    console.log(`roadtrip name: ${roadtripName}`);
     const roadtrip = {
       name: roadtripName,
       startLocation: currentLocation.name,
       startDate: new Date().toDateString(),
     };
+    console.log(roadtrip.startLocation);
     // should add check to see if these fields are valid here and present alert if not
     axios
       .post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip)
@@ -77,7 +78,6 @@ export function HomeScreen() {
         }
         console.log(error.config);
       });
-
     setModalVisible(false);
     setButtonIsStartRoadtrip(false);
   };

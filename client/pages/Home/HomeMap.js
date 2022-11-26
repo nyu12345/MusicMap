@@ -38,13 +38,13 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
             distanceInterval: 0,
           });
           if (location) {
-            let regionName = await Location.reverseGeocodeAsync({
-              longitude: location.coords.longitude,
-              latitude: location.coords.latitude,
-            });
-            if (regionName) {
-              updateLocationHandler(location, regionName);
-            }
+            // let regionName = await Location.reverseGeocodeAsync({
+            //   longitude: location.coords.longitude,
+            //   latitude: location.coords.latitude,
+            // });
+            // if (regionName) {
+              updateLocationHandler(location, "Durham, NC");
+            //}
           }
         }
       }
@@ -71,11 +71,11 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     })();
   });
 
-  useEffect(() => {
-    if (currentSong.spotifyId != null) {
-      postSongHandler();
-    }
-  }, [currentSong])
+  // useEffect(() => {
+  //   if (currentSong.spotifyId != null) {
+  //     postSongHandler();
+  //   }
+  // }, [currentSong])
 
   const getSongFromSpotify = async () => {
     let accessToken = await getValueFor("ACCESS_TOKEN");
@@ -101,9 +101,13 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     return null;
   };
 
-  const postSongHandler = () => {
+  const postSongHandler = (newSong) => {
+    if (newSong == currentSong) {
+      return;
+    }
+    console.log("POST SONG: " + newSong.title);
     axios
-      .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
+      .post(`${REACT_APP_BASE_URL}/songs/create-song`, newSong)
       .then((response) => {
         console.log(response.data);
       })
@@ -127,7 +131,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     }
     const song = await getSongFromSpotify();
     if (song == null || song.id == currentSong.spotifyId) {
-      console.log("NO NEW SONG CURRENTLY :(");
+      // console.log("NO NEW SONG CURRENTLY :(");
       return;
     }
     const newSong = {
@@ -149,6 +153,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
       newSong,
     ]);
     setOffset((prevOffset) => prevOffset + 0.005);
+    postSongHandler(newSong);
   };
 
   const clearPinsHandler = () => {

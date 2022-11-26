@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  ScrollView,
+  ScrollView, 
   SafeAreaView,
   Pressable,
 } from "react-native";
@@ -12,7 +12,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { getUserInfo } from "musicmap/util/UserInfo";
 
 export function SentScreen() {

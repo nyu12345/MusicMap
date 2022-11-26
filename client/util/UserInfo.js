@@ -14,16 +14,11 @@ export async function getUserInfo() {
 
     if (response) {
         const responseJson = await response.json();
-        console.log("responseJson:");
-        console.log(responseJson);
         const response2 = await axios.get(`${REACT_APP_BASE_URL}/users/${responseJson.id}`);
         if (response2) {
-            console.log("response2:")
-            console.log(response2);
-            console.log(response2.data[0]["_id"]);
             return [responseJson.display_name, responseJson.id, responseJson.followers.total, responseJson.images[0].url, response2.data[0]["_id"]]
         } else {
-            console.log("getUserId request returned no response");
+            console.log("user id not in database returned no response");
         }
     } else {
         console.log("getUserInfo request returned no response");

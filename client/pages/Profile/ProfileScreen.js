@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  ScrollView,
+  ScrollView, 
   SafeAreaView,
   Pressable,
 } from "react-native";
@@ -13,8 +13,6 @@ import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import { Linking, Networking, RefreshControl } from "react-native";
-import { AntDesign } from '@expo/vector-icons';
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { getUserInfo } from "musicmap/util/UserInfo";
 import { deleteValue } from "musicmap/util/SecureStore";
 import { FriendCard } from "musicmap/pages/Profile/FriendCard";

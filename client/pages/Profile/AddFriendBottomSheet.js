@@ -12,40 +12,20 @@ import {
 } from "@gorhom/bottom-sheet";
 import { REACT_APP_BASE_URL } from '@env';
 import axios from 'axios';
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import { getUserInfo } from "musicmap/util/UserInfo";
 
 export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [searchInput, setSearchInput] = useState("");
   const [username, setUsername] = useState(""); 
   const [userId, setUserId] = useState("");
 
-  async function getUserInfo() {
-    const accessToken = await getAccessTokenFromSecureStorage();
-
-    const response = await fetch("https://api.spotify.com/v1/me", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response) {
-      const responseJson = await response.json();
-      setUsername(responseJson.id);
-      await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
-        console.log("response: " + response.data[0]["_id"]); 
-        setUserId(response.data[0]["_id"]);
-      }).catch((err) => {
-        console.log(err);
-      });
-    } else {
-      console.log("getUserInfo request returned no response");
-    }
-  }
-
   useEffect(() => {
     (async () => {
-      await getUserInfo();
+      let userInfo = await getUserInfo();
+      if (userInfo) {
+        setUsername(userInfo[1]); 
+        setUserId(userInfo[4])
+      }
     })();
   });
 

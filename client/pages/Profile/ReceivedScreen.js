@@ -62,43 +62,26 @@ export function ReceivedScreen() {
   const ReceivedRequestCard = ({ name, numFriends, profilePic, username, friendId, userId }) => {
 
     const onPressX = async (e) => {
-      console.log("pressed x")
-      console.log(username);
-      console.log(friendId);
-      console.log(userId);
+      console.log("rejecting request")
       deleteFriendRequest(friendId, userId)
-      // - if X is clicked, delete the friend request from the database
-        // below code is for later - when the requested accepts the request, we add to friends list (make sure to add to both)
-        // const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${newId}`);
-        // console.log("data2:")
-        // console.log(data2);
-  
     }
-    const onPressCheck = async (e) => {
-      console.log("pressed check")
+
+    const onPressCheck = async (e) => { 
+      console.log("accepting request")
       const data = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${friendId}`);
       console.log("data:")
       console.log(data);
       const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${friendId}?friendId=${userId}`);
       console.log("data2:")
       console.log(data2);
-      // theoretically adds each person to the other's friends list, need to add delete functionality
-      // deleteFriendRequest(friendId, userId)
-      // - if check is clicked, add each person to the other’s friends list, and delete the friend request from the database
+      deleteFriendRequest(friendId, userId)
     }
   
     async function deleteFriendRequest(requestorId, requestedId) {
       console.log("deleting friend request");
-      console.log("requestor:");
-      console.log(requestorId);
-      console.log("requested:");
-      console.log(requestedId);
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${requestedId}&requestorId=${requestorId}`).then((response) => {
-        console.log(response.data[0]);
         let requestId = response.data[0]["_id"];
-        console.log(requestId);
         axios.delete(`${REACT_APP_BASE_URL}/friendRequests/${requestId}`).then((response) => {
-          console.log("success"); 
           setReceived([]);
         }).catch((err) => {
           console.log(err); 
@@ -106,9 +89,6 @@ export function ReceivedScreen() {
       }).catch((err) => {
         console.log(err); 
       })
-      // get id of friend request using requestorId and requestedId as parameters
-      // test delete route on postman!
-      // use this function when both x and check is clicked
     }
   
     return (

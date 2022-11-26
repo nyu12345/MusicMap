@@ -143,7 +143,7 @@ export function ProfileScreen(props) {
         style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{
           justifyContent: "center",
-          alignItems: "center",
+          alignItems: "center", 
         }}
       // refreshControl={
       //   <RefreshControl

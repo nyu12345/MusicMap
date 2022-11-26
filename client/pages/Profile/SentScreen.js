@@ -34,47 +34,35 @@ export function SentScreen() {
     if (response) {
       const responseJson = await response.json();
       setUsername(responseJson.id);
-      await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
-        console.log("response: " + response.data[0]["_id"]);
+      await axios.get(`${REACT_APP_BASE_URL}/users/${responseJson.id}`).then((response) => {
         setUserId(response.data[0]["_id"]);
       }).catch((err) => {
         console.log(err);
       });
     } else {
       console.log("getUserInfo request returned no response");
-    }
-  }
+    } 
+  } 
 
   async function getSent(userId) {
-    console.log("user id:");
-    console.log(userId);
     if (sent.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`).then((response) => {
-        console.log("requests:");
         if (response.data.length != 0) {
+          console.log("sent requests:");
           console.log(response.data[0]);
           let currRequestedId = response.data[0]["requestedId"]
           console.log(currRequestedId);
           axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response2) => {
             console.log("sent info");
             console.log(response2.data[0]);
-            sentInfo.push(response2.data[0])
+            sentInfo.push(response2.data[0]) 
+          }).catch((err) => {
+            console.log(err);
           })
           setSent(sentInfo);
         }
-        // console.log(response2.data[0]["friends"]); 
-        // if (response2.data[0]["friends"].length > 0) { 
-        //   response2.data[0]["friends"].map(async (userId) =>
-        //       await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
-        //         console.log("friends info");
-        //         console.log(response.data[0]);
-        //         friendsInfo.push(response.data[0]) 
-        //       }) 
-        //   );  
-        //   console.log("after axios");
-        //   setFriends(friendsInfo);   
-        //   console.log(friendsInfo);
-        // }
+      }).catch((err) => {
+        console.log(err);
       })
     } else {
       console.log("sent not null");
@@ -85,28 +73,11 @@ export function SentScreen() {
   useEffect(() => {
     (async () => {
       await getUserInfo();
-      await getSent(userId);
+      if (userId != "") {
+        await getSent(userId);
+      }
     })();
   });
-
-
-  // dummy data
-  const friends = [
-    {
-      name: "Jeffrey Liu",
-      numFriends: 30,
-      spotifyUsername: "jzl",
-      friends: [],
-      profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
-    },
-    {
-      name: "Nathan Huang",
-      numFriends: 29,
-      spotifyUsername: "nhu",
-      friends: [],
-      profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
-    },
-  ]
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

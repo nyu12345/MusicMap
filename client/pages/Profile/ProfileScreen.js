@@ -84,7 +84,7 @@ export function ProfileScreen(props) {
     const user = {
       name: name, 
       spotifyUsername: username, 
-      numFriends: numFollowers,  
+      numFriends: numFollowers,   
       profilePic: profilePicUrl, 
       friends: [], 
     }
@@ -113,7 +113,7 @@ export function ProfileScreen(props) {
       await addUserIfNew(username); 
       await getFriends(username); 
     })();
-  });
+  }); 
 
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {

@@ -26,6 +26,9 @@ export function HomeScreen() {
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
 
   const startRoadtripClickHandler = () => {
+    if (currentLocation == null) {
+      return; // maybe should hide the button until it's not null
+    }
     setModalVisible(true);
   };
 

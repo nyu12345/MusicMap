@@ -49,6 +49,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
         }
       }
       catch {
+        console.log("ERROR1");
       }
     })();
   });
@@ -65,6 +66,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
         }
       }
       catch {
+        console.log("ERROR2");
       }
     })();
   });
@@ -100,8 +102,6 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   };
 
   const postSongHandler = () => {
-    console.log(`name: ${currentSong.title}`);
-    // should add check to see if these fields are valid here and present alert if not
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
       .then((response) => {
@@ -139,7 +139,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
       location: {
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude + offset,
-        name: "Durham, NC",
+        name: currentLocation.name,
       },
       datestamp: new Date().toLocaleString("en-GB"),
     };

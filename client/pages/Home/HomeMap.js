@@ -7,12 +7,15 @@ import { getValueFor } from "musicmap/util/SecureStore";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 
+let currentSong = { title: "No song", spotifyId: null };
+
 export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTripData }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
   const [songs, setSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
+  // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
+
 
   /**
    * requests permission if needed
@@ -101,13 +104,10 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     return null;
   };
 
-  const postSongHandler = (newSong) => {
-    if (newSong == currentSong) {
-      return;
-    }
-    console.log("POST SONG: " + newSong.title);
+  const postSongHandler = () => {
+    console.log("POST SONG: " + currentSong.title);
     axios
-      .post(`${REACT_APP_BASE_URL}/songs/create-song`, newSong)
+      .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
       .then((response) => {
         console.log(response.data);
       })
@@ -126,12 +126,11 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   };
 
   const addPinHandler = async () => {
-    if (currentLocation == null) {
+    if (currentLocation == null || currentRoadTripData == null) {
       return;
     }
     const song = await getSongFromSpotify();
-    if (song == null || song.id == currentSong.spotifyId) {
-      // console.log("NO NEW SONG CURRENTLY :(");
+    if (song == null  || song.id == currentSong.spotifyId) {
       return;
     }
     const newSong = {
@@ -147,19 +146,21 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
       },
       datestamp: new Date().toLocaleString("en-GB"),
     };
-    setCurrentSong(newSong);
+    currentSong = newSong;
+    // setCurrentSong(newSong);
     setSongs((prevSongs) => [
       ...prevSongs,
       newSong,
     ]);
     setOffset((prevOffset) => prevOffset + 0.005);
-    postSongHandler(newSong);
+    postSongHandler();
   };
 
   const clearPinsHandler = () => {
     setSongs([]);
     setOffset(0);
-    setCurrentSong({ title: "No song", spotifyId: null });
+    currentSong = { title: "No song", spotifyId: null };
+    // setCurrentSong({ title: "No song", spotifyId: null });
   };
 
   return (

@@ -49,7 +49,7 @@ export function ReceivedScreen() {
   useEffect(() => { 
     (async () => { 
       let userInfo = await getUserInfo();
-      if (userInfo) {
+      if (userInfo.length > 4) { 
         setUsername(userInfo[1]); 
         setUserId(userInfo[4])
       }
@@ -100,7 +100,7 @@ export function ReceivedScreen() {
               <Text style={styles.name} numberOfLines={1}>{name}</Text>
               <Text numberOfLines={2} style={styles.subTitle}>
                 {numFriends} Friends
-              </Text>
+              </Text> 
             </View>
             <Pressable> 
               <AntDesign name="closecircleo" size={36} color="black" style={styles.icons} onPress={onPressX} />
@@ -125,7 +125,7 @@ export function ReceivedScreen() {
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
-            <Text style={styles.name}>Received Friend Requests</Text>
+            <Text style={styles.header}>Received Friend Requests</Text>
           </View>
         </View>
         {received.length > 0 ? received.map((item) => (
@@ -137,7 +137,7 @@ export function ReceivedScreen() {
 };
 
 const styles = StyleSheet.create({
-  name: {
+  header: {
     flex: 1,
     fontWeight: "bold",
     fontSize: 20,

@@ -11,7 +11,7 @@ const Tab = createMaterialTopTabNavigator();
 export function ProfileHomeScreen() {
     return (
         <Tab.Navigator style={{ marginTop: ExpoConstants.statusBarHeight }} >
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="Your Profile" component={ProfileScreen} />
             <Tab.Screen name="Received" component={ReceivedScreen} />
             <Tab.Screen name="Sent" component={SentScreen} />
             {/* Bottom sheet goes here */}

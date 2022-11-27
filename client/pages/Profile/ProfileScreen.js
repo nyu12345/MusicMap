@@ -13,7 +13,8 @@ import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import { Linking, Networking, RefreshControl } from "react-native";
-import { getUserInfo } from "musicmap/util/UserInfo";
+// import { getUserInfo } from "musicmap/util/UserInfo";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore";
 import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
@@ -33,6 +34,27 @@ export function ProfileScreen(props) {
   //   console.log("refresh"); 
   //   setFriends([]);
   // }, []);
+
+  async function getUserInfo() {
+    const accessToken = await getAccessTokenFromSecureStorage();
+
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setName(responseJson.display_name); 
+      setUsername(responseJson.id); 
+      setNumFollowers(responseJson.followers.total);
+      setProfilePic(responseJson.images[0].url);
+    } else {
+      console.log("getUserInfo request returned no response");
+    }
+  } 
 
   async function getFriends(username) {
     if (friends.length == 0) {
@@ -66,6 +88,8 @@ export function ProfileScreen(props) {
       profilePic: profilePicUrl,
       friends: [],
     }
+    console.log("adding to mongodb");
+    console.log(user);
     axios.post(`${REACT_APP_BASE_URL}/users`, user).then((response) => {
       console.log("success");
     }).catch((err) => {
@@ -77,29 +101,26 @@ export function ProfileScreen(props) {
     await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
       console.log("response: " + response.data.length);
       if (response.data.length === 0) {
+        console.log("new user");
         //setUserExists(false); 
         addUserToMongoDB(name, username, numFollowers, profilePic)
       }
     }).catch((err) => {
-      console.log(err);
+      console.log(err); 
     });
-  }
+  } 
  
   useEffect(() => {
-    (async () => { 
-      let userInfo = await getUserInfo();
-      if (userInfo != null) {
-        console.log("user info not null");
-        console.log(userInfo);
-        setName(userInfo[0]); 
-        setUsername(userInfo[1]); 
-        setNumFollowers(userInfo[2]);
-        setProfilePic(userInfo[3]);
+    (async () => {
+      await getUserInfo(); 
+      if (username != "" && profilePic != "") {
+        console.log("username not empty")
+        console.log(username)
+        await addUserIfNew(username); 
+        await getFriends(username); 
       }
-      await addUserIfNew(username);
-      await getFriends(username);
     })();
-  });
+  }); 
 
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {
@@ -143,10 +164,10 @@ export function ProfileScreen(props) {
         style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{
           justifyContent: "center",
-          alignItems: "center", 
+          alignItems: "center",  
         }}
       // refreshControl={
-      //   <RefreshControl
+      //   <RefreshControl 
       //     refreshing={friends.length == 0}
       //     onRefresh={onRefresh}
       //   />

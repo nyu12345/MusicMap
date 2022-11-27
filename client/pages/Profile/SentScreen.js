@@ -9,9 +9,9 @@ import {
   Pressable,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
+import { AntDesign } from '@expo/vector-icons';
 import { getUserInfo } from "musicmap/util/UserInfo";
 
 export function SentScreen() {
@@ -36,7 +36,7 @@ export function SentScreen() {
           }).catch((err) => {
             console.log(err);
           })
-          setSent(sentInfo);
+          setSent(sentInfo); 
         }
       }).catch((err) => {
         console.log(err);
@@ -60,6 +60,47 @@ export function SentScreen() {
     })();
   });
 
+  const SentRequestCard = ({ name, numFriends, profilePic, username, friendId, userId }) => {
+
+    const onPress = async (e) => {
+      console.log("withdrawing request")
+      deleteFriendRequest(userId, friendId)
+    }
+  
+    async function deleteFriendRequest(requestorId, requestedId) {
+      console.log("deleting friend request"); 
+      await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${requestedId}&requestorId=${requestorId}`).then((response) => {
+        let requestId = response.data[0]["_id"];
+        axios.delete(`${REACT_APP_BASE_URL}/friendRequests/${requestId}`).then((response) => {
+          setSent([]);
+        }).catch((err) => { 
+          console.log(err);  
+        })  
+      }).catch((err) => {
+        console.log(err); 
+      })
+    }
+  
+    return (
+      <View style={styles.friendCardContainer}>
+        <Image source={{ uri: profilePic }} style={styles.image} />
+        <View style={styles.friendCardContent}>
+          <View style={styles.cardRow}>
+            <View style={styles.cardColumn}>
+              <Text style={styles.name} numberOfLines={1}>{name}</Text>
+              <Text numberOfLines={2} style={styles.subTitle}>
+                {numFriends} Friends
+              </Text>
+            </View>
+            <Pressable>
+              <Text style={styles.withdraw} onPress={onPress}>Withdraw</Text>
+            </Pressable>
+          </View> 
+        </View>
+      </View>
+    );
+  }; 
+ 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
@@ -71,11 +112,11 @@ export function SentScreen() {
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
-            <Text style={styles.name}>Sent Friend Requests</Text>
+            <Text style={styles.header}>Sent Friend Requests</Text>
           </View>
         </View>
         {sent.length > 0 ? sent.map((item) => (
-          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
+          <SentRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not sent any friend requests!</Text>}
       </ScrollView>
     </SafeAreaView>
@@ -83,7 +124,7 @@ export function SentScreen() {
 };
 
 const styles = StyleSheet.create({
-  name: {
+  header: {
     flex: 1,
     fontWeight: "bold",
     fontSize: 20,
@@ -91,5 +132,46 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginBottom: 10,
+  },
+  friendCardContainer: {
+    flexDirection: "row",
+    marginHorizontal: 10,
+    marginVertical: 5,
+    height: 70,
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  friendCardContent: {
+    flex: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "lightgray",
+  },
+  cardRow: {
+    flexDirection: "row",
+    marginBottom: 5,
+  },
+  cardColumn: {
+    flexDirection: "column",
+    marginRight: 100,
+  },
+  name: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  subTitle: {
+    color: "gray",
+  },
+  icons: {
+    marginRight: 10,
+  },
+  withdraw: {
+    fontSize: 15,
+    fontWeight: "bold",
+    marginTop: 18,
   },
 });

@@ -21,21 +21,24 @@ export function SentScreen() {
   const [sent, setSent] = useState([]);
   let sentInfo = [];
   
-  async function getSent(userId) {
+  async function getSent() {
+    console.log("in get sent");
     if (sent.length == 0) {
-      await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`).then((response) => {
+      await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
           console.log("sent requests:");
           console.log(response.data[0]);
           let currRequestedId = response.data[0]["requestedId"]
           console.log(currRequestedId);
-          axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response2) => {
+          await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response2) => {
             console.log("sent info");
             console.log(response2.data[0]);
             sentInfo.push(response2.data[0]) 
           }).catch((err) => {
             console.log(err);
           })
+          console.log("sent info:")
+          console.log(sentInfo);
           setSent(sentInfo); 
         }
       }).catch((err) => {
@@ -48,14 +51,15 @@ export function SentScreen() {
   }
 
   useEffect(() => {
-    (async () => {
+    (async () => { 
       let userInfo = await getUserInfo();
       if (userInfo) { 
         setUsername(userInfo[1]);
         setUserId(userInfo[4])
       }
       if (userId != "") { 
-        await getSent(userId);
+        console.log("user id not null")
+        await getSent();
       }
     })();
   });
@@ -109,7 +113,7 @@ export function SentScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-      >
+      > 
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
             <Text style={styles.header}>Sent Friend Requests</Text>

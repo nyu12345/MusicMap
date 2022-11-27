@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  ScrollView, 
+  ScrollView,
   SafeAreaView,
   Pressable,
 } from "react-native";
@@ -47,31 +47,31 @@ export function ProfileScreen(props) {
 
     if (response) {
       const responseJson = await response.json();
-      setName(responseJson.display_name); 
-      setUsername(responseJson.id); 
+      setName(responseJson.display_name);
+      setUsername(responseJson.id);
       setNumFollowers(responseJson.followers.total);
       setProfilePic(responseJson.images[0].url);
     } else {
       console.log("getUserInfo request returned no response");
     }
-  } 
+  }
 
-  async function getFriends(username) {
+  async function getFriends() {
     if (friends.length == 0) {
-      await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then((response2) => {
+      await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then(async function (response2) {
         console.log("friends:")
         console.log(response2.data[0]["friends"]);
         if (response2.data[0]["friends"].length > 0) {
-          response2.data[0]["friends"].map(async (userId) =>
+          response2.data[0]["friends"].map(async function (userId) {
             await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
               console.log("friends info");
               console.log(response.data[0]);
               friendsInfo.push(response.data[0])
             })
-          );
-          console.log("after axios");
-          setFriends(friendsInfo);
-          console.log(friendsInfo);
+            console.log("after axios");
+            setFriends(friendsInfo);
+            console.log(friendsInfo);
+          });
         }
       })
     } else {
@@ -106,21 +106,21 @@ export function ProfileScreen(props) {
         addUserToMongoDB(name, username, numFollowers, profilePic)
       }
     }).catch((err) => {
-      console.log(err); 
+      console.log(err);
     });
-  } 
- 
+  }
+
   useEffect(() => {
     (async () => {
-      await getUserInfo(); 
+      await getUserInfo();
       if (username != "" && profilePic != "") {
         console.log("username not empty")
         console.log(username)
-        await addUserIfNew(username); 
-        await getFriends(username); 
+        await addUserIfNew(username);
+        await getFriends();
       }
     })();
-  }); 
+  });
 
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {
@@ -164,7 +164,7 @@ export function ProfileScreen(props) {
         style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{
           justifyContent: "center",
-          alignItems: "center",  
+          alignItems: "center",
         }}
       // refreshControl={
       //   <RefreshControl 

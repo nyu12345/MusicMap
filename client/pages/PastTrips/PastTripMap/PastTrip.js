@@ -1,5 +1,5 @@
 import { Text, View, Image, StyleSheet, Pressable } from "react-native";
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -12,24 +12,13 @@ const PastTrip = ({
   destination,
   startDate,
   endDate,
-  getSongs, 
+  getSongs,
 }) => {
-  // const [songs, setSongs] = useState([]); 
-
-  // // get songs played in the selected roadtrip
-  // const getSongs = async (tripId) => {
-  //   await axios.get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${tripId}`).then((response) => {
-  //     setSongs(response.data); 
-  //   }).catch((err) => {
-  //     console.log(err); 
-  //   });
-  // };
-
   return (
     <Pressable
-      onPress={() => {
+      onPress={async () => {
         console.log("selected roadtrip");
-        getSongs(tripId); 
+        await getSongs(tripId);
       }}
       style={styles.roadtripContainer}
     >

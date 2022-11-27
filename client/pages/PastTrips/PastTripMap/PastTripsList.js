@@ -8,18 +8,21 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList({getSongs}) {
-  const base_url = `${REACT_APP_BASE_URL}/users/`;
+export function PastTripsList({ getSongs }) {
+  //const base_url = `${REACT_APP_BASE_URL}/users/`;
   const [roadtrips, setRoadtrips] = useState([]);
   const [searchInput, setSearchInput] = useState("");
 
   // get roadtrip data from API
   if (roadtrips.length == 0) {
-    axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
-      setRoadtrips(response.data);
-    }).catch((err) => {
-      console.log(err); 
-    });
+    axios
+      .get(`${REACT_APP_BASE_URL}/roadtrips/`)
+      .then((response) => {
+        setRoadtrips(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   const bottomSheetRef = useRef(null);

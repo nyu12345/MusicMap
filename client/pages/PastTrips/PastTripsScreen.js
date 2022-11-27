@@ -20,7 +20,6 @@ export function PastTripsScreen() {
     <Tab.Navigator style={{ marginTop: ExpoConstants.statusBarHeight }}>
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Statistics" component={StatisticsScreen} />
-      {/* Bottom sheet goes here */}
     </Tab.Navigator>
   );
 }

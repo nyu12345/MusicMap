@@ -6,26 +6,26 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
-  Pressable, 
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import { Linking, Networking } from "react-native";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
-import { deleteValue } from "musicmap/util/SecureStore"; 
-import { FriendCard } from "musicmap/pages/Profile/FriendCard"; 
+import { deleteValue } from "musicmap/util/SecureStore";
+import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 
 const ProfileScreen = (props) => {
   const [name, setName] = useState("");
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
-  const emptyProfilePic = "abc_dummy.com"; 
+  const emptyProfilePic = "abc_dummy.com";
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -40,7 +40,7 @@ const ProfileScreen = (props) => {
     if (response) {
       const responseJson = await response.json();
       setName(responseJson.display_name);
-      setUsername(responseJson.id); 
+      setUsername(responseJson.id);
       setNumFollowers(responseJson.followers.total);
       setProfilePic(responseJson.images[0].url);
     } else {
@@ -50,35 +50,39 @@ const ProfileScreen = (props) => {
 
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
     const user = {
-      name: name, 
-      spotifyUsername: username, 
-      numFriends: numFollowers, 
-      profilePic: profilePicUrl, 
-      friends: [], 
-    }
-    axios.post(`${REACT_APP_BASE_URL}/users`, user).then((response) => {
-      console.log("success"); 
-    }).catch((err) => {
-      console.log(err); 
-    })
+      name: name,
+      spotifyUsername: username,
+      numFriends: numFollowers,
+      profilePic: profilePicUrl,
+      friends: [],
+    };
+    axios
+      .post(`${REACT_APP_BASE_URL}/users`, user)
+      .then((response) => {
+        console.log("success");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   async function addUserIfNew(username) {
-    await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
-      console.log("response: " + response.data.length); 
-      if (response.data.length === 0) {
-        //setUserExists(false); 
-        addUserToMongoDB(name, username, numFollowers, profilePic)
-      }
-    }).catch((err) => {
-      console.log(err); 
-    });
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/${username}`)
+      .then((response) => {
+        if (response.data.length === 0) {
+          addUserToMongoDB(name, username, numFollowers, profilePic);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   useEffect(() => {
     (async () => {
-      await getUserInfo(); 
-      await addUserIfNew(username); 
+      await getUserInfo();
+      await addUserIfNew(username);
     })();
   });
 
@@ -103,25 +107,27 @@ const ProfileScreen = (props) => {
   // dummy data
   const friends = [
     {
-        name: "Jeffrey Liu", 
-        numFriends: 30, 
-        spotifyUsername: "jzl", 
-        friends: [], 
-        profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
-    }, 
+      name: "Jeffrey Liu",
+      numFriends: 30,
+      spotifyUsername: "jzl",
+      friends: [],
+      profilePic:
+        "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
+    },
     {
-        name: "Nathan Huang", 
-        numFriends: 29, 
-        spotifyUsername: "nhu", 
-        friends: [], 
-        profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
-    }, 
-  ]
+      name: "Nathan Huang",
+      numFriends: 29,
+      spotifyUsername: "nhu",
+      friends: [],
+      profilePic:
+        "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
+    },
+  ];
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
-        style={{flex: 1, padding: 20}}
+        style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{
           justifyContent: "center",
           alignItems: "center",
@@ -146,10 +152,15 @@ const ProfileScreen = (props) => {
           </View>
         </View>
 
-        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef}/>
+        <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
 
         {friends.map((item) => (
-          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername}/>
+          <FriendCard
+            name={item.name}
+            numFriends={item.numFriends}
+            profilePic={item.profilePic}
+            key={item.spotifyUsername}
+          />
         ))}
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
@@ -171,46 +182,46 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 10,
     marginBottom: 5,
   },
   userInfoWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 10, 
-    marginBottom: 15, 
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    marginTop: 10,
+    marginBottom: 15,
   },
   userInfoItem: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   userInfoTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
-    textAlign: 'center',
+    textAlign: "center",
   },
   userInfoSubTitle: {
     fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   logoutButton: {
-    marginTop: 10, 
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 30,
     elevation: 3,
-    backgroundColor: '#1DB954',
+    backgroundColor: "#1DB954",
   },
   logoutButtonText: {
     fontSize: 16,
     lineHeight: 21,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     letterSpacing: 0.25,
-    color: 'black',
+    color: "black",
   },
 });

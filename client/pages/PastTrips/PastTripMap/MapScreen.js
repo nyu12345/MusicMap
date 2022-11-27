@@ -1,15 +1,18 @@
 import { Text, View, StyleSheet, Image } from "react-native";
-import React, { useCallback, useState, useMemo, useRef, useEffect } from "react";
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import MapView, { Marker, Callout } from "react-native-maps";
 import axios from "axios";
 import lazyfair from "musicmap/assets/lazyfair.jpg";
-import {REACT_APP_BASE_URL} from "@env"; 
+import { REACT_APP_BASE_URL } from "@env";
 import { PastTripsList } from "musicmap/pages/PastTrips/PastTripMap/PastTripsList";
 
 export function MapScreen() {
-  const [songs, setSongs] = useState([]); 
-  const [currentLocation, setCurrentLocation] = useState(null); 
-
   // map size parameters
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
@@ -18,38 +21,55 @@ export function MapScreen() {
     longitude: -122.4324,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
-  }; 
+  };
+
+  const [songs, setSongs] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState(defaultLocation);
+
+  // animate/relocate to current location
+  const mapRef = useRef();
+  const animateMap = () => {
+    mapRef.current.animateToRegion(currentLocation, 1000);
+  };
 
   // get songs played in the selected roadtrip
   const getSongs = async (tripId) => {
-    await axios.get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${tripId}`).then((response) => {
-      setSongs(response.data); 
-    }).catch((err) => {
-      console.log(err); 
-    });
+    await axios
+      .get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${tripId}`)
+      .then((response) => {
+        setSongs(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   // something with await/async - not functioning properly
   useEffect(() => {
-    console.log("songs: " + songs); 
     if (songs.length !== 0) {
-      console.log("inside if"); 
-      console.log(songs[0]); 
       setCurrentLocation({
-        latitude: songs[0].location.latitude, 
-        longitude: songs[0].location.longitude, 
-        latitudeDelta: LATITUDE_DELTA, 
-        longitudeDelta: LONGITUDE_DELTA, 
-      }); 
+        latitude: songs[0].location.latitude,
+        longitude: songs[0].location.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      });
     }
-    console.log(currentLocation); 
-  }, [songs]); 
+  }, [songs]);
+
+  useEffect(() => {
+    if (currentLocation !== defaultLocation) {
+      animateMap();
+    }
+  }, [currentLocation]);
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
+        ref={mapRef}
         style={styles.map}
-        initialRegion={currentLocation === null ? defaultLocation : currentLocation}
+        initialRegion={
+          currentLocation === null ? defaultLocation : currentLocation
+        }
         showsUserLocation={true}
       >
         {songs.map((item, index) => {
@@ -74,7 +94,7 @@ export function MapScreen() {
           );
         })}
       </MapView>
-      <PastTripsList getSongs={getSongs}/>
+      <PastTripsList getSongs={getSongs} />
     </View>
   );
 }

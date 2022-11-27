@@ -13,13 +13,11 @@ import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import { Linking, Networking, RefreshControl } from "react-native";
-// import { getUserInfo } from "musicmap/util/UserInfo";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore";
 import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
-import { set } from "react-native-reanimated";
 
 export function ProfileScreen(props) {
   const [name, setName] = useState("");
@@ -30,10 +28,10 @@ export function ProfileScreen(props) {
   let friendsInfo = [];
   const emptyProfilePic = "abc_dummy.com";
 
-  // const onRefresh = React.useCallback(() => {
-  //   console.log("refresh"); 
-  //   setFriends([]);
-  // }, []);
+  const onRefresh = React.useCallback(() => {
+    console.log("refresh");
+    setFriends([]);
+  }, []);
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -72,6 +70,8 @@ export function ProfileScreen(props) {
             setFriends(friendsInfo);
             console.log(friendsInfo);
           });
+        } else {
+          setFriends(["nada"]);
         }
       })
     } else {
@@ -88,8 +88,6 @@ export function ProfileScreen(props) {
       profilePic: profilePicUrl,
       friends: [],
     }
-    console.log("adding to mongodb");
-    console.log(user);
     axios.post(`${REACT_APP_BASE_URL}/users`, user).then((response) => {
       console.log("success");
     }).catch((err) => {
@@ -140,24 +138,6 @@ export function ProfileScreen(props) {
   // define bottom sheet modal properties
   const bottomSheetModalRef = useRef(null);
 
-  // dummy data
-  // const friends = [
-  //   {
-  //       name: "Jeffrey Liu", 
-  //       numFriends: 30, 
-  //       spotifyUsername: "jzl", 
-  //       friends: [], 
-  //       profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
-  //   }, 
-  //   {
-  //       name: "Nathan Huang", 
-  //       numFriends: 29, 
-  //       spotifyUsername: "nhu", 
-  //       friends: [], 
-  //       profilePic: "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6", 
-  //   }, 
-  // ]
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
@@ -166,12 +146,12 @@ export function ProfileScreen(props) {
           justifyContent: "center",
           alignItems: "center",
         }}
-      // refreshControl={
-      //   <RefreshControl 
-      //     refreshing={friends.length == 0}
-      //     onRefresh={onRefresh}
-      //   />
-      // }
+        refreshControl={
+          <RefreshControl
+            refreshing={friends.length == 0}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <Image
           style={styles.profilePic}
@@ -193,7 +173,7 @@ export function ProfileScreen(props) {
         </View>
 
         <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
-        {friends.length > 0 ? friends.map((item) => (
+        {(friends.length > 0 && friends[0] != "nada") ? friends.map((item) => (
           <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
         )) : <Text>No friends!</Text>}
 

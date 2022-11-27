@@ -4,9 +4,10 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  ScrollView, 
+  ScrollView,
   SafeAreaView,
   Pressable,
+  RefreshControl
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { REACT_APP_BASE_URL } from "@env";
@@ -20,26 +21,28 @@ export function SentScreen() {
   const [userId, setUserId] = useState("");
   const [sent, setSent] = useState([]);
   let sentInfo = [];
-  
+
+  const onRefresh = React.useCallback(() => {
+    console.log("refresh");
+    setSent([]);
+  }, []);
+
   async function getSent() {
-    console.log("in get sent");
     if (sent.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
-          console.log("sent requests:");
-          console.log(response.data[0]);
           let currRequestedId = response.data[0]["requestedId"]
           console.log(currRequestedId);
           await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response2) => {
             console.log("sent info");
             console.log(response2.data[0]);
-            sentInfo.push(response2.data[0]) 
+            sentInfo.push(response2.data[0])
           }).catch((err) => {
             console.log(err);
           })
-          console.log("sent info:")
-          console.log(sentInfo);
-          setSent(sentInfo); 
+          setSent(sentInfo);
+        } else {
+          setSent(["nada"])
         }
       }).catch((err) => {
         console.log(err);
@@ -51,14 +54,13 @@ export function SentScreen() {
   }
 
   useEffect(() => {
-    (async () => { 
+    (async () => {
       let userInfo = await getUserInfo();
-      if (userInfo) { 
+      if (userInfo) {
         setUsername(userInfo[1]);
         setUserId(userInfo[4])
       }
-      if (userId != "") { 
-        console.log("user id not null")
+      if (userId != "") {
         await getSent();
       }
     })();
@@ -70,21 +72,21 @@ export function SentScreen() {
       console.log("withdrawing request")
       deleteFriendRequest(userId, friendId)
     }
-  
+
     async function deleteFriendRequest(requestorId, requestedId) {
-      console.log("deleting friend request"); 
+      console.log("deleting friend request");
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${requestedId}&requestorId=${requestorId}`).then((response) => {
         let requestId = response.data[0]["_id"];
         axios.delete(`${REACT_APP_BASE_URL}/friendRequests/${requestId}`).then((response) => {
           setSent([]);
-        }).catch((err) => { 
-          console.log(err);  
-        })  
+        }).catch((err) => {
+          console.log(err);
+        })
       }).catch((err) => {
-        console.log(err); 
+        console.log(err);
       })
     }
-  
+
     return (
       <View style={styles.friendCardContainer}>
         <Image source={{ uri: profilePic }} style={styles.image} />
@@ -99,12 +101,12 @@ export function SentScreen() {
             <Pressable>
               <Text style={styles.withdraw} onPress={onPress}>Withdraw</Text>
             </Pressable>
-          </View> 
+          </View>
         </View>
       </View>
     );
-  }; 
- 
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
@@ -113,13 +115,19 @@ export function SentScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-      > 
+        refreshControl={
+          <RefreshControl
+            refreshing={sent.length == 0}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
             <Text style={styles.header}>Sent Friend Requests</Text>
           </View>
         </View>
-        {sent.length > 0 ? sent.map((item) => (
+        {(sent.length > 0 && sent[0] != "nada") ? sent.map((item) => (
           <SentRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not sent any friend requests!</Text>}
       </ScrollView>

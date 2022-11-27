@@ -16,14 +16,14 @@ import { getUserInfo } from "musicmap/util/UserInfo";
 
 export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [searchInput, setSearchInput] = useState("");
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
 
   useEffect(() => {
     (async () => {
       let userInfo = await getUserInfo();
       if (userInfo) {
-        setUsername(userInfo[1]); 
+        setUsername(userInfo[1]);
         setUserId(userInfo[4])
       }
     })();
@@ -37,9 +37,6 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     console.log("handleSheetChange", index);
   }, []);
 
-  // when the submit button is pressed, check to see if the searched username 
-  // is valid (in our database). if so, create a friend request
-  // with the current user as the requestor and the searched user as the requested
   const onPress = async (e) => {
     console.log("submitted")
     console.log(searchInput)
@@ -50,11 +47,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       let newId = data.data[0]["_id"];
       console.log(newId);
       createFriendRequest(userId, newId); // await?
-
-      // below code is for later - when the requested accepts the request, we add to friends list (make sure to add to both)
-      // const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${newId}`);
-      // console.log("data2:")
-      // console.log(data2);
+      setSearchInput("");
     }
   }
 
@@ -69,9 +62,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       requestedId: requestedId,
     }
     axios.post(`${REACT_APP_BASE_URL}/friendRequests`, friendRequest).then((response) => {
-      console.log("success"); 
+      console.log("success");
     }).catch((err) => {
-      console.log(err); 
+      console.log(err);
     })
   }
 

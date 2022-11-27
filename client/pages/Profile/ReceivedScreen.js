@@ -1,19 +1,20 @@
 import {
   Text,
-  View, 
+  View,
   StyleSheet,
   Image,
-  TextInput, 
+  TextInput,
   ScrollView,
   SafeAreaView,
-  Pressable, 
+  Pressable,
+  RefreshControl
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import { AntDesign } from '@expo/vector-icons';
 import { getUserInfo } from "musicmap/util/UserInfo";
- 
+
 export function ReceivedScreen() {
 
   const [username, setUsername] = useState("");
@@ -21,42 +22,49 @@ export function ReceivedScreen() {
   const [received, setReceived] = useState([]);
   let receivedInfo = [];
 
+  const onRefresh = React.useCallback(() => {
+    console.log("refresh");
+    setReceived([]);
+  }, []);
+
   async function getReceived(userId) {
-    if (received.length == 0) { 
+    if (received.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
-          console.log("received requests:"); 
-          console.log(response.data[0]); 
+          console.log("received requests:");
+          console.log(response.data[0]);
           let currRequestorId = response.data[0]["requestorId"]
           axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response2) => {
-            console.log("received info"); 
-            console.log(response2.data[0]); 
-            receivedInfo.push(response2.data[0]) 
+            console.log("received info");
+            console.log(response2.data[0]);
+            receivedInfo.push(response2.data[0])
           }).catch((err) => {
-            console.log(err); 
+            console.log(err);
           })
           setReceived(receivedInfo);
+        } else {
+          setReceived(["nada"]);
         }
       }).catch((err) => {
-        console.log(err); 
+        console.log(err);
       })
     } else {
       console.log("received not null");
       console.log(received);
     }
-  } 
- 
-  useEffect(() => { 
-    (async () => { 
+  }
+
+  useEffect(() => {
+    (async () => {
       let userInfo = await getUserInfo();
-      if (userInfo.length > 4) { 
-        setUsername(userInfo[1]); 
+      if (userInfo.length > 4) {
+        setUsername(userInfo[1]);
         setUserId(userInfo[4])
       }
-      if (userId != "") { 
+      if (userId != "") {
         await getReceived(userId);
-      } 
-    })(); 
+      }
+    })();
   });
 
   const ReceivedRequestCard = ({ name, numFriends, profilePic, username, friendId, userId }) => {
@@ -66,7 +74,7 @@ export function ReceivedScreen() {
       deleteFriendRequest(friendId, userId)
     }
 
-    const onPressCheck = async (e) => { 
+    const onPressCheck = async (e) => {
       console.log("accepting request")
       const data = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${friendId}`);
       console.log("data:")
@@ -76,7 +84,7 @@ export function ReceivedScreen() {
       console.log(data2);
       deleteFriendRequest(friendId, userId)
     }
-  
+
     async function deleteFriendRequest(requestorId, requestedId) {
       console.log("deleting friend request");
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${requestedId}&requestorId=${requestorId}`).then((response) => {
@@ -84,13 +92,13 @@ export function ReceivedScreen() {
         axios.delete(`${REACT_APP_BASE_URL}/friendRequests/${requestId}`).then((response) => {
           setReceived([]);
         }).catch((err) => {
-          console.log(err); 
-        })  
+          console.log(err);
+        })
       }).catch((err) => {
-        console.log(err); 
+        console.log(err);
       })
     }
-  
+
     return (
       <View style={styles.friendCardContainer}>
         <Image source={{ uri: profilePic }} style={styles.image} />
@@ -100,9 +108,9 @@ export function ReceivedScreen() {
               <Text style={styles.name} numberOfLines={1}>{name}</Text>
               <Text numberOfLines={2} style={styles.subTitle}>
                 {numFriends} Friends
-              </Text> 
+              </Text>
             </View>
-            <Pressable> 
+            <Pressable>
               <AntDesign name="closecircleo" size={36} color="black" style={styles.icons} onPress={onPressX} />
             </Pressable>
             <Pressable>
@@ -117,22 +125,28 @@ export function ReceivedScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
-        style={{ flex: 1, padding: 20 }} 
+        style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{
           justifyContent: "center",
-          alignItems: "center", 
-        }}  
+          alignItems: "center",
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={received.length == 0}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
             <Text style={styles.header}>Received Friend Requests</Text>
           </View>
         </View>
-        {received.length > 0 ? received.map((item) => (
+        {(received.length > 0 && received[0] != "nada") ? received.map((item) => (
           <ReceivedRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not received any friend requests!</Text>}
-      </ScrollView> 
-    </SafeAreaView> 
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

@@ -27,14 +27,14 @@ export function ReceivedScreen() {
     setReceived([]);
   }, []);
 
-  async function getReceived(userId) {
+  async function getReceived(userId) { 
     if (received.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
           console.log("received requests:");
           console.log(response.data[0]);
           let currRequestorId = response.data[0]["requestorId"]
-          axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response2) => {
+          await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response2) => {
             console.log("received info");
             console.log(response2.data[0]);
             receivedInfo.push(response2.data[0])

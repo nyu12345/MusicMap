@@ -9,7 +9,6 @@ import BottomSheet, {
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
 export function PastTripsList({ getSongs }) {
-  //const base_url = `${REACT_APP_BASE_URL}/users/`;
   const [roadtrips, setRoadtrips] = useState([]);
   const [searchInput, setSearchInput] = useState("");
 
@@ -46,6 +45,9 @@ export function PastTripsList({ getSongs }) {
       return roadtrips;
     }
     return roadtrips.filter(function ({ name, startLocation, destination }) {
+      if (name === null || startLocation === null || destination === null) {
+        return false; 
+      }
       let input = searchInput.toLowerCase().replace(/\s/g, "");
       const nameArr = name.split(" ");
       const startLocationArr = startLocation.split(" ");

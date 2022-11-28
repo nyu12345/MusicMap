@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo, useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import BottomSheet, {
@@ -13,7 +13,7 @@ export function PastTripsList({ getSongs }) {
   const [searchInput, setSearchInput] = useState("");
 
   // get roadtrip data from API
-  if (roadtrips.length == 0) {
+  const getRoadtrips = () => {
     axios
       .get(`${REACT_APP_BASE_URL}/roadtrips/`)
       .then((response) => {
@@ -22,6 +22,11 @@ export function PastTripsList({ getSongs }) {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  // get roadtrip data from API upon refresh
+  if (roadtrips.length == 0) {
+    getRoadtrips(); 
   }
 
   const bottomSheetRef = useRef(null);
@@ -92,6 +97,7 @@ export function PastTripsList({ getSongs }) {
       startDate={item.startDate}
       endDate={item.endDate}
       getSongs={getSongs}
+      getRoadtrips={getRoadtrips}
     />
   );
 

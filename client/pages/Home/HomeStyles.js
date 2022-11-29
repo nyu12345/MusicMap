@@ -4,6 +4,20 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  addImageButton: {
+    alignSelf: 'flex-end',
+    alignItems: "center", 
+    justifyContent: "center", 
+    paddingVertical: 10, 
+    paddingHorizontal: 10, 
+    borderRadius: 4, 
+    backgroundColor: "aliceblue", 
+    position: "absolute",
+    right: 20, 
+    top: 50, 
+    shadowColor: 'black',
+    shadowOpacity: 0.8,
+  },
   startButton: {
     alignItems: "center",
     justifyContent: "center",

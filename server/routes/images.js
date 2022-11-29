@@ -20,6 +20,12 @@ router.post("/create-image", async (req, res, next) => {
     const image = new Image({
         tripId: req.body.tripId,
         imageURL: req.body.imageURL,
+        location: {
+            latitude: req.body.location.latitude,
+            longitude: req.body.location.longitude,
+            name: req.body.location.name,
+        },
+        datestamp: req.body.datestamp,
     });
 
     image

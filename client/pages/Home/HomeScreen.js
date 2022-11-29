@@ -65,7 +65,7 @@ export function HomeScreen() {
 
     console.log(result);
 
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImage(result.assets[0].uri);
     }
   };
@@ -169,11 +169,6 @@ export function HomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {/* {!buttonIsStartRoadtrip ? (
-        <Pressable style={styles.addImageButton} onPress={pickImage}>
-          <MaterialIcons name="add-photo-alternate" size={24} color="black" />
-        </Pressable>
-      ) : null} */}
       <HomeMap
         updateLocationHandler={updateLocationHandler}
         currentLocation={currentLocation}
@@ -211,9 +206,11 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
-      <Pressable style={styles.addImageButton} onPress={pickImage}>
-        <MaterialIcons name="add-photo-alternate" size={28} color="black" />
-      </Pressable>
+      {!buttonIsStartRoadtrip ? (
+        <Pressable style={styles.addImageButton} onPress={pickImage}>
+          <MaterialIcons name="add-photo-alternate" size={28} color="#696969" />
+        </Pressable>
+      ) : null}
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}

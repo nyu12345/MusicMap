@@ -49,6 +49,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
         }
       }
       catch {
+        console.log("ERROR1");
       }
     })();
   });
@@ -65,6 +66,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
         }
       }
       catch {
+        console.log("ERROR2");
       }
     })();
   });

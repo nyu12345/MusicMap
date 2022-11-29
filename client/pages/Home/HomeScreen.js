@@ -51,6 +51,10 @@ export function HomeScreen() {
     setModalVisible(false);
   };
 
+  const createImagePicker = () => {
+
+  }; 
+
   const createHandler = () => {
     console.log(`roadtrip name: ${roadtripName}`);
     const roadtrip = {
@@ -135,7 +139,7 @@ export function HomeScreen() {
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
   /**
-   * update's the current location of the user
+   * updates the current location of the user
    * @param {Location.LocationObject} newLocation the new location
    */
   const updateLocationHandler = (newLocation, regionName) => {
@@ -150,6 +154,13 @@ export function HomeScreen() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      {!buttonIsStartRoadtrip ? (
+        <Pressable style={styles.startButton} onPress={endRoadtripClickHandler}>
+          <Text title="End Roadtrip" style={styles.text}>
+            {END_ROADTRIP_BUTTON_TEXT}
+          </Text>
+        </Pressable>
+      ) : null}
       <HomeMap
         updateLocationHandler={updateLocationHandler}
         currentLocation={currentLocation}

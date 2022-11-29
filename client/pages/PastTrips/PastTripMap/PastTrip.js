@@ -152,4 +152,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PastTrip;
+export default React.memo(PastTrip);

@@ -69,12 +69,7 @@ export function ReceivedScreen() {
 
   const ReceivedRequestCard = ({ name, numFriends, profilePic, username, friendId, userId }) => {
 
-    const onPressX = async (e) => {
-      console.log("rejecting request")
-      deleteFriendRequest(friendId, userId)
-    }
-
-    const onPressCheck = async (e) => {
+    const onPress = async (e) => {
       console.log("accepting request")
       const data = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${friendId}`);
       console.log("data:")
@@ -111,10 +106,10 @@ export function ReceivedScreen() {
               </Text>
             </View>
             <Pressable>
-              <AntDesign name="closecircleo" size={36} color="black" style={styles.icons} onPress={onPressX} />
+              <AntDesign name="closecircleo" size={36} color="black" style={styles.icons} onPress={() => {deleteFriendRequest(friendId, userId)}} />
             </Pressable>
             <Pressable>
-              <AntDesign name="checkcircleo" size={36} color="black" onPress={onPressCheck} />
+              <AntDesign name="checkcircleo" size={36} color="black" onPress={onPress} />
             </Pressable>
           </View>
         </View>

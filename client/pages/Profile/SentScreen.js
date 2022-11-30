@@ -68,11 +68,6 @@ export function SentScreen() {
 
   const SentRequestCard = ({ name, numFriends, profilePic, username, friendId, userId }) => {
 
-    const onPress = async (e) => {
-      console.log("withdrawing request")
-      deleteFriendRequest(userId, friendId)
-    }
-
     async function deleteFriendRequest(requestorId, requestedId) {
       console.log("deleting friend request");
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${requestedId}&requestorId=${requestorId}`).then((response) => {
@@ -99,7 +94,7 @@ export function SentScreen() {
               </Text>
             </View>
             <Pressable>
-              <Text style={styles.withdraw} onPress={onPress}>Withdraw</Text>
+              <Text style={styles.withdraw} onPress={() => {deleteFriendRequest(userId, friendId)}}>Withdraw</Text>
             </Pressable>
           </View>
         </View>

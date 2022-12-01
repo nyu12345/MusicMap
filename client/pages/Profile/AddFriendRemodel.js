@@ -65,6 +65,8 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
     const renderItem = ({ item }) => (
         <FriendCard
         name={item.name}
+        numFriends={item.numFriends}
+        profilePic={item.profilePic}
         />
     );
 

@@ -31,8 +31,6 @@ export function ReceivedScreen() {
     if (received.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
-          console.log("received requests:");
-          console.log(response.data[0]);
           let currRequestorId = response.data[0]["requestorId"]
           await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response2) => {
             console.log("received info");
@@ -42,8 +40,6 @@ export function ReceivedScreen() {
             console.log(err);
           })
           setReceived(receivedInfo);
-        } else {
-          setReceived(["nada"]);
         }
       }).catch((err) => {
         console.log(err);
@@ -125,19 +121,19 @@ export function ReceivedScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        refreshControl={
-          <RefreshControl
-            refreshing={received.length == 0}
-            onRefresh={onRefresh}
-          />
-        }
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={received.length == 0}
+        //     onRefresh={onRefresh}
+        //   />
+        // }
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
             <Text style={styles.header}>Received Friend Requests</Text>
           </View>
         </View>
-        {(received.length > 0 && received[0] != "nada") ? received.map((item) => (
+        {(received.length > 0) ? received.map((item) => (
           <ReceivedRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not received any friend requests!</Text>}
       </ScrollView>

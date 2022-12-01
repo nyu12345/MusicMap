@@ -110,12 +110,12 @@ export function SentScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        refreshControl={
-          <RefreshControl
-            refreshing={sent.length == 0}
-            onRefresh={onRefresh}
-          />
-        }
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={sent.length == 0}
+        //     onRefresh={onRefresh}
+        //   />
+        // }
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>

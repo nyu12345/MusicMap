@@ -6,6 +6,7 @@ const { ObjectId } = require("mongodb");
 
 router.get("/", (req, res) => {
   console.log("Router working");
+  console.log("getting requests")
   const filter = {};
   if (req.query.requestedId)
     filter.requestedId = req.query.requestedId;

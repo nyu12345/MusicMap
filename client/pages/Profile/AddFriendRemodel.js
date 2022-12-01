@@ -1,5 +1,5 @@
-import React, { useCallback, useState, useMemo, useRef } from "react";
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import React, { useCallback, useState, useMemo, useRef, useEffect } from "react";
+import { View, StyleSheet, SafeAreaView, Text } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import {
@@ -8,23 +8,30 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
+import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 
 export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
-    const base_url = `${REACT_APP_BASE_URL}/users/`;
-    const [friends, setFriends] = useState([]);
+    const [users, setUsers] = useState([]);
     const [searchInput, setSearchInput] = useState("");
+    
+    const [page, setPage] = useState(1);
+    const [usersToDisplay, setUsersToDisplay] = useState([]);
 
-    if (friends.length == 0) {
-        axios.get('${REACT_APP_BASE_URL}/friends/').then((response) => {
-            setFriends(response.data);
+    if (users.length == 0) {
+        console.log("0 users")
+        axios.get(`${REACT_APP_BASE_URL}/users/`).then((response) => {
+            setUsers(response.data);
         })
+        .catch((err) => {
+            console.log(err);
+        });
     }
 
     const handleSheetChange = useCallback((index) => {
         console.log("handleSheetChange", index);
     }, []);
     const handleRefresh = useCallback(() => {
-        setFriends([]);
+        setUsers([]);
         console.log("handleRefresh");
     }, []);
 
@@ -32,20 +39,24 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
 
     const snapPoints = useMemo(() => ["13%", "50%", "95%"], []);
 
-    const filter = (friends) => {
+    const filter = (users) => {
         if (searchInput == "") {
-            return friends;
+            return users;
         }
-        return friends.filter(function ({friend}) {
-            const friends = friend.split(" ");
-            for (let i = 0; i < friends.length; i++) {
-                friends[i] = friends[i].toLowerCase();
-                if (friends[i].indexOf(input) == 0) {
+        return users.filter(function ({user}) {
+            console.log(user);
+            if (user == null) {
+                return false;
+            }
+            const users = user.split(" ");
+            for (let i = 0; i < users.length; i++) {
+                users[i] = users[i].toLowerCase();
+                if (users[i].indexOf(input) == 0) {
                 return true;
                 }
             }
             return (
-                friends.join("").indexOf(input) == 0
+                users.join("").indexOf(input) == 0
             );
         })
         }
@@ -55,6 +66,45 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
         name={item.name}
         />
     );
+
+  // render footer (load more, or signal if reached end of list)
+    const renderFooter = () => (
+        <View style={styles.footerText}>
+          {page < Math.floor(users.length / 10) + 1 && <ActivityIndicator />}
+          {page !== 1 && page >= Math.floor(users.length / 10) + 1 && (
+            <Text>No more users at the moment</Text>
+          )}
+        </View>
+    );
+
+// render empty component (no roadtrips available yet)
+  const renderEmpty = () => (
+    <View style={styles.emptyText}>
+      <Text>No users at the moment</Text>
+    </View>
+  );
+
+  const fetchMoreData = () => {
+    console.log("fetch more data");
+    if (page < Math.floor(users.length / 10) + 1) {
+      setPage(page + 1);
+      setUsersToDisplay(users.slice(0, 10*page)); 
+    }
+  };
+
+
+    useEffect(() => {
+        setPage(1); 
+        setUsersToDisplay(users.slice(0, 10)); 
+    }, [users]); 
+
+    useEffect(() => {
+        if (searchInput !== "") {
+          setUsersToDisplay(filter(users, searchInput)); 
+        } else {
+          setUsersToDisplay(users.slice(0, 10*page)); 
+        }
+    }, [searchInput]); 
 
     return (
         <BottomSheetModalProvider>
@@ -73,13 +123,17 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
                         style={styles.textInput}
                     />
                     <BottomSheetFlatList
-                        data={filter(friends, searchInput)}
+                        data={usersToDisplay}
                         renderItem={renderItem}
+                        ListFooterComponent={renderFooter}
+                        ListEmptyComponent={renderEmpty}
                         keyExtractor={(item) => item._id}
-                        refreshing={friends.length == 0}
+                        refreshing={users.length == 0}
                         onRefresh={handleRefresh}
                         style={{ backgroundColor: "white" }}
                         contentContainerStyle={{ backgroundColor: "white" }}
+                        onEndReachedThreshold={0.2}
+                        onEndReached={fetchMoreData}
                     />
                 </BottomSheetModal>
             </SafeAreaView>
@@ -97,5 +151,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(151, 151, 151, 0.25)",
     color: "black",
     textAlign: "left",
+  },
+  footerText: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  emptyText: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

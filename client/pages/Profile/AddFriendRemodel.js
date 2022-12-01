@@ -43,20 +43,21 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
         if (searchInput == "") {
             return users;
         }
-        return users.filter(function ({user}) {
-            console.log(user);
-            if (user == null) {
+        return users.filter(function ({name}) {
+            console.log(name);
+            if (name == null) {
                 return false;
             }
-            const users = user.split(" ");
-            for (let i = 0; i < users.length; i++) {
-                users[i] = users[i].toLowerCase();
-                if (users[i].indexOf(input) == 0) {
+            let input = searchInput.toLowerCase().replace(/\s/g, "");
+            const names = name.split(" ");
+            for (let i = 0; i < names.length; i++) {
+                names[i] = names[i].toLowerCase();
+                if (names[i].indexOf(input) == 0) {
                 return true;
                 }
             }
             return (
-                users.join("").indexOf(input) == 0
+                names.join("").indexOf(input) == 0
             );
         })
         }
@@ -101,6 +102,8 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
     useEffect(() => {
         if (searchInput !== "") {
           setUsersToDisplay(filter(users, searchInput)); 
+          console.log("users to display")
+          console.log(usersToDisplay)
         } else {
           setUsersToDisplay(users.slice(0, 10*page)); 
         }

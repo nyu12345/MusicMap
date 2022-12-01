@@ -18,6 +18,7 @@ import { deleteValue } from "musicmap/util/SecureStore";
 import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
+import { AddFriendRemodel } from "musicmap/pages/Profile/AddFriendRemodel";
 
 export function ProfileScreen(props) {
   const [name, setName] = useState("");
@@ -27,11 +28,12 @@ export function ProfileScreen(props) {
   const [friends, setFriends] = useState([]);
   let friendsInfo = [];
   const emptyProfilePic = "abc_dummy.com";
-
+/*
   const onRefresh = React.useCallback(() => {
     console.log("refresh");
     setFriends([]);
   }, []);
+*/
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -146,12 +148,12 @@ export function ProfileScreen(props) {
           justifyContent: "center",
           alignItems: "center",
         }}
-        refreshControl={
+        /*refreshControl={
           <RefreshControl
             refreshing={friends.length == 0}
             onRefresh={onRefresh}
           />
-        }
+        }*/
       >
         <Image
           style={styles.profilePic}
@@ -181,7 +183,7 @@ export function ProfileScreen(props) {
           <Text style={styles.logoutButtonText}>LOG OUT</Text>
         </Pressable>
       </ScrollView>
-      <AddFriendBottomSheet bottomSheetModalRef={bottomSheetModalRef} />
+      <AddFriendRemodel bottomSheetModalRef={bottomSheetModalRef} />
     </SafeAreaView>
   );
 };

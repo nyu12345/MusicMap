@@ -144,6 +144,7 @@ export function HomeScreen() {
       longitude: newLocation.coords.longitude,
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
+      regionName: regionName,
       name: regionName[0]["city"] + ", " + regionName[0]["region"],
     });
   };

@@ -20,8 +20,7 @@ export function HomeMap({
 }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
-  const [songs, setSongs] = useState([]);
-  const [images, setImages] = useState([]);
+  const [pins, setPins] = useState([]);
   // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
 
@@ -32,8 +31,23 @@ export function HomeMap({
     (async () => {
       let permission = await Location.requestForegroundPermissionsAsync();
       setStatus(permission);
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        timeInterval: 10000,
+        distanceInterval: 0,
+      });
+      if (location) {
+        let regionName = await Location.reverseGeocodeAsync({
+          longitude: location.coords.longitude,
+          latitude: location.coords.latitude,
+        });
+        if (regionName) {
+          updateLocationHandler(location, regionName);
+        }
+      }
     })();
   }, []);
+
 
   useEffect(() => {
     (async () => {
@@ -49,13 +63,7 @@ export function HomeMap({
             distanceInterval: 0,
           });
           if (location) {
-            // let regionName = await Location.reverseGeocodeAsync({
-            //   longitude: location.coords.longitude,
-            //   latitude: location.coords.latitude,
-            // });
-            // if (regionName) {
-            updateLocationHandler(location, "Durham, NC");
-            //}
+            updateLocationHandler(location, currentLocation.regionName);
           }
         }
       } catch {
@@ -98,11 +106,12 @@ export function HomeMap({
     console.log(result);
 
     if (!result.cancelled) {
-      await postImage(result.uri);
+      postImage(result.uri);
     }
   };
 
-  const postImage = async (imageUri) => {
+  const postImage = (imageUri) => {
+    console.log("POST Image: " + imageUri);
     const newImage = {
       tripId: currentRoadTripData.createdReview._id,
       imageURL: imageUri,
@@ -113,18 +122,10 @@ export function HomeMap({
       },
       datestamp: new Date().toLocaleString("en-GB"),
     };
+    setPins((prevPins) => [...prevPins, newImage]);
+    setOffset((prevOffset) => prevOffset + 0.005);
 
-    console.log(images); 
-    console.log(newImage); 
-    console.log("new set of images: " + [...images, newImage]); 
-
-    setImages([
-      ...images, 
-      newImage, 
-    ]); 
-    console.log("images: " + images); 
-
-    await axios
+    axios
       .post(`${REACT_APP_BASE_URL}/images/create-image`, newImage)
       .then((response) => {
         console.log(response.data);
@@ -211,13 +212,13 @@ export function HomeMap({
     };
     currentSong = newSong;
     // setCurrentSong(newSong);
-    setSongs((prevSongs) => [...prevSongs, newSong]);
+    setPins((prevPins) => [...prevPins, newSong]);
     setOffset((prevOffset) => prevOffset + 0.005);
     postSongHandler();
   };
 
   const clearPinsHandler = () => {
-    setSongs([]);
+    setPins([]);
     setOffset(0);
     currentSong = { title: "No song", spotifyId: null };
     // setCurrentSong({ title: "No song", spotifyId: null });
@@ -230,7 +231,7 @@ export function HomeMap({
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
-        {songs.map((item, index) => {
+        {pins.map((item, index) => {
           return (
             <Marker
               key={index}
@@ -247,21 +248,6 @@ export function HomeMap({
                 <Text style={{ textAlign: "center" }}>{item.title}</Text>
                 <Text style={{ textAlign: "center" }}>{item.artist}</Text>
                 <Text style={{ textAlign: "center" }}>{item.datestamp}</Text>
-              </Callout>
-            </Marker>
-          );
-        })}
-        {images.map((item, index) => {
-          return (
-            <Marker>
-              key={index}
-              coordinate=
-              {{
-                latitude: item.location.latitude,
-                longitude: item.location.longitude,
-              }}
-              <Callout>
-                <Image source={{ uri: item.imageURL }} />
               </Callout>
             </Marker>
           );

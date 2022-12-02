@@ -1,21 +1,29 @@
-import MapView, { Marker, Callout } from "react-native-maps";
+import MapView, { Marker, Callout, Polygon } from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { Text, Image } from "react-native";
+import { Text, Image, Pressable } from "react-native";
 import * as Location from "expo-location";
-import { getValueFor } from "musicmap/util/SecureStore";
+//import { getValueFor } from "musicmap/util/SecureStore";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import * as ImagePicker from "expo-image-picker";
+import { MaterialIcons } from "@expo/vector-icons";
 
 let currentSong = { title: "No song", spotifyId: null };
 
-export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTripData }) {
+export function HomeMap({
+  updateLocationHandler,
+  currentLocation,
+  currentRoadTripData,
+  buttonIsStartRoadtrip,
+}) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
   const [songs, setSongs] = useState([]);
+  const [images, setImages] = useState([]);
   // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
-
 
   /**
    * requests permission if needed
@@ -46,12 +54,11 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
             //   latitude: location.coords.latitude,
             // });
             // if (regionName) {
-              updateLocationHandler(location, "Durham, NC");
+            updateLocationHandler(location, "Durham, NC");
             //}
           }
         }
-      }
-      catch {
+      } catch {
         console.log("ERROR1");
       }
     })();
@@ -67,8 +74,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
           setIsOngoingSession(false);
           clearPinsHandler();
         }
-      }
-      catch {
+      } catch {
         console.log("ERROR2");
       }
     })();
@@ -80,8 +86,65 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   //   }
   // }, [currentSong])
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      //mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      //aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      await postImage(result.uri);
+    }
+  };
+
+  const postImage = async (imageUri) => {
+    const newImage = {
+      tripId: currentRoadTripData.createdReview._id,
+      imageURL: imageUri,
+      location: {
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude + offset,
+        name: currentLocation.name,
+      },
+      datestamp: new Date().toLocaleString("en-GB"),
+    };
+
+    console.log(images); 
+    console.log(newImage); 
+    console.log("new set of images: " + [...images, newImage]); 
+
+    setImages([
+      ...images, 
+      newImage, 
+    ]); 
+    console.log("images: " + images); 
+
+    await axios
+      .post(`${REACT_APP_BASE_URL}/images/create-image`, newImage)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
   const getSongFromSpotify = async () => {
-    let accessToken = await getValueFor("ACCESS_TOKEN");
+    let accessToken = await getAccessTokenFromSecureStorage();
     const response = await fetch(
       "https://api.spotify.com/v1/me/player/currently-playing",
       {
@@ -130,7 +193,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
       return;
     }
     const song = await getSongFromSpotify();
-    if (song == null  || song.id == currentSong.spotifyId) {
+    if (song == null || song.id == currentSong.spotifyId) {
       return;
     }
     const newSong = {
@@ -148,10 +211,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     };
     currentSong = newSong;
     // setCurrentSong(newSong);
-    setSongs((prevSongs) => [
-      ...prevSongs,
-      newSong,
-    ]);
+    setSongs((prevSongs) => [...prevSongs, newSong]);
     setOffset((prevOffset) => prevOffset + 0.005);
     postSongHandler();
   };
@@ -191,12 +251,32 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
             </Marker>
           );
         })}
+        {images.map((item, index) => {
+          return (
+            <Marker>
+              key={index}
+              coordinate=
+              {{
+                latitude: item.location.latitude,
+                longitude: item.location.longitude,
+              }}
+              <Callout>
+                <Image source={{ uri: item.imageURL }} />
+              </Callout>
+            </Marker>
+          );
+        })}
       </MapView>
       <Text style={styles.modalText}>
         {currentLocation
           ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude}) \n ${currentLocation.name}`
           : "Retrieving your location..."}
       </Text>
+      {!buttonIsStartRoadtrip ? (
+        <Pressable style={styles.addImageButton} onPress={pickImage}>
+          <MaterialIcons name="add-photo-alternate" size={28} color="#696969" />
+        </Pressable>
+      ) : null}
     </>
   );
 }

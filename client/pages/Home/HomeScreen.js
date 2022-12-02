@@ -14,8 +14,6 @@ import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";
 import * as Location from "expo-location";
-import * as ImagePicker from 'expo-image-picker';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,7 +21,6 @@ export function HomeScreen() {
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [image, setImage] = useState(null);
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
@@ -52,22 +49,6 @@ export function HomeScreen() {
 
   const cancelCreateHandler = () => {
     setModalVisible(false);
-  };
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) {
-      setImage(result.assets[0].uri);
-    }
   };
 
   const createHandler = () => {
@@ -168,11 +149,14 @@ export function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <SafeAreaView
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    >
       <HomeMap
         updateLocationHandler={updateLocationHandler}
         currentLocation={currentLocation}
         currentRoadTripData={currentRoadTripData}
+        buttonIsStartRoadtrip={buttonIsStartRoadtrip}
       />
       <Modal
         animationType="slide"
@@ -206,11 +190,11 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
-      {!buttonIsStartRoadtrip ? (
+      {/* {buttonIsStartRoadtrip ? (
         <Pressable style={styles.addImageButton} onPress={pickImage}>
           <MaterialIcons name="add-photo-alternate" size={28} color="#696969" />
         </Pressable>
-      ) : null}
+      ) : null} */}
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}

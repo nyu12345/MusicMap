@@ -1,9 +1,10 @@
 import MapView, { Marker, Callout, Polygon } from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { Text, Image, Pressable } from "react-native";
+import { View, Text, Image, Pressable, Modal } from "react-native";
 import * as Location from "expo-location";
 //import { getValueFor } from "musicmap/util/SecureStore";
+import ImageView from "react-native-image-viewing";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
@@ -21,8 +22,10 @@ export function HomeMap({
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
   const [pins, setPins] = useState([]);
+  const [images, setImages] = useState([]);
   // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
+  const [imageViewVisible, setImageViewVisible] = useState(false);
 
   /**
    * requests permission if needed
@@ -47,7 +50,6 @@ export function HomeMap({
       }
     })();
   }, []);
-
 
   useEffect(() => {
     (async () => {
@@ -123,6 +125,7 @@ export function HomeMap({
       datestamp: new Date().toLocaleString("en-GB"),
     };
     setPins((prevPins) => [...prevPins, newImage]);
+    setImages((prevImages) => [...prevImages, newImage]);
     setOffset((prevOffset) => prevOffset + 0.005);
 
     axios
@@ -224,6 +227,13 @@ export function HomeMap({
     // setCurrentSong({ title: "No song", spotifyId: null });
   };
 
+  const createImageView = (itemType) => {
+    console.log("images: " + images); 
+    if (itemType == "image") {
+      setImageViewVisible(true);
+    }
+  };
+
   return (
     <>
       <MapView
@@ -231,23 +241,55 @@ export function HomeMap({
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
+        <ImageView
+          images={images}
+          //keyExtractor={}
+          imageIndex={0}
+          transparent={true}
+          visible={imageViewVisible}
+          onRequestClose={() => setImageViewVisible(false)}
+        />
         {pins.map((item, index) => {
           return (
             <Marker
               key={index}
+              pinColor={item.title != null ? "red" : "blue"}
               coordinate={{
                 latitude: item.location.latitude,
                 longitude: item.location.longitude,
               }}
             >
-              <Callout>
-                <Image
-                  style={{ alignSelf: "center", width: 50, height: 50 }}
-                  source={{ uri: item.imageURL }}
-                />
-                <Text style={{ textAlign: "center" }}>{item.title}</Text>
-                <Text style={{ textAlign: "center" }}>{item.artist}</Text>
-                <Text style={{ textAlign: "center" }}>{item.datestamp}</Text>
+              <Callout
+                onPress={() => {
+                  if (item.title == null) {
+                    createImageView("image");
+                  }
+                }}
+              >
+                {item.title != null ? (
+                  <View>
+                    <Image
+                      style={{ alignSelf: "center", width: 50, height: 50 }}
+                      source={{ uri: item.imageURL }}
+                    />
+                    <Text style={{ textAlign: "center" }}>{item.title}</Text>
+                    <Text style={{ textAlign: "center" }}>{item.artist}</Text>
+                    <Text style={{ textAlign: "center" }}>
+                      {item.datestamp}
+                    </Text>
+                  </View>
+                ) : (
+                  <Pressable
+                    onPress={() => {
+                      console.log("wtf hello");
+                    }}
+                  >
+                    <Image
+                      style={{ alignSelf: "center", width: 50, height: 50 }}
+                      source={{ uri: item.imageURL }}
+                    />
+                  </Pressable>
+                )}
               </Callout>
             </Marker>
           );

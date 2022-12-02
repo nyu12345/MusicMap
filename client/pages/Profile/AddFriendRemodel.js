@@ -8,11 +8,13 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
-import { FriendCard } from "musicmap/pages/Profile/FriendCard";
+import { FriendAddCard } from "musicmap/pages/Profile/FriendAddCard";
+import { getUserInfo } from "musicmap/util/UserInfo";
 
 export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
     const [users, setUsers] = useState([]);
     const [searchInput, setSearchInput] = useState("");
+    const [userId, setUserId] = useState("");
     
     const [page, setPage] = useState(1);
     const [usersToDisplay, setUsersToDisplay] = useState([]);
@@ -63,10 +65,12 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
         }
     
     const renderItem = ({ item }) => (
-        <FriendCard
+        <FriendAddCard
         name={item.name}
         numFriends={item.numFriends}
         profilePic={item.profilePic}
+        userId={userId}
+        friendId={item._id}
         />
     );
 
@@ -95,6 +99,14 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      let userInfo = await getUserInfo();
+      if (userInfo.length > 4) {
+        setUserId(userInfo[4])
+      }
+    })();
+  });
 
     useEffect(() => {
         setPage(1); 

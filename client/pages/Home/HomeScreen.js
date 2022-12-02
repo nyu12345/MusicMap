@@ -42,7 +42,6 @@ export function HomeScreen() {
   const cancelRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
     deleteRoadtrip();
-    setModalVisible(false);
     setCurrentRoadTripData(null);
     setRoadtripName("");
   };

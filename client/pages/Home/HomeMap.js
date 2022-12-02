@@ -13,9 +13,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
   const [songs, setSongs] = useState([]);
-  // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
-
 
   /**
    * requests permission if needed
@@ -46,7 +44,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
             //   latitude: location.coords.latitude,
             // });
             // if (regionName) {
-              updateLocationHandler(location, "Durham, NC");
+            updateLocationHandler(location, "Durham, NC");
             //}
           }
         }
@@ -74,12 +72,6 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     })();
   });
 
-  // useEffect(() => {
-  //   if (currentSong.spotifyId != null) {
-  //     postSongHandler();
-  //   }
-  // }, [currentSong])
-
   const getSongFromSpotify = async () => {
     let accessToken = await getValueFor("ACCESS_TOKEN");
     const response = await fetch(
@@ -105,7 +97,6 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   };
 
   const postSongHandler = () => {
-    console.log("POST SONG: " + currentSong.title);
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
       .then((response) => {
@@ -126,7 +117,8 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   };
 
   const addPinHandler = async () => {
-    if (currentLocation == null || currentRoadTripData == null) {
+    if (currentLocation == null || currentRoadTripData == null || !isOngoingSession) {
+      clearPinsHandler()
       return;
     }
     const song = await getSongFromSpotify();
@@ -147,7 +139,6 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
       datestamp: new Date().toLocaleString("en-GB"),
     };
     currentSong = newSong;
-    // setCurrentSong(newSong);
     setSongs((prevSongs) => [
       ...prevSongs,
       newSong,
@@ -160,7 +151,6 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
     setSongs([]);
     setOffset(0);
     currentSong = { title: "No song", spotifyId: null };
-    // setCurrentSong({ title: "No song", spotifyId: null });
   };
 
   return (
@@ -171,7 +161,7 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
         showsUserLocation={true}
       >
         {songs.map((item, index) => {
-          return (
+          return isOngoingSession ? (
             <Marker
               key={index}
               coordinate={{
@@ -189,13 +179,11 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
                 <Text style={{ textAlign: "center" }}>{item.datestamp}</Text>
               </Callout>
             </Marker>
-          );
+          ) : null;
         })}
       </MapView>
       <Text style={styles.modalText}>
-        {currentLocation
-          ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude}) \n ${currentLocation.name}`
-          : "Retrieving your location..."}
+        {currentLocation ? "" : "Retrieving your location..."}
       </Text>
     </>
   );

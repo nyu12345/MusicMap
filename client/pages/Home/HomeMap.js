@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image, Pressable, Modal } from "react-native";
 import * as Location from "expo-location";
 //import { getValueFor } from "musicmap/util/SecureStore";
-import ImageView from "react-native-image-viewing";
+import ImageViewing from "react-native-image-viewing";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
@@ -26,6 +26,7 @@ export function HomeMap({
   // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
   const [imageViewVisible, setImageViewVisible] = useState(false);
+  const [curImageIdx, setCurImageIdx] = useState(0); 
 
   /**
    * requests permission if needed
@@ -123,10 +124,12 @@ export function HomeMap({
         name: currentLocation.name,
       },
       datestamp: new Date().toLocaleString("en-GB"),
+      //imageIdx: curImageIdx+1, 
     };
     setPins((prevPins) => [...prevPins, newImage]);
     setImages((prevImages) => [...prevImages, newImage]);
     setOffset((prevOffset) => prevOffset + 0.005);
+    //setCurImageIdx(curImageIdx + 1); 
 
     axios
       .post(`${REACT_APP_BASE_URL}/images/create-image`, newImage)
@@ -227,11 +230,9 @@ export function HomeMap({
     // setCurrentSong({ title: "No song", spotifyId: null });
   };
 
-  const createImageView = (itemType) => {
-    console.log("images: " + images); 
-    if (itemType == "image") {
-      setImageViewVisible(true);
-    }
+  const createImageView = (item) => {
+    setImageViewVisible(true);
+    //setCurImageIdx()
   };
 
   return (
@@ -241,11 +242,15 @@ export function HomeMap({
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
-        <ImageView
+        <ImageViewing
+          // images={images}
+          // //keyExtractor={}
+          // imageIndex={0}
+          // transparent={true}
+          // visible={imageViewVisible}
+          // onRequestClose={() => setImageViewVisible(false)}
           images={images}
-          //keyExtractor={}
           imageIndex={0}
-          transparent={true}
           visible={imageViewVisible}
           onRequestClose={() => setImageViewVisible(false)}
         />
@@ -261,8 +266,8 @@ export function HomeMap({
             >
               <Callout
                 onPress={() => {
-                  if (item.title == null) {
-                    createImageView("image");
+                  if (item.title == null) { // is an image
+                    createImageView(item);
                   }
                 }}
               >

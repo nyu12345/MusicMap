@@ -142,7 +142,7 @@ export function HomeMap({
 
   const getSongFromSpotify = async () => {
     try {
-      let accessToken = await getValueFor("ACCESS_TOKEN");
+      let accessToken = await getAccessTokenFromSecureStorage();
       const response = await fetch(
         "https://api.spotify.com/v1/me/player/currently-playing",
         {
@@ -164,7 +164,7 @@ export function HomeMap({
     }
     catch {
       console.log("COULD NOT GET SONG :(");
-    }    
+    }
     return null;
   };
 

@@ -32,6 +32,8 @@ export function StatisticsScreen() {
   const [roadtrips, setRoadtrips] = useState([]);
   const [selected, setSelected] = useState("");
 
+  // setSelected("Default");
+
   const onRefresh = React.useCallback(() => {
     setStatistics([]);
   }, []);
@@ -56,17 +58,18 @@ export function StatisticsScreen() {
   if (roadtrips.length == 0) {
     axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
       setRoadtrips(response.data);
-      setSelected(response.data[0].name);
+      setSelected(response.data[0]._id);
     });
   }
   return (
     <View>
       <View style={styles.horizontalScroll}>
         <ScrollView horizontal={true} >
+        <AllTrips key={-1} name={"All Roadtrips"} isSelected={selected == -1} mySetSelected={setSelected} fadeAnim={fadeAnim}></AllTrips>
           {
             (
               roadtrips.map((roadtrip) =>
-                <PastTrip key={roadtrip._id} name={roadtrip.name} isSelected={selected == roadtrip.name} mySetSelected={setSelected} fadeAnim={fadeAnim}></PastTrip>
+                <PastTrip key={roadtrip._id} roadtrip={roadtrip} isSelected={selected == roadtrip._id} mySetSelected={setSelected} fadeAnim={fadeAnim}></PastTrip>
               )
             )
           }
@@ -88,9 +91,36 @@ export function StatisticsScreen() {
   );
 }
 
-const PastTrip = ({ name, isSelected, mySetSelected, fadeAnim }) => {
+const AllTrips = ({ name, isSelected, mySetSelected, fadeAnim }) => {
   const onP = () => {
-    mySetSelected(name);
+    mySetSelected(-1);
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start();
+  }
+  return (
+    <Pressable
+      style={{ marginRight: 20 }}
+      onPress={onP} // Set selected and reset fade
+    >
+      <View style={styles.icon}>
+        <Image source={require('musicmap/assets/earth.jpeg')} style={styles.image} />
+        <View style={isSelected ? styles.bubbleSelected : styles.bubbleNonSelected} >
+          <Text style={isSelected ? styles.textSelected : styles.textNonSelected}>{name}</Text>
+
+        </View>
+
+      </View>
+    </Pressable>
+  );
+};
+
+const PastTrip = ({ roadtrip, isSelected, mySetSelected, fadeAnim }) => {
+  const onP = () => {
+    mySetSelected(roadtrip._id);
     fadeAnim.setValue(0);
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -106,7 +136,7 @@ const PastTrip = ({ name, isSelected, mySetSelected, fadeAnim }) => {
       <View style={styles.icon}>
         <Image source={require('musicmap/assets/sample_pfp.png')} style={styles.image} />
         <View style={isSelected ? styles.bubbleSelected : styles.bubbleNonSelected} >
-          <Text style={isSelected ? styles.textSelected : styles.textNonSelected}>{name}</Text>
+          <Text style={isSelected ? styles.textSelected : styles.textNonSelected}>{roadtrip.name}</Text>
 
         </View>
 

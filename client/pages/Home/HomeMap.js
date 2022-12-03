@@ -3,8 +3,6 @@ import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, Pressable, Modal } from "react-native";
 import * as Location from "expo-location";
-import { getValueFor } from "musicmap/util/SecureStore";
-import ImageView from "react-native-image-viewing";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
@@ -18,6 +16,7 @@ export function HomeMap({
   currentLocation,
   currentRoadTripData,
   buttonIsStartRoadtrip,
+  createImageViewer, 
 }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
@@ -93,9 +92,9 @@ export function HomeMap({
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      //mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      //aspect: [4, 3],
+      aspect: [4, 3],
       quality: 1,
     });
 
@@ -229,13 +228,7 @@ export function HomeMap({
     setPins([]);
     setOffset(0);
     currentSong = { title: "No song", spotifyId: null };
-  };
-
-  const createImageView = (itemType) => {
-    console.log("images: " + images); 
-    if (itemType == "image") {
-      setImageViewVisible(true);
-    }
+    // setCurrentSong({ title: "No song", spotifyId: null });
   };
 
   return (
@@ -245,13 +238,6 @@ export function HomeMap({
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
-        <ImageView
-          images={images}
-          imageIndex={0}
-          transparent={true}
-          visible={imageViewVisible}
-          onRequestClose={() => setImageViewVisible(false)}
-        />
         {pins.map((item, index) => {
           return isOngoingSession ? (
             <Marker
@@ -264,8 +250,8 @@ export function HomeMap({
             >
               <Callout
                 onPress={() => {
-                  if (item.title == null) {
-                    createImageView("image");
+                  if (item.title == null) { // is an image
+                    createImageViewer(item);
                   }
                 }}
               >
@@ -282,16 +268,10 @@ export function HomeMap({
                     </Text>
                   </View>
                 ) : (
-                  <Pressable
-                    onPress={() => {
-                      console.log("wtf hello");
-                    }}
-                  >
-                    <Image
-                      style={{ alignSelf: "center", width: 50, height: 50 }}
-                      source={{ uri: item.imageURL }}
-                    />
-                  </Pressable>
+                  <Image
+                    style={{ alignSelf: "center", width: 50, height: 50 }}
+                    source={{ uri: item.imageURL }}
+                  />
                 )}
               </Callout>
             </Marker>

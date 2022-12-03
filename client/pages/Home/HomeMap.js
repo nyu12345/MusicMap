@@ -8,6 +8,7 @@ import { REACT_APP_BASE_URL } from "@env";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
+import { getTrack, getCurrentlyPlayingTrack, getTracksAudioFeatures } from "musicmap/util/SpotifyAPICalls"; 
 
 let currentSong = { title: "No song", spotifyId: null };
 
@@ -140,34 +141,6 @@ export function HomeMap({
       });
   };
 
-  const getSongFromSpotify = async () => {
-    try {
-      let accessToken = await getAccessTokenFromSecureStorage();
-      const response = await fetch(
-        "https://api.spotify.com/v1/me/player/currently-playing",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      if (response) {
-        const responseJson = await response.json();
-        return {
-          id: responseJson.item.id,
-          title: responseJson.item.name,
-          artist: responseJson.item.artists[0].name,
-          imageURL: responseJson.item.album.images[0].url,
-        };
-      }
-    }
-    catch {
-      console.log("COULD NOT GET SONG :(");
-    }
-    return null;
-  };
-
   const postSongHandler = () => {
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
@@ -194,13 +167,15 @@ export function HomeMap({
         clearPinsHandler()
         return;
       }
-      const song = await getSongFromSpotify();
-      if (song == null  || song.id == currentSong.spotifyId) {
+      const song = await getCurrentlyPlayingTrack();
+      if (song == null  || song.trackID == currentSong.spotifyId) {
         return;
       }
+      const trackInfo = await getTrack(song.trackID); 
+      const audioFeatures = await getTracksAudioFeatures(song.trackID); 
       const newSong = {
         tripId: currentRoadTripData.createdReview._id,
-        spotifyId: song.id,
+        spotifyId: song.trackID,
         title: song.title,
         artist: song.artist,
         imageURL: song.imageURL,
@@ -209,6 +184,26 @@ export function HomeMap({
           longitude: currentLocation.longitude + offset,
           name: currentLocation.name,
         },
+        songInfo: {
+          albumID: trackInfo.albumID, 
+          albumName: trackInfo.albumName, 
+          releaseDate: trackInfo.releaseDate, 
+          trackPopularity: trackInfo.popularity, 
+          trackPreviewURL: trackInfo.previewURL, 
+          acousticness: audioFeatures.acousticness, 
+          danceability: audioFeatures.danceability, 
+          duration: audioFeatures.duration, 
+          energy: audioFeatures.energy, 
+          instrumentalness: audioFeatures.instrumentalness, 
+          key: audioFeatures.key, 
+          liveness: audioFeatures.liveness, 
+          loudness: audioFeatures.loudness, 
+          modality: audioFeatures.modality, 
+          speechiness: audioFeatures.speechiness, 
+          tempo: audioFeatures.tempo, 
+          timeSignature: audioFeatures.timeSignature, 
+          valence: audioFeatures.valence, 
+        }
         datestamp: new Date().toLocaleString("en-GB"),
       };
       currentSong = newSong;

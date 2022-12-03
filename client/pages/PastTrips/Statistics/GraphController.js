@@ -22,9 +22,22 @@ import {
 import { MyProgressRing } from "./graphs/MyProgressRing";
 import { MyPieChart } from "./graphs/MyPieChart";
 
-export function StatisticsGraphs({myStatistics, myRoadtrips, fadeAnim}) {
+export function StatisticsGraphs({tripId, myStatistics, myRoadtrips, fadeAnim}) {
     const[search, onChangeSearch] = React.useState("");
-    return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    console.log(tripId);
+    if(tripId == -1)
+      return AllTripsGraphs({tripId, myStatistics, myRoadtrips, fadeAnim});
+    return SpecificTripGraphs({tripId, myStatistics, myRoadtrips, fadeAnim});
+}
+
+function AllTripsGraphs({tripId, myStatistics, myRoadtrips, fadeAnim}) {
+  return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <Text> All Trips Data</Text>
+  </View>);
+}
+
+function SpecificTripGraphs({tripId, myStatistics, myRoadtrips, fadeAnim}) {
+  return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     {/* <TextInput
       style={styles.input}
       onChangeText={onChangeSearch}
@@ -51,6 +64,7 @@ export function StatisticsGraphs({myStatistics, myRoadtrips, fadeAnim}) {
     <Text>🎸 Your most popular music category was Rock 🤟Rock on 😎</Text>
   </View>);
 }
+
 
 const styles = StyleSheet.create({
     input: {

@@ -85,7 +85,7 @@ export function StatisticsScreen() {
           />
         }
       >
-        <StatisticsGraphs myStatistics={statistics} myRoadtrips={roadtrips} fadeAnim={fadeAnim}></StatisticsGraphs>
+        <StatisticsGraphs tripId={selected} myStatistics={statistics} myRoadtrips={roadtrips} fadeAnim={fadeAnim}></StatisticsGraphs>
       </ScrollView>
     </View>
   );

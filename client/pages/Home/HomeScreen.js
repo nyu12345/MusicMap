@@ -134,7 +134,7 @@ export function HomeScreen() {
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
   /**
-   * update's the current location of the user
+   * updates the current location of the user
    * @param {Location.LocationObject} newLocation the new location
    */
   const updateLocationHandler = (newLocation, regionName) => {
@@ -143,16 +143,20 @@ export function HomeScreen() {
       longitude: newLocation.coords.longitude,
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
+      regionName: regionName,
       name: regionName[0]["city"] + ", " + regionName[0]["region"],
     });
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <SafeAreaView
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    >
       <HomeMap
         updateLocationHandler={updateLocationHandler}
         currentLocation={currentLocation}
         currentRoadTripData={currentRoadTripData}
+        buttonIsStartRoadtrip={buttonIsStartRoadtrip}
       />
       <Modal
         animationType="slide"
@@ -186,6 +190,11 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
+      {/* {buttonIsStartRoadtrip ? (
+        <Pressable style={styles.addImageButton} onPress={pickImage}>
+          <MaterialIcons name="add-photo-alternate" size={28} color="#696969" />
+        </Pressable>
+      ) : null} */}
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}
@@ -213,6 +222,6 @@ export function HomeScreen() {
           </Text>
         </Pressable>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 }

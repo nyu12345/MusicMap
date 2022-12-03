@@ -20,29 +20,31 @@ export function SentScreen() {
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
   const [sent, setSent] = useState([]);
-  let sentInfo = [];
+  const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     console.log("refresh");
+    setRefreshing(true);
+    console.log("setting sent to 0")
     setSent([]);
+    setRefreshing(false);
   }, []);
 
   async function getSent() {
     if (sent.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
-          let currRequestedId = response.data[0]["requestedId"]
-          console.log(currRequestedId);
-          await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response2) => {
-            console.log("sent info");
-            console.log(response2.data[0]);
-            sentInfo.push(response2.data[0])
-          }).catch((err) => {
-            console.log(err);
-          })
-          setSent(sentInfo);
-        } else {
-          setSent(["nada"])
+          let sentInfo = []
+          for (let i = 0; i < response.data.length; i++) {
+            let response2 = response.data[i];
+            let currRequestedId = response2["requestedId"]
+            await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response3) => {
+              sentInfo.push(response3.data[0]) 
+            }).catch((err) => {
+              console.log(err); 
+            }) 
+          }
+          setSent(sentInfo); 
         }
       }).catch((err) => {
         console.log(err);
@@ -110,19 +112,19 @@ export function SentScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        // refreshControl={
-        //   <RefreshControl
-        //     refreshing={sent.length == 0}
-        //     onRefresh={onRefresh}
-        //   />
-        // }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>
             <Text style={styles.header}>Sent Friend Requests</Text>
           </View>
         </View>
-        {(sent.length > 0 && sent[0] != "nada") ? sent.map((item) => (
+        {(sent.length > 0) ? sent.map((item) => (
           <SentRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not sent any friend requests!</Text>}
       </ScrollView>

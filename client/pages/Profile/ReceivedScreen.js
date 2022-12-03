@@ -20,25 +20,29 @@ export function ReceivedScreen() {
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
   const [received, setReceived] = useState([]);
-  let receivedInfo = [];
+  const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     console.log("refresh");
+    setRefreshing(true);
     setReceived([]);
+    setRefreshing(false);
   }, []);
 
   async function getReceived(userId) { 
     if (received.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
-          let currRequestorId = response.data[0]["requestorId"]
-          await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response2) => {
-            console.log("received info");
-            console.log(response2.data[0]);
-            receivedInfo.push(response2.data[0])
-          }).catch((err) => {
-            console.log(err);
-          })
+          let receivedInfo = []
+          for (let i = 0; i < response.data.length; i++) {
+            let response2 = response.data[i];
+            let currRequestorId = response2["requestorId"];
+            await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response3) => {
+              receivedInfo.push(response3.data[0])
+            }).catch((err) => { 
+              console.log(err);
+            })
+          }
           setReceived(receivedInfo);
         }
       }).catch((err) => {
@@ -58,6 +62,7 @@ export function ReceivedScreen() {
         setUserId(userInfo[4])
       }
       if (userId != "") {
+        console.log("getting received")
         await getReceived(userId);
       }
     })();
@@ -121,12 +126,12 @@ export function ReceivedScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        // refreshControl={
-        //   <RefreshControl
-        //     refreshing={received.length == 0}
-        //     onRefresh={onRefresh}
-        //   />
-        // }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.row}>

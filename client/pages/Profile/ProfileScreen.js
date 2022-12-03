@@ -26,14 +26,15 @@ export function ProfileScreen(props) {
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
   const [friends, setFriends] = useState([]);
-  let friendsInfo = [];
+  const [refreshing, setRefreshing] = useState(false);
   const emptyProfilePic = "abc_dummy.com";
-/*
+
   const onRefresh = React.useCallback(() => {
     console.log("refresh");
+    setRefreshing(true);
     setFriends([]);
+    setRefreshing(false);
   }, []);
-*/
 
   async function getUserInfo() {
     console.log("getting user info");
@@ -62,21 +63,15 @@ export function ProfileScreen(props) {
   async function getFriends() {
     if (friends.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then(async function (response2) {
-        console.log("friends:")
-        console.log(response2.data[0]["friends"]);
         if (response2.data[0]["friends"].length > 0) {
-          response2.data[0]["friends"].map(async function (userId) {
+          let friendsInfo = [];
+          for (let i = 0; i < response2.data[0]["friends"].length; i++) {
+            let userId = response2.data[0]["friends"][i];
             await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
-              console.log("friends info");
-              console.log(response.data[0]);
               friendsInfo.push(response.data[0])
-            })
-            console.log("after axios");
-            setFriends(friendsInfo);
-            console.log(friendsInfo);
-          });
-        } else {
-          setFriends(["nada"]);
+            }) 
+          }
+          setFriends(friendsInfo);
         }
       })
     } else {
@@ -151,12 +146,12 @@ export function ProfileScreen(props) {
           justifyContent: "center",
           alignItems: "center",
         }}
-        /*refreshControl={
+        refreshControl={
           <RefreshControl
-            refreshing={friends.length == 0}
+            refreshing={refreshing}
             onRefresh={onRefresh}
-          />
-        }*/
+          /> 
+        }
       >
         <Image
           style={styles.profilePic}
@@ -178,7 +173,7 @@ export function ProfileScreen(props) {
         </View>
 
         <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
-        {(friends.length > 0 && friends[0] != "nada") ? friends.map((item) => (
+        {(friends.length > 0) ? friends.map((item) => (
           <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
         )) : <Text>No friends!</Text>}
 

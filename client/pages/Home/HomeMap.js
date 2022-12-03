@@ -3,8 +3,6 @@ import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, Pressable, Modal } from "react-native";
 import * as Location from "expo-location";
-//import { getValueFor } from "musicmap/util/SecureStore";
-import ImageViewing from "react-native-image-viewing";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
@@ -18,6 +16,7 @@ export function HomeMap({
   currentLocation,
   currentRoadTripData,
   buttonIsStartRoadtrip,
+  createImageViewer, 
 }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
@@ -26,7 +25,6 @@ export function HomeMap({
   // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
   const [imageViewVisible, setImageViewVisible] = useState(false);
-  const [curImageIdx, setCurImageIdx] = useState(0); 
 
   /**
    * requests permission if needed
@@ -100,9 +98,9 @@ export function HomeMap({
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      //mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      //aspect: [4, 3],
+      aspect: [4, 3],
       quality: 1,
     });
 
@@ -124,12 +122,10 @@ export function HomeMap({
         name: currentLocation.name,
       },
       datestamp: new Date().toLocaleString("en-GB"),
-      //imageIdx: curImageIdx+1, 
     };
     setPins((prevPins) => [...prevPins, newImage]);
     setImages((prevImages) => [...prevImages, newImage]);
     setOffset((prevOffset) => prevOffset + 0.005);
-    //setCurImageIdx(curImageIdx + 1); 
 
     axios
       .post(`${REACT_APP_BASE_URL}/images/create-image`, newImage)
@@ -230,11 +226,6 @@ export function HomeMap({
     // setCurrentSong({ title: "No song", spotifyId: null });
   };
 
-  const createImageView = (item) => {
-    setImageViewVisible(true);
-    //setCurImageIdx()
-  };
-
   return (
     <>
       <MapView
@@ -242,18 +233,6 @@ export function HomeMap({
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
-        <ImageViewing
-          // images={images}
-          // //keyExtractor={}
-          // imageIndex={0}
-          // transparent={true}
-          // visible={imageViewVisible}
-          // onRequestClose={() => setImageViewVisible(false)}
-          images={images}
-          imageIndex={0}
-          visible={imageViewVisible}
-          onRequestClose={() => setImageViewVisible(false)}
-        />
         {pins.map((item, index) => {
           return (
             <Marker
@@ -267,7 +246,7 @@ export function HomeMap({
               <Callout
                 onPress={() => {
                   if (item.title == null) { // is an image
-                    createImageView(item);
+                    createImageViewer(item);
                   }
                 }}
               >
@@ -284,16 +263,10 @@ export function HomeMap({
                     </Text>
                   </View>
                 ) : (
-                  <Pressable
-                    onPress={() => {
-                      console.log("wtf hello");
-                    }}
-                  >
-                    <Image
-                      style={{ alignSelf: "center", width: 50, height: 50 }}
-                      source={{ uri: item.imageURL }}
-                    />
-                  </Pressable>
+                  <Image
+                    style={{ alignSelf: "center", width: 50, height: 50 }}
+                    source={{ uri: item.imageURL }}
+                  />
                 )}
               </Callout>
             </Marker>

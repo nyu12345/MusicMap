@@ -69,6 +69,7 @@ export const AddFriendRemodel = ({ bottomSheetModalRef }) => {
         setRefreshing(true);
         setSentRequests([]);
         setUsers([]);
+        setFriends([]);
         setRefreshing(false);
         console.log("handleRefresh");
     }, []);

@@ -39,12 +39,12 @@ export function SentScreen() {
             let response2 = response.data[i];
             let currRequestedId = response2["requestedId"]
             await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestedId}`).then((response3) => {
-              sentInfo.push(response3.data[0]) 
+              sentInfo.push(response3.data[0])
             }).catch((err) => {
-              console.log(err); 
-            }) 
+              console.log(err);
+            })
           }
-          setSent(sentInfo); 
+          setSent(sentInfo);
         }
       }).catch((err) => {
         console.log(err);
@@ -89,17 +89,15 @@ export function SentScreen() {
         <Image source={{ uri: profilePic }} style={styles.image} />
         <View style={styles.friendCardContent}>
           <View style={styles.cardRow}>
-            <View style={styles.cardColumn}>
-              <Text style={styles.name} numberOfLines={1}>{name}</Text>
-              <Text numberOfLines={2} style={styles.subTitle}>
-                {numFriends} Friends
-              </Text>
-            </View>
-            <Pressable>
-              <Text style={styles.withdraw} onPress={() => {deleteFriendRequest(userId, friendId)}}>Withdraw</Text>
-            </Pressable>
+            <Text style={styles.name} numberOfLines={1}>{name}</Text>
           </View>
+          <Text numberOfLines={2} style={styles.subTitle}>
+            {numFriends} Friends
+          </Text>
         </View>
+        <Pressable>
+          <Text style={styles.withdraw} onPress={() => { deleteFriendRequest(userId, friendId) }}>Withdraw</Text>
+        </Pressable>
       </View>
     );
   };
@@ -119,11 +117,6 @@ export function SentScreen() {
           />
         }
       >
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <View style={styles.row}>
-            <Text style={styles.header}>Sent Friend Requests</Text>
-          </View>
-        </View>
         {(sent.length > 0) ? sent.map((item) => (
           <SentRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not sent any friend requests!</Text>}
@@ -147,6 +140,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "lightgray",
   },
   image: {
     width: 60,
@@ -156,8 +151,6 @@ const styles = StyleSheet.create({
   },
   friendCardContent: {
     flex: 1,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "lightgray",
   },
   cardRow: {
     flexDirection: "row",

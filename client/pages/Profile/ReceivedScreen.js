@@ -29,7 +29,7 @@ export function ReceivedScreen() {
     setRefreshing(false);
   }, []);
 
-  async function getReceived(userId) { 
+  async function getReceived(userId) {
     if (received.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`).then(async function (response) {
         if (response.data.length != 0) {
@@ -39,7 +39,7 @@ export function ReceivedScreen() {
             let currRequestorId = response2["requestorId"];
             await axios.get(`${REACT_APP_BASE_URL}/users?id=${currRequestorId}`).then((response3) => {
               receivedInfo.push(response3.data[0])
-            }).catch((err) => { 
+            }).catch((err) => {
               console.log(err);
             })
           }
@@ -100,20 +100,18 @@ export function ReceivedScreen() {
         <Image source={{ uri: profilePic }} style={styles.image} />
         <View style={styles.friendCardContent}>
           <View style={styles.cardRow}>
-            <View style={styles.cardColumn}>
-              <Text style={styles.name} numberOfLines={1}>{name}</Text>
-              <Text numberOfLines={2} style={styles.subTitle}>
-                {numFriends} Friends
-              </Text>
-            </View>
-            <Pressable>
-              <AntDesign name="closecircleo" size={36} color="black" style={styles.icons} onPress={() => {deleteFriendRequest(friendId, userId)}} />
-            </Pressable>
-            <Pressable>
-              <AntDesign name="checkcircleo" size={36} color="black" onPress={onPress} />
-            </Pressable>
+            <Text style={styles.name} numberOfLines={1}>{name}</Text>
           </View>
+          <Text numberOfLines={2} style={styles.subTitle}>
+            {numFriends} Friends
+          </Text>
         </View>
+        <Pressable>
+          <AntDesign name="closecircleo" size={36} color="black" style={styles.icons} onPress={() => { deleteFriendRequest(friendId, userId) }} />
+        </Pressable>
+        <Pressable>
+          <AntDesign name="checkcircleo" size={36} color="black" onPress={onPress} />
+        </Pressable>
       </View>
     );
   };
@@ -133,11 +131,6 @@ export function ReceivedScreen() {
           />
         }
       >
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <View style={styles.row}>
-            <Text style={styles.header}>Received Friend Requests</Text>
-          </View>
-        </View>
         {(received.length > 0) ? received.map((item) => (
           <ReceivedRequestCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} username={item.spotifyUsername} friendId={item._id} userId={userId} key={item.spotifyUsername} />
         )) : <Text>You have not received any friend requests!</Text>}
@@ -161,6 +154,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "lightgray",
   },
   image: {
     width: 60,
@@ -170,8 +165,6 @@ const styles = StyleSheet.create({
   },
   friendCardContent: {
     flex: 1,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "lightgray",
   },
   cardRow: {
     flexDirection: "row",

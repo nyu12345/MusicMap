@@ -73,26 +73,30 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   });
 
   const getSongFromSpotify = async () => {
-    let accessToken = await getValueFor("ACCESS_TOKEN");
-    const response = await fetch(
-      "https://api.spotify.com/v1/me/player/currently-playing",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+    try {
+      let accessToken = await getValueFor("ACCESS_TOKEN");
+      const response = await fetch(
+        "https://api.spotify.com/v1/me/player/currently-playing",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      if (response) {
+        const responseJson = await response.json();
+        return {
+          id: responseJson.item.id,
+          title: responseJson.item.name,
+          artist: responseJson.item.artists[0].name,
+          imageURL: responseJson.item.album.images[0].url,
+        };
       }
-    );
-    if (response) {
-      const responseJson = await response.json();
-      return {
-        id: responseJson.item.id,
-        title: responseJson.item.name,
-        artist: responseJson.item.artists[0].name,
-        imageURL: responseJson.item.album.images[0].url,
-      };
     }
-    console.log("COULD NOT GET SONG :(");
+    catch {
+      console.log("COULD NOT GET SONG :(");
+    }    
     return null;
   };
 
@@ -117,34 +121,39 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
   };
 
   const addPinHandler = async () => {
-    if (currentLocation == null || currentRoadTripData == null || !isOngoingSession) {
-      clearPinsHandler()
-      return;
+    try {
+      if (currentLocation == null || currentRoadTripData == null || !isOngoingSession) {
+        clearPinsHandler()
+        return;
+      }
+      const song = await getSongFromSpotify();
+      if (song == null  || song.id == currentSong.spotifyId) {
+        return;
+      }
+      const newSong = {
+        tripId: currentRoadTripData.createdReview._id,
+        spotifyId: song.id,
+        title: song.title,
+        artist: song.artist,
+        imageURL: song.imageURL,
+        location: {
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude + offset,
+          name: currentLocation.name,
+        },
+        datestamp: new Date().toLocaleString("en-GB"),
+      };
+      currentSong = newSong;
+      setSongs((prevSongs) => [
+        ...prevSongs,
+        newSong,
+      ]);
+      setOffset((prevOffset) => prevOffset + 0.005);
+      postSongHandler();
     }
-    const song = await getSongFromSpotify();
-    if (song == null  || song.id == currentSong.spotifyId) {
-      return;
+    catch {
+      console.log("ADD PIN ERROR");
     }
-    const newSong = {
-      tripId: currentRoadTripData.createdReview._id,
-      spotifyId: song.id,
-      title: song.title,
-      artist: song.artist,
-      imageURL: song.imageURL,
-      location: {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude + offset,
-        name: currentLocation.name,
-      },
-      datestamp: new Date().toLocaleString("en-GB"),
-    };
-    currentSong = newSong;
-    setSongs((prevSongs) => [
-      ...prevSongs,
-      newSong,
-    ]);
-    setOffset((prevOffset) => prevOffset + 0.005);
-    postSongHandler();
   };
 
   const clearPinsHandler = () => {

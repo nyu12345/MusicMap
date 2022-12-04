@@ -11,8 +11,7 @@ import {
     StackedBarChart
 } from "react-native-chart-kit";
 
-export function MyPieChart({roadtrips, fadeAnim}) {
-    const [progressTime, setProgressTime] = useState(0);
+export function MyPieChart({roadtrips, progressTime}) {
     // const base_url = `${REACT_APP_BASE_URL}/users/`;
     function randColor(index) {
         //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
@@ -44,15 +43,6 @@ export function MyPieChart({roadtrips, fadeAnim}) {
         //legendFontColor: "white",
         //legendFontSize: 0
     });
-
-    useEffect(() => {
-        // Listen the animation variable and update chart variable
-        fadeAnim.addListener(({ value }) => {
-          //console.log('🚀 ~ animationValue.addListener ~ value', value);
-          setProgressTime(value);
-        });
-    
-      }, []);
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

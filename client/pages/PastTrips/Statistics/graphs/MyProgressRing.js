@@ -21,9 +21,9 @@ import {
     ContributionGraph,
     StackedBarChart,
 } from "react-native-chart-kit";
+import { FontAwesome } from '@expo/vector-icons';
 
-export function MyProgressRing({fadeAnim}) {
-    const [progressTime, setProgressTime] = useState(0);
+export function MyProgressRing({vibeValue,progressTime}) {
     const base_url = `${REACT_APP_BASE_URL}/users/`;
     const randColor = () => {
         //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
@@ -31,34 +31,30 @@ export function MyProgressRing({fadeAnim}) {
         //return "rgb(0, 0, " + (Math.floor(Math.random() * 255)) + ")";
     }
     
-    useEffect(() => {
-        // Listen the animation variable and update chart variable
-        fadeAnim.addListener(({ value }) => {
-          //console.log('🚀 ~ animationValue.addListener ~ value', value);
-          setProgressTime(value);
-        });
-    
-      }, []);
     //console.log("switched")
     const data = {
-        labels: ["Swim", "Bike", "Run"], // optional
-        data: [0.3*progressTime, 0.5*progressTime, 0.2*progressTime]
+        data: [vibeValue*progressTime]
       };
 
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontWeight: "bold" }}>Progress</Text>
+        <SafeAreaView style={{ flex: 1, justifyContent: 'left', alignItems: 'left' }}>
             <Animated.View>
             <ProgressChart
                 data={data}
                 width={Dimensions.get("window").width}
-                height={220}
-                strokeWidth={16}
-                radius={32}
+                height={200}
+                strokeWidth={32}
+                radius={64}
                 chartConfig={styles.chartConfig}
-                hideLegend={false}
+                hideLegend={true}
             />
             </Animated.View>
+            <Text style={{ marginHorizontal: 40, flex: 1, justifyContent: 'left', alignItems: 'left', fontWeight: "bold", color: "#0078FA", fontSize: 12 }}>
+                VibeScore&trade;
+            </Text>
+            <Text style={{ marginHorizontal: 40, flex: 1, justifyContent: 'left', alignItems: 'left', fontWeight: "bold", color: "#0078FA", fontSize: 24 }}>
+                {parseInt(vibeValue*100)}/100
+            </Text>
         </SafeAreaView>
     );
 }
@@ -75,10 +71,10 @@ const styles = StyleSheet.create({
         textAlign: "left",
     },
     chartConfig: {
-        backgroundGradientFrom: "lightblue",
-        backgroundGradientTo: "white",
+        backgroundGradientFrom: "#F2F2F2",
+        backgroundGradientTo: "#F2F2F2",
         decimalPlaces: 2, // optional, defaults to 2dp
-        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        color: (opacity = 1) => `rgba(0, 120, 250, ${opacity})`,
         labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
         style: {
             borderRadius: 16

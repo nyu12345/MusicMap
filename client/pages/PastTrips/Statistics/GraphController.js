@@ -21,45 +21,36 @@ import {
 } from "react-native-chart-kit";
 import { MyProgressRing } from "./graphs/MyProgressRing";
 import { MyPieChart } from "./graphs/MyPieChart";
+import { MyContributionGraph } from "./graphs/MyContributionGraph";
 
 export function StatisticsGraphs({tripId, myStatistics, myRoadtrips, fadeAnim}) {
     const[search, onChangeSearch] = React.useState("");
-    console.log(tripId);
+    const [progressTime, setProgressTime] = useState(0);
+    useEffect(() => {
+      // Listen the animation variable and update chart variable
+      fadeAnim.addListener(({ value }) => {
+        //console.log('🚀 ~ animationValue.addListener ~ value', value);
+        setProgressTime(value);
+      });
+  
+    }, []);
+    // console.log(tripId);
     if(tripId == -1)
-      return AllTripsGraphs({tripId, myStatistics, myRoadtrips, fadeAnim});
-    return SpecificTripGraphs({tripId, myStatistics, myRoadtrips, fadeAnim});
+      return AllTripsGraphs({tripId, myStatistics, myRoadtrips, progressTime});
+    return SpecificTripGraphs({tripId, myStatistics, myRoadtrips, progressTime});
 }
 
-function AllTripsGraphs({tripId, myStatistics, myRoadtrips, fadeAnim}) {
+function AllTripsGraphs({tripId, myStatistics, myRoadtrips, progressTime}) {
   return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text> All Trips Data</Text>
+    <MyProgressRing vibeValue={0.85}progressTime={progressTime}/>
+    <MyContributionGraph roadtrips={myRoadtrips} progressTime={progressTime}/>
   </View>);
 }
 
-function SpecificTripGraphs({tripId, myStatistics, myRoadtrips, fadeAnim}) {
+function SpecificTripGraphs({tripId, myStatistics, myRoadtrips, progressTime}) {
   return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    {/* <TextInput
-      style={styles.input}
-      onChangeText={onChangeSearch}
-      value={search}
-      placeholder="Filter Username"
-    />
-    {myStatistics.length == 0 ? (
-      <Text></Text>
-    ) : (
-      myStatistics.map((statistic) =>
-        !statistic.spotifyUsername.includes(search.toLowerCase()) ? (
-          <Text></Text>
-        ) : (
-          <Text key={statistic._id}>
-            {statistic.spotifyUsername} has been on {statistic.numTrips}{" "}
-            trips
-          </Text>
-        )
-      )
-    )} */}
-    <MyProgressRing fadeAnim={fadeAnim}/>
-    <MyPieChart roadtrips={myRoadtrips} fadeAnim={fadeAnim}/>
+    <MyProgressRing vibeValue={0.5} progressTime={progressTime}/>
+    <MyPieChart roadtrips={myRoadtrips} progressTime={progressTime}/>
     <Text>Wow based on my calculations you went {parseInt(Math.random()*20)+80}MPH 🤓 Drive Safe!</Text>
     <Text>🎸 Your most popular music category was Rock 🤟Rock on 😎</Text>
   </View>);

@@ -47,7 +47,10 @@ export function StatisticsScreen() {
     });
   }
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  fadeAnim.setValue(0);
+  useEffect(() => {
+    // Listen the animation variable and update chart variable
+    fadeAnim.setValue(0);
+  }, []);
   Animated.timing(fadeAnim, {
     toValue: 1,
     duration: 1000,

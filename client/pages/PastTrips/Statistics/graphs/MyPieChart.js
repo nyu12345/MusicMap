@@ -11,6 +11,15 @@ import {
     StackedBarChart
 } from "react-native-chart-kit";
 
+const colors = [
+    "#52c2f9",
+    "#57a7f9",
+    "#578af8",
+    "#506bf8",
+    "#4149f6",
+    "#150ef4",
+];
+
 export function MyPieChart({roadtrips, progressTime}) {
     // const base_url = `${REACT_APP_BASE_URL}/users/`;
     function randColor(index) {
@@ -30,8 +39,8 @@ export function MyPieChart({roadtrips, progressTime}) {
         datab.push({
             name: city,
             num: counts[city],
-            color: randColor(index),
-            legendFontColor: "#7F7F7F",
+            color: colors[index%colors.length],
+            legendFontColor: colors[index%colors.length],
             legendFontSize: 15,
         });
         index++;
@@ -46,7 +55,7 @@ export function MyPieChart({roadtrips, progressTime}) {
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{fontWeight: "bold"}}>Start Locations</Text>
+            <Text style={styles.title}>Start Locations</Text>
             <PieChart
                 data={datab}
                 width={Dimensions.get("window").width}
@@ -56,52 +65,6 @@ export function MyPieChart({roadtrips, progressTime}) {
                 backgroundColor={"transparent"}
             />
         </SafeAreaView>
-        // <View>
-        //     <Text>Bezier Line Chart</Text>
-        //     <LineChart
-        //         data={{
-        //             labels: ["January", "February", "March", "April", "May", "June"],
-        //             datasets: [
-        //                 {
-        //                     data: [
-        //                         Math.random() * 100,
-        //                         Math.random() * 100,
-        //                         Math.random() * 100,
-        //                         Math.random() * 100,
-        //                         Math.random() * 100,
-        //                         Math.random() * 100
-        //                     ]
-        //                 }
-        //             ]
-        //         }}
-        //         width={Dimensions.get("window").width} // from react-native
-        //         height={220}
-        //         yAxisLabel="$"
-        //         yAxisSuffix="k"
-        //         yAxisInterval={1} // optional, defaults to 1
-        //         chartConfig={{
-        //             backgroundColor: "#e26a00",
-        //             backgroundGradientFrom: "#fb8c00",
-        //             backgroundGradientTo: "#ffa726",
-        //             decimalPlaces: 2, // optional, defaults to 2dp
-        //             color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        //             labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        //             style: {
-        //                 borderRadius: 16
-        //             },
-        //             propsForDots: {
-        //                 r: "6",
-        //                 strokeWidth: "2",
-        //                 stroke: "#ffa726"
-        //             }
-        //         }}
-        //         bezier
-        //         style={{
-        //             marginVertical: 8,
-        //             borderRadius: 16
-        //         }}
-        //     />
-        // </View>
     );
 }
 
@@ -121,8 +84,8 @@ const styles = StyleSheet.create({
         backgroundGradientFrom: "#fb8c00",
         backgroundGradientTo: "#ffa726",
         decimalPlaces: 2, // optional, defaults to 2dp
-        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+        color: (opacity = 1) => `rgba(0, 120, 250, ${opacity})`,
+        labelColor: (opacity = 1) => `rgba(0, 120, 250, ${opacity})`,
         style: {
             borderRadius: 16
         },
@@ -131,5 +94,15 @@ const styles = StyleSheet.create({
             strokeWidth: "2",
             stroke: "#ffa726"
         }
-    }
+    },
+    title: {
+        marginHorizontal: 25,
+        flex: 1,
+        justifyContent: 'right',
+        alignItems: 'right',
+        alignContent: 'right',
+        fontWeight: "bold",
+        color: "#0078FA",
+        fontSize: 12
+      },
 })

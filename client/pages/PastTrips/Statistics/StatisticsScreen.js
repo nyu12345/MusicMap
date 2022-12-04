@@ -61,11 +61,11 @@ export function StatisticsScreen() {
   if (roadtrips.length == 0) {
     axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
       setRoadtrips(response.data);
-      setSelected(response.data[0]._id);
+      setSelected(-1);
     });
   }
   return (
-    <View>
+    <View style={{flex: 1}} >
       <View style={styles.horizontalScroll}>
         <ScrollView horizontal={true} >
         <AllTrips key={-1} name={"All Roadtrips"} isSelected={selected == -1} mySetSelected={setSelected} fadeAnim={fadeAnim}></AllTrips>
@@ -80,7 +80,7 @@ export function StatisticsScreen() {
       </View>
       <ScrollView
         //contentContainerStyle={styles.scrollView}
-        style={{ height: 1000, marginTop: 10 }}
+        // style={{ height: 1000, marginTop: 10 }}
         refreshControl={
           <RefreshControl
             refreshing={statistics.length == 0}
@@ -88,7 +88,7 @@ export function StatisticsScreen() {
           />
         }
       >
-        <StatisticsGraphs tripId={selected} myStatistics={statistics} myRoadtrips={roadtrips} fadeAnim={fadeAnim}></StatisticsGraphs>
+        <StatisticsGraphs tripId={selected} myStatistics={statistics} myRoadtrips={roadtrips} fadeAnim={fadeAnim} ></StatisticsGraphs>
       </ScrollView>
     </View>
   );

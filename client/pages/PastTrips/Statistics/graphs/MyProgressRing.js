@@ -23,7 +23,7 @@ import {
 } from "react-native-chart-kit";
 import { FontAwesome } from '@expo/vector-icons';
 
-export function MyProgressRing({vibeValue,progressTime}) {
+export function MyProgressRing({vibeValue,progressTime, allData}) {
     const base_url = `${REACT_APP_BASE_URL}/users/`;
     const randColor = () => {
         //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
@@ -42,18 +42,23 @@ export function MyProgressRing({vibeValue,progressTime}) {
             <ProgressChart
                 data={data}
                 width={Dimensions.get("window").width}
-                height={200}
-                strokeWidth={32}
-                radius={64}
+                height={300}
+                strokeWidth={50}
+                radius={96}
                 chartConfig={styles.chartConfig}
                 hideLegend={true}
             />
             </Animated.View>
             <Text style={{ marginHorizontal: 40, flex: 1, justifyContent: 'left', alignItems: 'left', fontWeight: "bold", color: "#0078FA", fontSize: 12 }}>
-                VibeScore&trade;
+                {allData ? "Average " : ""}VibeScore&trade;
             </Text>
-            <Text style={{ marginHorizontal: 40, flex: 1, justifyContent: 'left', alignItems: 'left', fontWeight: "bold", color: "#0078FA", fontSize: 24 }}>
+            <Text style={{ marginHorizontal: 40, flex: 1, justifyContent: 'left', alignItems: 'left', fontWeight: "bold", color: "#0078FA", fontSize: 32 }}>
+                <Text>
                 {parseInt(vibeValue*100)}/100
+                </Text>
+                <Text style={{fontSize: 12}}>
+                    points
+                </Text>
             </Text>
         </SafeAreaView>
     );

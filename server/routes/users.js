@@ -59,8 +59,8 @@ router.post("/", async (req, res, next) => {
   const user = new User({
     name: req.body.name,
     spotifyUsername: req.body.spotifyUsername,
-    numFriends: req.body.numFriends, 
-    profilePic: req.body.profilePic, 
+    numFriends: req.body.numFriends,
+    profilePic: req.body.profilePic,
     friends: [],
   });
 
@@ -78,13 +78,15 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/:username", (req, res) => {
-  console.log("finding user by username"); 
-  User.find({ spotifyUsername: req.params.username }).then((doc) => {
-    res.status(200).json(doc); 
-  }).catch((err) => {
-    res.status(500).json({ error: err }); 
-  })
-}); 
+  console.log("finding user by username");
+  User.find({ spotifyUsername: req.params.username })
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+});
 
 router.patch("/:_id", (req, res, next) => {
   const id = req.params._id;

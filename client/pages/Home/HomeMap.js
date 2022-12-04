@@ -192,18 +192,18 @@ export function HomeMap({
           trackPreviewURL: trackInfo.previewURL, 
           acousticness: audioFeatures.acousticness, 
           danceability: audioFeatures.danceability, 
-          duration: audioFeatures.duration, 
+          duration_ms: audioFeatures.duration_ms, 
           energy: audioFeatures.energy, 
           instrumentalness: audioFeatures.instrumentalness, 
           key: audioFeatures.key, 
           liveness: audioFeatures.liveness, 
           loudness: audioFeatures.loudness, 
-          modality: audioFeatures.modality, 
+          mode: audioFeatures.mode, 
           speechiness: audioFeatures.speechiness, 
           tempo: audioFeatures.tempo, 
           timeSignature: audioFeatures.timeSignature, 
           valence: audioFeatures.valence, 
-        }
+        }, 
         datestamp: new Date().toLocaleString("en-GB"),
       };
       currentSong = newSong;

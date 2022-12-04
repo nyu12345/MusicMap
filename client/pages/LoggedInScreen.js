@@ -4,6 +4,8 @@ import { HomeScreen } from "musicmap/pages/Home/HomeScreen";
 import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripsScreen";
 import { MemoriesScreen } from "musicmap/pages/Memories";
 import { ProfileHomeScreen } from "musicmap/pages/Profile/ProfileHomeScreen";
+import { MemoriesScreen } from "musicmap/pages/Memories/MemoriesScreen";
+import ProfileScreen from "musicmap/pages/Profile/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -50,7 +52,7 @@ export function LoggedInScreen(props) {
         component={PastTripsScreen}
       />
       <Tab.Screen
-        options={{ headerShown: false }}
+        options={{ headerShown: true }}
         name="Memories"
         component={MemoriesScreen}
       />

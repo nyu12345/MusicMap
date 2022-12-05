@@ -45,6 +45,8 @@ const PastTrip = ({
         }
         console.log(error.config);
       });
+
+    await getRoadtrips(); 
   };
 
   const createAlert = () => {
@@ -59,10 +61,9 @@ const PastTrip = ({
         },
         {
           text: "Delete",
-          onPress: () => {
+          onPress: async () => {
             console.log("delete selected");
-            deleteRoadtrip(tripId);
-            getRoadtrips(); 
+            await deleteRoadtrip(tripId);
           },
         },
       ]

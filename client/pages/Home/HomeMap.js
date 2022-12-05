@@ -18,6 +18,7 @@ export function HomeMap({
   currentLocation,
   currentRoadTripData,
   buttonIsStartRoadtrip,
+  updateParentSongHandler,
 }) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
@@ -165,7 +166,7 @@ export function HomeMap({
     }
     catch {
       console.log("COULD NOT GET SONG :(");
-    }    
+    }
     return null;
   };
 
@@ -196,7 +197,7 @@ export function HomeMap({
         return;
       }
       const song = await getSongFromSpotify();
-      if (song == null  || song.id == currentSong.spotifyId) {
+      if (song == null || song.id == currentSong.spotifyId) {
         return;
       }
       const newSong = {
@@ -213,6 +214,7 @@ export function HomeMap({
         datestamp: new Date().toLocaleString("en-GB"),
       };
       currentSong = newSong;
+      updateParentSongHandler(currentSong);
       setPins((prevSongs) => [
         ...prevSongs,
         newSong,
@@ -229,10 +231,11 @@ export function HomeMap({
     setPins([]);
     setOffset(0);
     currentSong = { title: "No song", spotifyId: null };
+    updateParentSongHandler(currentSong);
   };
 
   const createImageView = (itemType) => {
-    console.log("images: " + images); 
+    console.log("images: " + images);
     if (itemType == "image") {
       setImageViewVisible(true);
     }
@@ -261,6 +264,7 @@ export function HomeMap({
                 latitude: item.location.latitude,
                 longitude: item.location.longitude,
               }}
+              icon={{ uri: item.imageURL }}
             >
               <Callout
                 onPress={() => {

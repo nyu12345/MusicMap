@@ -7,6 +7,7 @@ import {
   Pressable,
   Alert,
   Modal,
+  Image,
 } from "react-native";
 import React, { useState } from "react";
 import styles from "./HomeStyles";
@@ -14,6 +15,8 @@ import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";
 import * as Location from "expo-location";
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -21,6 +24,7 @@ export function HomeScreen() {
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
@@ -148,6 +152,10 @@ export function HomeScreen() {
     });
   };
 
+  const updateParentSongHandler = (newSong) => {
+    setCurrentSong(newSong);
+  }
+
   return (
     <SafeAreaView
       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -157,6 +165,8 @@ export function HomeScreen() {
         currentLocation={currentLocation}
         currentRoadTripData={currentRoadTripData}
         buttonIsStartRoadtrip={buttonIsStartRoadtrip}
+        currentSong={currentSong}
+        updateParentSongHandler={updateParentSongHandler}
       />
       <Modal
         animationType="slide"
@@ -190,37 +200,42 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
-      {/* {buttonIsStartRoadtrip ? (
-        <Pressable style={styles.addImageButton} onPress={pickImage}>
-          <MaterialIcons name="add-photo-alternate" size={28} color="#696969" />
-        </Pressable>
-      ) : null} */}
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}
           onPress={startRoadtripClickHandler}
         >
-          <Text title="Start Roadtrip" style={styles.text}>
-            {START_ROADTRIP_BUTTON_TEXT}
-          </Text>
+          <FontAwesome name="play-circle" size={50} color="black" />
         </Pressable>
       ) : null}
       {!buttonIsStartRoadtrip ? (
-        <Pressable style={styles.startButton} onPress={endRoadtripClickHandler}>
-          <Text title="End Roadtrip" style={styles.text}>
-            {END_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
-      ) : null}
-      {!buttonIsStartRoadtrip ? (
-        <Pressable
-          style={styles.cancelRoadtripButton}
-          onPress={cancelRoadtripClickHandler}
+        <View
+          style={styles.roadtripHeader}
         >
-          <Text title="Cancel Roadtrip" style={styles.text}>
-            {CANCEL_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
+          <View style={styles.songHeader}>
+            {currentSong.imageURL ? (
+              <Image
+                style={styles.songImage}
+                source={{ uri: currentSong.imageURL }}
+              />) : null}
+            <View style={styles.songTexts}>
+              <Text numberOfLines={1} style={styles.songTitle}>{currentSong.title}</Text>
+              {currentSong.artist ? <Text numberOfLines={1} style={styles.songArtist}>{currentSong.artist}</Text> : null}
+            </View>
+
+          </View>
+          <View style={styles.roadtripButtonContainer}>
+            <Pressable
+              style={styles.cancelRoadtripButton}
+              onPress={cancelRoadtripClickHandler}
+            >
+              <MaterialIcons name="cancel" size={50} color="red" />
+            </Pressable>
+            <Pressable onPress={endRoadtripClickHandler}>
+              <FontAwesome name="stop-circle" size={50} color="black" />
+            </Pressable>
+          </View>
+        </View>
       ) : null}
     </SafeAreaView>
   );

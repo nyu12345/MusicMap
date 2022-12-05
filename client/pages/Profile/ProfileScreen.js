@@ -29,7 +29,6 @@ const ProfileScreen = (props) => {
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
-
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
       headers: {
@@ -41,7 +40,6 @@ const ProfileScreen = (props) => {
       const responseJson = await response.json();
       setName(responseJson.display_name);
       setUsername(responseJson.id);
-      props.updateCurrentUsername(responseJson.id);
       setNumFollowers(responseJson.followers.total);
       setProfilePic(responseJson.images[0].url);
     } else {
@@ -86,6 +84,7 @@ const ProfileScreen = (props) => {
       await addUserIfNew(username);
     })();
   });
+
 
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {

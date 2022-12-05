@@ -8,11 +8,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createBottomTabNavigator();
-const [currentUsername, setCurrentUsername] = useState(null);
-
-const updateCurrentUsername = (newUsername) => {
-  setCurrentUsername(newUsername);
-}
 
 
 export function LoggedInScreen(props) {
@@ -47,7 +42,7 @@ export function LoggedInScreen(props) {
       <Tab.Screen
         options={{ headerShown: false }}
         name="Home"
-        children={() => <HomeScreen currentUsername={currentUsername} />}
+        component={HomeScreen}
       />
       <Tab.Screen
         options={{ headerShown: false }}
@@ -67,7 +62,6 @@ export function LoggedInScreen(props) {
           <ProfileScreen
             navigation={props.navigation}
             loginToParent={loginToParent}
-            updateCurrentUsername={updateCurrentUsername}
           />
         )}
       />

@@ -9,7 +9,7 @@ import {
   Modal,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./HomeStyles";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
@@ -18,6 +18,7 @@ import { ImageViewer } from "musicmap/pages/Home/ImageViewer";
 import * as Location from "expo-location";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from "@expo/vector-icons";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,6 +29,7 @@ export function HomeScreen() {
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
+  const [currentUsername, setCurrentUsername] = useState(null);
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
@@ -146,6 +148,30 @@ export function HomeScreen() {
       });
   };
 
+  const updateUserTrips = () => {
+    axios
+      .patch(
+        `${REACT_APP_BASE_URL}/roadtrips/update-roadtrip/${currentRoadTripData.createdReview._id}`,
+        endDetails
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
+
   // map size parameters
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
@@ -167,6 +193,30 @@ export function HomeScreen() {
   const updateParentSongHandler = (newSong) => {
     setCurrentSong(newSong);
   }
+
+
+  async function getUsername() {
+    const accessToken = await getAccessTokenFromSecureStorage();
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setCurrentUsername(responseJson.id);
+    } else {
+      console.log("getUsername request returned no response");
+    }
+  }
+
+  useEffect(() => {
+    (async () => {
+      await getUsername();
+    })();
+  }, []);
 
   return (
     <SafeAreaView

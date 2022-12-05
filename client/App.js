@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { save, getValueFor } from "musicmap/util/SecureStore";
 //import { createAppContainer } from 'react-navigation';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests"; 
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
 const Stack = createStackNavigator();
 

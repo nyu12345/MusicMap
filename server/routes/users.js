@@ -62,6 +62,7 @@ router.post("/", async (req, res, next) => {
     numFriends: req.body.numFriends,
     profilePic: req.body.profilePic,
     friends: [],
+    roadtrips: [],
   });
 
   user

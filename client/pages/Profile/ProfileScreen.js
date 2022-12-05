@@ -41,6 +41,7 @@ const ProfileScreen = (props) => {
       const responseJson = await response.json();
       setName(responseJson.display_name);
       setUsername(responseJson.id);
+      props.updateCurrentUsername(responseJson.id);
       setNumFollowers(responseJson.followers.total);
       setProfilePic(responseJson.images[0].url);
     } else {
@@ -96,7 +97,7 @@ const ProfileScreen = (props) => {
     await deleteValue("EXPIRATION_TIME");
 
     Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects?
-    Networking.clearCookies(() => {});
+    Networking.clearCookies(() => { });
 
     props.navigation.navigate("login");
   };

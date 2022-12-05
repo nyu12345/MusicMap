@@ -1,5 +1,11 @@
-import React, { useCallback, useState, useMemo, useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import BottomSheet, {
@@ -8,20 +14,32 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList() {
-  const base_url = `${REACT_APP_BASE_URL}/users/`;
+export function PastTripsList({ getSongs }) {
   const [roadtrips, setRoadtrips] = useState([]);
   const [searchInput, setSearchInput] = useState("");
 
+  // states for handling FlatList pagination
+  const [page, setPage] = useState(1);
+  const [tripsToDisplay, setTripsToDisplay] = useState([]);
+
   // get roadtrip data from API
+  const getRoadtrips = () => {
+    axios
+      .get(`${REACT_APP_BASE_URL}/roadtrips/`)
+      .then((response) => {
+        setRoadtrips(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // get roadtrip data from API upon refresh
   if (roadtrips.length == 0) {
-    axios.get(`${REACT_APP_BASE_URL}/roadtrips/`).then((response) => {
-      setRoadtrips(response.data);
-    }).catch((err) => {
-      console.log(err); 
-    });
+    getRoadtrips();
   }
 
+  // configure bottom sheet
   const bottomSheetRef = useRef(null);
 
   // Points for the bottom sheet to snap to, sorted from bottom to top
@@ -36,13 +54,16 @@ export function PastTripsList() {
     console.log("handleRefresh");
   }, []);
 
-  // handle search
+  // handle search by name, startLocation and destination
   const filter = (roadtrips) => {
     console.log(searchInput);
     if (searchInput == "") {
       return roadtrips;
     }
     return roadtrips.filter(function ({ name, startLocation, destination }) {
+      if (name === null || startLocation === null || destination === null) {
+        return false;
+      }
       let input = searchInput.toLowerCase().replace(/\s/g, "");
       const nameArr = name.split(" ");
       const startLocationArr = startLocation.split(" ");
@@ -77,16 +98,59 @@ export function PastTripsList() {
     });
   };
 
-  // render
+  // render past roadtrip
   const renderItem = ({ item }) => (
     <PastTrip
+      tripId={item._id}
       name={item.name}
       startLocation={item.startLocation}
       destination={item.destination}
       startDate={item.startDate}
       endDate={item.endDate}
+      getSongs={getSongs}
+      getRoadtrips={getRoadtrips}
     />
   );
+
+  // render footer (load more, or signal if reached end of list)
+  const renderFooter = () => (
+    <View style={styles.footerText}>
+      {page < Math.floor(roadtrips.length / 10) + 1 && <ActivityIndicator />}
+      {page !== 1 && page >= Math.floor(roadtrips.length / 10) + 1 && (
+        <Text>No more roadtrips at the moment</Text>
+      )}
+    </View>
+  );
+
+  // render empty component (no roadtrips available yet)
+  const renderEmpty = () => (
+    <View style={styles.emptyText}>
+      <Text>No roadtrips at the moment</Text>
+    </View>
+  );
+
+  const fetchMoreData = () => {
+    console.log("fetch more data");
+    if (page < Math.floor(roadtrips.length / 10) + 1) {
+      setPage(page + 1);
+      setTripsToDisplay(roadtrips.slice(0, 10*page)); 
+    }
+  };
+
+  // used to set trips to display upon first getting roadtrips data from Mongo
+  useEffect(() => {
+    setPage(1); 
+    setTripsToDisplay(roadtrips.slice(0, 10)); 
+  }, [roadtrips]); 
+
+  // search
+  useEffect(() => {
+    if (searchInput !== "") {
+      setTripsToDisplay(filter(roadtrips, searchInput)); 
+    } else {
+      setTripsToDisplay(roadtrips.slice(0, 10*page)); 
+    }
+  }, [searchInput]); 
 
   return (
     <BottomSheet
@@ -100,23 +164,28 @@ export function PastTripsList() {
         placeholder="Search by date, song, people, or location"
         onChangeText={setSearchInput} // look into for setting states
         value={searchInput}
-        style={styles.textInput}
+        style={styles.searchTextInput}
       />
       <BottomSheetFlatList
-        data={filter(roadtrips, searchInput)}
+        //data={filter(roadtrips, searchInput)}
+        data={tripsToDisplay}
         renderItem={renderItem}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
         keyExtractor={(item) => item._id}
         refreshing={roadtrips.length == 0}
         onRefresh={handleRefresh}
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{ backgroundColor: "white" }}
+        onEndReachedThreshold={0.2}
+        onEndReached={fetchMoreData}
       />
     </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  textInput: {
+  searchTextInput: {
     alignSelf: "stretch",
     marginHorizontal: 12,
     marginBottom: 12,
@@ -125,5 +194,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(151, 151, 151, 0.25)",
     color: "black",
     textAlign: "left",
+  },
+  footerText: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  emptyText: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

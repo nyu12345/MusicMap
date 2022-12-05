@@ -4,7 +4,7 @@ const Song = require("../models/songSchema");
 const mongoose = require("mongoose");
 
 router.get("/get-trip-songs/:tripId", (req, res) => {
-  console.log("Getting song for trip: %s", req.params.tripId);
+  console.log("Getting songs for trip: %s", req.params.tripId);
   Song.find({ tripId: req.params.tripId })
     .exec()
     .then((docs) => {
@@ -33,25 +33,25 @@ router.post("/create-song", async (req, res, next) => {
       name: req.body.location.name,
     },
     songInfo: {
-      albumID: req.body.songInfo.albumID, 
-      albumName: req.body.songInfo.albumName, 
-      releaseDate: req.body.songInfo.releaseDate, 
-      trackPopularity: req.body.songInfo.trackPopularity, 
-      trackPreviewURL: req.body.songInfo.trackPreviewURL, 
-      acousticness: req.body.songInfo.acousticness, 
-      danceability: req.body.songInfo.danceability, 
-      duration_ms: req.body.songInfo.duration_ms, 
-      energy: req.body.songInfo.energy, 
-      instrumentalness: req.body.songInfo.instrumentalness, 
-      key: req.body.songInfo.key, 
-      liveness: req.body.songInfo.liveness, 
-      loudness: req.body.songInfo.loudness, 
-      mode: req.body.songInfo.mode, 
-      speechiness: req.body.songInfo.speechiness, 
-      tempo: req.body.songInfo.tempo, 
-      timeSignature: req.body.songInfo.timeSignature, 
-      valence: req.body.songInfo.valence, 
-    }, 
+      albumID: req.body.songInfo.albumID,
+      albumName: req.body.songInfo.albumName,
+      releaseDate: req.body.songInfo.releaseDate,
+      trackPopularity: req.body.songInfo.trackPopularity,
+      trackPreviewURL: req.body.songInfo.trackPreviewURL,
+      acousticness: req.body.songInfo.acousticness,
+      danceability: req.body.songInfo.danceability,
+      duration_ms: req.body.songInfo.duration_ms,
+      energy: req.body.songInfo.energy,
+      instrumentalness: req.body.songInfo.instrumentalness,
+      key: req.body.songInfo.key,
+      liveness: req.body.songInfo.liveness,
+      loudness: req.body.songInfo.loudness,
+      mode: req.body.songInfo.mode,
+      speechiness: req.body.songInfo.speechiness,
+      tempo: req.body.songInfo.tempo,
+      timeSignature: req.body.songInfo.timeSignature,
+      valence: req.body.songInfo.valence,
+    },
     datestamp: req.body.datestamp,
   });
 

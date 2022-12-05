@@ -14,12 +14,15 @@ import styles from "./HomeStyles";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";
+import { ImageViewer } from "musicmap/pages/Home/ImageViewer";
 import * as Location from "expo-location";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from "@expo/vector-icons";
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageToDisplay, setImageToDisplay] = useState("");
   const [roadtripName, setRoadtripName] = useState("");
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
@@ -28,6 +31,15 @@ export function HomeScreen() {
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
+
+  const createImageViewer = (item) => {
+    setImageViewerVisible(true);
+    setImageToDisplay(item.imageURL);
+  };
+
+  const closeImageViewer = () => {
+    setImageViewerVisible(false);
+  }
 
   const startRoadtripClickHandler = () => {
     if (currentLocation == null) {
@@ -167,7 +179,19 @@ export function HomeScreen() {
         buttonIsStartRoadtrip={buttonIsStartRoadtrip}
         currentSong={currentSong}
         updateParentSongHandler={updateParentSongHandler}
+        createImageViewer={createImageViewer}
       />
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={imageViewerVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setImageViewerVisible(false);
+        }}
+      >
+        <ImageViewer closeImageViewer={closeImageViewer} imageURL={imageToDisplay} />
+      </Modal>
       <Modal
         animationType="slide"
         transparent={true}

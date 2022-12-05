@@ -67,7 +67,7 @@ export function StatisticsScreen() {
   return (
     <View style={{flex: 1}} >
       <View style={styles.horizontalScroll}>
-        <ScrollView horizontal={true} >
+        <ScrollView horizontal={true} style={{marginVertical: 10}}>
         <AllTrips key={-1} name={"All Roadtrips"} isSelected={selected == -1} mySetSelected={setSelected} fadeAnim={fadeAnim}></AllTrips>
           {
             (

@@ -37,11 +37,12 @@ const styles = StyleSheet.create({
     fontSize: 33, 
     color: "white", 
     fontWeight: "bold", 
+    flexWrap: "wrap", // don't think wrap works
   }, 
   subtitle: {
     fontSize: 15, 
     color: "white", 
-    flexWrap: "wrap", 
+    flexWrap: "wrap", // don't think wrap works
   }
 });
 

@@ -121,7 +121,7 @@ export function MemoriesScreen() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ bottom: 10 }}>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -129,7 +129,7 @@ export function MemoriesScreen() {
         style={{ top: 8 }}
       >
         {fakeRoadtripsData.map((item, index) => (
-          <MemoryCard roadtripData={item} key={index} style={styles.memoryCard} />
+          <MemoryCard roadtripData={item} key={index} />
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -137,8 +137,5 @@ export function MemoriesScreen() {
 }
 
 const styles = StyleSheet.create({
-  memoryCard: {
-    padding: 10, 
-    marginHorizontal: 10, 
-  }
+  
 });

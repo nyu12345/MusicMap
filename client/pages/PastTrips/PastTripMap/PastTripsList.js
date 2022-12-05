@@ -12,6 +12,7 @@ import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 export function PastTripsList({ getSongs }) {
   const [roadtrips, setRoadtrips] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+  const [selectedTripId, setSelectedTripId] = useState("");
 
   // get roadtrip data from API
   const getRoadtrips = () => {
@@ -102,7 +103,8 @@ export function PastTripsList({ getSongs }) {
       endDate={item.endDate}
       getSongs={getSongs}
       getRoadtrips={getRoadtrips}
-      roadtrips={roadtrips}
+      selectedTripId={selectedTripId}
+      setSelectedTripId={setSelectedTripId}
     />
   );
 
@@ -134,6 +136,7 @@ export function PastTripsList({ getSongs }) {
       />
       <BottomSheetFlatList
         data={filter(roadtrips, searchInput)}
+        extraData={selectedTripId}
         renderItem={renderItem}
         ListEmptyComponent={renderEmpty}
         keyExtractor={(item) => item._id}

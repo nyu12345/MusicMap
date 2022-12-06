@@ -29,7 +29,6 @@ const ProfileScreen = (props) => {
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
-
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
       headers: {
@@ -86,6 +85,7 @@ const ProfileScreen = (props) => {
     })();
   });
 
+
   // remove token, show Spotify log out screen, clear cookies & navigate to login screen
   const logOut = async () => {
     props.loginToParent();
@@ -96,7 +96,7 @@ const ProfileScreen = (props) => {
     await deleteValue("EXPIRATION_TIME");
 
     Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects?
-    Networking.clearCookies(() => {});
+    Networking.clearCookies(() => { });
 
     props.navigation.navigate("login");
   };

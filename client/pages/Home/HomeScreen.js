@@ -7,25 +7,46 @@ import {
   Pressable,
   Alert,
   Modal,
+  Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./HomeStyles";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";
+import { ImageViewer } from "musicmap/pages/Home/ImageViewer";
 import * as Location from "expo-location";
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageToDisplay, setImageToDisplay] = useState("");
   const [roadtripName, setRoadtripName] = useState("");
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
+  const [currentUsername, setCurrentUsername] = useState(null);
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
   const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
 
+  const createImageViewer = (item) => {
+    setImageViewerVisible(true);
+    setImageToDisplay(item.imageURL);
+  };
+
+  const closeImageViewer = () => {
+    setImageViewerVisible(false);
+  }
+
   const startRoadtripClickHandler = () => {
+    if (currentLocation == null) {
+      return; // maybe should hide the button until it's not null
+    }
     setModalVisible(true);
   };
 
@@ -39,7 +60,6 @@ export function HomeScreen() {
   const cancelRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
     deleteRoadtrip();
-    setModalVisible(false);
     setCurrentRoadTripData(null);
     setRoadtripName("");
   };
@@ -49,12 +69,13 @@ export function HomeScreen() {
   };
 
   const createHandler = () => {
-    console.log(`name: ${roadtripName}`);
+    console.log(`roadtrip name: ${roadtripName}`);
     const roadtrip = {
       name: roadtripName,
       startLocation: currentLocation.name,
       startDate: new Date().toDateString(),
     };
+    console.log(roadtrip.startLocation);
     // should add check to see if these fields are valid here and present alert if not
     axios
       .post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip)
@@ -74,7 +95,6 @@ export function HomeScreen() {
         }
         console.log(error.config);
       });
-
     setModalVisible(false);
     setButtonIsStartRoadtrip(false);
   };
@@ -128,11 +148,40 @@ export function HomeScreen() {
       });
   };
 
+  const updateUserTrips = () => {
+    if (currentRoadTripData) {
+      const roadtripDetails = {
+        roadtripId: currentRoadTripData.createdReview._id
+      };
+      axios
+        .patch(
+          `${REACT_APP_BASE_URL}/users/update-user-roadtrip/${currentUsername}`,
+          roadtripDetails
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch(function (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+          console.log(error.config);
+        });
+    }
+  };
+
+
   // map size parameters
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
   /**
-   * update's the current location of the user
+   * updates the current location of the user
    * @param {Location.LocationObject} newLocation the new location
    */
   const updateLocationHandler = (newLocation, regionName) => {
@@ -141,17 +190,67 @@ export function HomeScreen() {
       longitude: newLocation.coords.longitude,
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
+      regionName: regionName,
       name: regionName[0]["city"] + ", " + regionName[0]["region"],
     });
   };
 
+  const updateParentSongHandler = (newSong) => {
+    setCurrentSong(newSong);
+  }
+
+
+  async function getUsername() {
+    const accessToken = await getAccessTokenFromSecureStorage();
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setCurrentUsername(responseJson.id);
+    } else {
+      console.log("getUsername request returned no response");
+    }
+  }
+
+  useEffect(() => {
+    (async () => {
+      await getUsername();
+    })();
+  }, []);
+
+  useEffect(() => {
+    updateUserTrips();
+  }, [currentRoadTripData])
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <SafeAreaView
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    >
       <HomeMap
         updateLocationHandler={updateLocationHandler}
         currentLocation={currentLocation}
         currentRoadTripData={currentRoadTripData}
+        buttonIsStartRoadtrip={buttonIsStartRoadtrip}
+        currentSong={currentSong}
+        updateParentSongHandler={updateParentSongHandler}
+        createImageViewer={createImageViewer}
       />
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={imageViewerVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setImageViewerVisible(false);
+        }}
+      >
+        <ImageViewer closeImageViewer={closeImageViewer} imageURL={imageToDisplay} />
+      </Modal>
       <Modal
         animationType="slide"
         transparent={true}
@@ -189,28 +288,38 @@ export function HomeScreen() {
           style={styles.startButton}
           onPress={startRoadtripClickHandler}
         >
-          <Text title="Start Roadtrip" style={styles.text}>
-            {START_ROADTRIP_BUTTON_TEXT}
-          </Text>
+          <FontAwesome name="play-circle" size={50} color="black" />
         </Pressable>
       ) : null}
       {!buttonIsStartRoadtrip ? (
-        <Pressable style={styles.startButton} onPress={endRoadtripClickHandler}>
-          <Text title="End Roadtrip" style={styles.text}>
-            {END_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
-      ) : null}
-      {!buttonIsStartRoadtrip ? (
-        <Pressable
-          style={styles.cancelRoadtripButton}
-          onPress={cancelRoadtripClickHandler}
+        <View
+          style={styles.roadtripHeader}
         >
-          <Text title="Cancel Roadtrip" style={styles.text}>
-            {CANCEL_ROADTRIP_BUTTON_TEXT}
-          </Text>
-        </Pressable>
+          <View style={styles.songHeader}>
+            {currentSong.imageURL ? (
+              <Image
+                style={styles.songImage}
+                source={{ uri: currentSong.imageURL }}
+              />) : null}
+            <View style={styles.songTexts}>
+              <Text numberOfLines={1} style={styles.songTitle}>{currentSong.title}</Text>
+              {currentSong.artist ? <Text numberOfLines={1} style={styles.songArtist}>{currentSong.artist}</Text> : null}
+            </View>
+
+          </View>
+          <View style={styles.roadtripButtonContainer}>
+            <Pressable
+              style={styles.cancelRoadtripButton}
+              onPress={cancelRoadtripClickHandler}
+            >
+              <MaterialIcons name="cancel" size={50} color="red" />
+            </Pressable>
+            <Pressable onPress={endRoadtripClickHandler}>
+              <FontAwesome name="stop-circle" size={50} color="black" />
+            </Pressable>
+          </View>
+        </View>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 }

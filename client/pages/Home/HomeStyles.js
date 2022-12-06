@@ -1,28 +1,85 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const dimensions = Dimensions.get('window');
+const imageHeight = Math.round(dimensions.width * 9 / 16); //calculate with aspect ratio
+const imageWidth = dimensions.width;
 
 const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  addImageButton: {
+    alignSelf: 'flex-end',
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: "aliceblue",
+    position: "absolute",
+    right: 20,
+    top: 50,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+
+    elevation: 3,
+  },
   startButton: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 4,
-    backgroundColor: "black",
     position: "absolute",
     bottom: 30,
   },
-  cancelRoadtripButton: {
+  roadtripHeader: {
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 4,
-    backgroundColor: "red",
+    backgroundColor: "white",
+    width: "70%",
+    borderRadius: 30,
+    position: "relative",
+    top: imageHeight - 20,
+    height: 150
+  },
+  roadtripButtonContainer: {
     position: "absolute",
-    bottom: 80,
+    width: "70%",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    top: 90
+  },
+  songHeader: {
+    bottom: 100,
+    position: "absolute",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  songTexts: {
+    position: "relative",
+    right: 30
+  },
+  songTitle: {
+    position: "absolute",
+    width: 160,
+    fontSize: 15,
+    fontWeight: "bold",
+    bottom: 4,
+  },
+  songArtist: {
+    position: "absolute",
+    width: 160,
+    fontSize: 15,
+  },
+  songImage: {
+    position: "absolute",
+    height: 60,
+    width: 60,
+    right: 40
+
   },
   createButton: {
     alignItems: "center",

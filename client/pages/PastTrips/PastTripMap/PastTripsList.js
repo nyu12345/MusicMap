@@ -1,4 +1,10 @@
-import React, { useCallback, useState, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
@@ -7,29 +13,105 @@ import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
 export function PastTripsList({ getSongs }) {
+  const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
+  const [roadtripIds, setRoadtripIds] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [selectedTripId, setSelectedTripId] = useState("");
 
   // get roadtrip data from API
-  const getRoadtrips = () => {
-    axios
-      .get(`${REACT_APP_BASE_URL}/roadtrips/`)
+  const getRoadtrips = async () => {
+    await getUserRoadtripIds(username);
+    await getUserRoadtrips(roadtripIds);
+  };
+
+  // get all the roadtrips the current user has been on
+  // 1. get current user's username
+  const getUsername = async () => {
+    const accessToken = await getAccessTokenFromSecureStorage();
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setUsername(responseJson.id);
+    } else {
+      console.log("getUserInfo request returned no response");
+    }
+  };
+
+  // 2. get current user's info from Mongo with username and then get user's road trip ids
+  const getUserRoadtripIds = async (username) => {
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/${username}`)
       .then((response) => {
-        setRoadtrips(response.data);
+        setRoadtripIds(response.data[0].roadtrips);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  // get roadtrip data from API upon refresh
-  if (roadtrips.length == 0) {
-    getRoadtrips();
-  }
+  // 3. get all road trip information from the road trip ids
+  const getUserRoadtrips = async (roadtripIds) => {
+    // remove duplicate road trips
+    const roadtripSet = new Set();
+    for (let i = 0; i < roadtripIds.length; i++) {
+      roadtripSet.add(roadtripIds[i]);
+    }
+
+    const uniqueRoadtripIds = [];
+    roadtripSet.forEach((trip) => uniqueRoadtripIds.push(trip));
+
+    // get road trip info for all unique road trips
+    const uniqueRoadtrips = [];
+    for (let i = 0; i < uniqueRoadtripIds.length; i++) {
+      const curTripId = uniqueRoadtripIds[i];
+      await axios
+        .get(`${REACT_APP_BASE_URL}/roadtrips/${curTripId}`)
+        .then((response) => {
+          uniqueRoadtrips.push(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+
+    setRoadtrips(uniqueRoadtrips);
+  };
+
+  // initial rendering
+  useEffect(() => {
+    async () => {
+      await getUsername();
+    };
+  }, []);
+
+  // after getUsername from initial rendering, get roadtrips using that username
+  useEffect(() => {
+    (async () => {
+      if (username != "") {
+        getRoadtrips();
+      }
+    })();
+  }, [username]);
+
+  useEffect(() => {
+    // get roadtrip data from API upon refresh
+    (async () => {
+      if (roadtrips.length == 0) {
+        getRoadtrips();
+      }
+    })();
+  }, [roadtrips]);
 
   // configure bottom sheet
   const bottomSheetRef = useRef(null);
@@ -42,13 +124,12 @@ export function PastTripsList({ getSongs }) {
     console.log("handleSheetChange", index);
   }, []);
   const handleRefresh = useCallback(() => {
-    setRoadtrips([]);
     console.log("handleRefresh");
+    setRoadtrips([]);
   }, []);
 
   // handle search
   const filter = (roadtrips) => {
-    console.log(searchInput);
     if (searchInput == "") {
       return roadtrips;
     }
@@ -111,11 +192,9 @@ export function PastTripsList({ getSongs }) {
   // render empty component (no roadtrips available yet)
   const renderEmpty = () => (
     <View style={styles.emptyText}>
+      <Text style={{ fontSize: 15 }}>No roadtrips at the moment :(</Text>
       <Text style={{ fontSize: 15 }}>
-        No roadtrips at the moment :(
-      </Text>
-      <Text style={{ fontSize: 15 }}>
-        Go out there to explore and make more memories! 
+        Go out there to explore and make more memories!
       </Text>
     </View>
   );

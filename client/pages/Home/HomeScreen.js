@@ -199,7 +199,6 @@ export function HomeScreen() {
     setCurrentSong(newSong);
   }
 
-
   async function getUsername() {
     const accessToken = await getAccessTokenFromSecureStorage();
     const response = await fetch("https://api.spotify.com/v1/me", {

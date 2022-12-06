@@ -36,7 +36,6 @@ export function ProfileScreen(props) {
   }, []);
 
   async function getUserInfo() {
-    console.log("getting user info");
     const accessToken = await getAccessTokenFromSecureStorage();
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
@@ -44,7 +43,6 @@ export function ProfileScreen(props) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
     if (response) {
       const responseJson = await response.json();
       console.log(responseJson);

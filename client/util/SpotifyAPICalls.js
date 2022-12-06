@@ -22,6 +22,7 @@ export const getTrack = async (trackID) => {
         },
       }
     );
+
     if (response) {
       const responseJson = await response.json();
       return {
@@ -58,6 +59,7 @@ export const getCurrentlyPlayingTrack = async () => {
         },
       }
     );
+
     if (response) {
       const responseJson = await response.json();
       return {
@@ -102,6 +104,7 @@ export const getTracksAudioFeatures = async (trackID) => {
         },
       }
     );
+     
     if (response) {
       const responseJson = await response.json();
       return {

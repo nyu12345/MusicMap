@@ -59,7 +59,7 @@ export function LoggedInScreen(props) {
         name="Profile"
         //component = {ProfileScreen}
         children={(props) => (
-          <ProfileScreen
+          <ProfileHomeScreen
             navigation={props.navigation}
             loginToParent={loginToParent}
           />

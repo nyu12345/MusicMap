@@ -14,7 +14,7 @@ export const FriendAddCard = ({
   profilePic,
   userId,
   friendId,
-  setDidSendRequest, 
+  setDidSendRequest,
 }) => {
 
   async function createFriendRequest(requestorId, requestedId) {

@@ -30,16 +30,14 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   // get all users in the database
   async function getUsers() {
-    if (users.length == 0) {
-      await axios
-        .get(`${REACT_APP_BASE_URL}/users/`)
-        .then((response) => {
-          setUsers(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/`)
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   // get all sent friend requests
@@ -58,18 +56,16 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   // get friends of the current user
   async function getFriends() {
-    if (friends.length == 0) {
-      await axios
-        .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
-        .then(async function (response) {
-          if (response.data.length != 0) {
-            setFriends(response.data[0]["friends"]);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
+      .then(async function (response) {
+        if (response.data.length != 0) {
+          setFriends(response.data[0]["friends"]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   const handleSheetChange = useCallback((index) => {

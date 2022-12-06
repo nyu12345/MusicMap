@@ -27,7 +27,7 @@ export function MyBezierGraph({ data, progressTime, title }) {
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.title}>{title}</Text>
             <LineChart
-                data={data == null ? tempdata : data}
+                data={data == null || data.datasets[0].data.length == 0 ? tempdata : data}
                 width={Dimensions.get('window').width - 16} // from react-native
                 height={220}
                 chartConfig={{

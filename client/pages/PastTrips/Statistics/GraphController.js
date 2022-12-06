@@ -83,6 +83,8 @@ function AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrD
     for (const [key, value] of Object.entries(startCityCount)) {
       // console.log(key);
       // console.log(value);
+      if(key == null || value == null)
+        continue;
       startLocData.push({
         name: key,
         num: value,
@@ -106,6 +108,8 @@ function AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrD
     for (const [key, value] of Object.entries(endCityCount)) {
       // console.log(key);
       // console.log(value);
+      if(key == null || isNaN(value))
+        continue;
       endLocData.push({
         name: key,
         num: value,
@@ -181,12 +185,19 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
   let topArtists = [["Null",0],["Null",0],["Null",0]];
   try {
     vibeScore = (tripSongs[tripId]['vibeScore'] / Math.max(tripSongs[tripId]['numSongs'], 1)).toFixed(2);
+    console.log(vibeScore);
     distance = (tripSongs[tripId]['distance']).toFixed(2);
+    console.log(distance);
     numSongs = tripSongs[tripId]['numSongs'];
+    console.log("afdsafd" + numSongs);
     numMinutes = (tripSongs[tripId]['numSeconds'] / 60).toFixed(2);
+    console.log("fdsa" + numMinutes);
     topSpeed = tripSongs[tripId]['topSpeed'].toFixed(0);
+    console.log("afd" + topSpeed);
     fastestSong = tripSongs[tripId]['fastestSong'];
-    avgSpeed = (distance / numMinutes * 60).toFixed(0);
+    console.log("af" + fastestSong);
+    avgSpeed = (distance / Math.max(numMinutes,1) * 60).toFixed(0);
+    console.log("a" + avgSpeed);
     let distances = tripSongs[tripId]['distances'];
     
     // console.log(tripSongs[tripId]['topSongs']);
@@ -201,10 +212,13 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
     let index = 0;
 
     for (d of distances) {
-      // console.log(d);
-      animatedDistances.push(index / distances.length <= progressTime ? d * progressTime : 0);
+      if(isNaN(d))
+        continue;
+      animatedDistances.push(index / Math.max(distances.length,1) <= progressTime ? d * progressTime : 0);
       index++;
     }
+    if(animatedDistances.length == 0)
+      animatedDistances.push(0);
     bezierData = {
       labels: [],
       datasets: [

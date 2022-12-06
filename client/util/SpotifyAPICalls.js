@@ -70,7 +70,6 @@ export const getCurrentlyPlayingTrack = async () => {
   } catch {
     console.log("COULD NOT GET CURRENTLY PLAYING TRACK :(");
   }
-  //return null;
 };
 
 /*

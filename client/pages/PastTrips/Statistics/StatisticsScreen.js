@@ -102,6 +102,8 @@ export function StatisticsScreenHelper() {
                 return a.datestamp - b.datestamp;
               });
               trip_song_map[rt._id] = {};
+              trip_song_map[rt._id]['songCount'] = {};
+              trip_song_map[rt._id]['artistCount'] = {};
               trip_song_map[rt._id]['songs'] = s1;
               trip_song_map[rt._id]['distances'] = [];
               let totalDistance = 0;
@@ -118,6 +120,13 @@ export function StatisticsScreenHelper() {
               for (const s of s1) {
                 try {
                   numSongs += 1;
+                  if (!(trip_song_map[rt._id]['songCount'].hasOwnProperty(s.title)))
+                    trip_song_map[rt._id]['songCount'][s.title] = 1;
+                  trip_song_map[rt._id]['songCount'][s.title] += 1;
+                  // console.log(trip_song_map[rt._id]['songCount'][s.title]);
+                  if (!(trip_song_map[rt._id]['artistCount'].hasOwnProperty(s.artist)))
+                    trip_song_map[rt._id]['artistCount'][s.artist] = 1;
+                  trip_song_map[rt._id]['artistCount'][s.artist] += 1;
                   let curLat = s.location.latitude;
                   let curLong = s.location.longitude;
                   tempVibeScore += calcVibeScore(s);
@@ -151,6 +160,24 @@ export function StatisticsScreenHelper() {
               trip_song_map[rt._id]['vibeScore'] = tempVibeScore;
               trip_song_map[rt._id]['topSpeed'] = highestSpeed;
               trip_song_map[rt._id]['fastestSong'] = fastestSong;
+
+              let items = Object.keys(trip_song_map[rt._id]['songCount']).map(function(key) {
+                return [key, trip_song_map[rt._id]['songCount'][key]];
+              });
+              items.sort(function(first, second) {
+                return second[1] - first[1];
+              });
+              trip_song_map[rt._id]['topSongs'] = items;
+              // console.log(items);
+
+              items = Object.keys(trip_song_map[rt._id]['artistCount']).map(function(key) {
+                return [key, trip_song_map[rt._id]['artistCount'][key]];
+              });
+              items.sort(function(first, second) {
+                return second[1] - first[1];
+              });
+              trip_song_map[rt._id]['topArtists'] = items;
+
               aggrDataCollection['distance'] += totalDistance;
               aggrDataCollection['numSongs'] += numSongs;
               aggrDataCollection['numSeconds'] += numSeconds;

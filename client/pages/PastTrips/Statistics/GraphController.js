@@ -177,6 +177,8 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
   let fastestSong = "Null";
   let avgSpeed = 0;
   let bezierData = null;
+  let topSongs = [["Null",0],["Null",0],["Null",0]];
+  let topArtists = [["Null",0],["Null",0],["Null",0]];
   try {
     vibeScore = (tripSongs[tripId]['vibeScore'] / Math.max(tripSongs[tripId]['numSongs'], 1)).toFixed(2);
     distance = (tripSongs[tripId]['distance']).toFixed(2);
@@ -186,6 +188,14 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
     fastestSong = tripSongs[tripId]['fastestSong'];
     avgSpeed = (distance / numMinutes * 60).toFixed(0);
     let distances = tripSongs[tripId]['distances'];
+    
+    // console.log(tripSongs[tripId]['topSongs']);
+    topSongs = tripSongs[tripId]['topSongs'].slice(0,3);
+    while(topSongs.length<3)
+      topSongs.push(["",0]);
+    topArtists = tripSongs[tripId]['topArtists'].slice(0,3);
+    while(topArtists.length<3)
+      topArtists.push(["",0]);
 
     let animatedDistances = [];
     let index = 0;
@@ -206,7 +216,7 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
       ]
     }
   } catch (e) {
-    console.log("Specifics?");
+    // console.log("Specifics?");
   }
   return (<View style={{ flex: 1, justifyContent: "left", alignItems: "left", marginBottom: 40, }}>
     <MyProgressRing vibeValue={vibeScore} progressTime={progressTime} />
@@ -244,6 +254,50 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
           <Text style={styles.text}>{avgSpeed} </Text>
           <Text style={styles.title}>
             mph
+          </Text>
+        </Text>
+      </View>
+    </View>
+    <View style={{ justifyContent: 'left', alignItems: 'left', flexDirection: 'row', flex: 1, marginBottom: 20 }}>
+      <View style={styles.boxes}>
+        <Text style={styles.chartTitle}>Top Songs</Text>
+        <Text>
+          <Text style={styles.chartText}>{topSongs[0][0]} </Text>
+          <Text style={styles.chartTextNum}>
+            {topSongs[0][0] == "" ? null : "X"+ topSongs[0][1]}
+          </Text>
+        </Text>
+        <Text>
+          <Text style={styles.chartText}>{topSongs[1][0]} </Text>
+          <Text style={styles.chartTextNum}>
+            {topSongs[1][0] == "" ? null : "X"+ topSongs[1][1]}
+          </Text>
+        </Text>
+        <Text>
+          <Text style={styles.chartText}>{topSongs[2][0]} </Text>
+          <Text style={styles.chartTextNum}>
+            {topSongs[2][0] == "" ? null : "X"+ topSongs[2][1]}
+          </Text>
+        </Text>
+      </View>
+      <View style={styles.boxes}>
+        <Text style={styles.chartTitle}>Top Artists</Text>
+        <Text>
+          <Text style={styles.chartText}>{topArtists[0][0]} </Text>
+          <Text style={styles.chartTextNum}>
+            {topArtists[0][0] == "" ? null : "X"+ topArtists[0][1]}
+          </Text>
+        </Text>
+        <Text>
+          <Text style={styles.chartText}>{topArtists[1][0]} </Text>
+          <Text style={styles.chartTextNum}>
+            {topArtists[1][0] == "" ? null : "X"+ topArtists[1][1]}
+          </Text>
+        </Text>
+        <Text>
+          <Text style={styles.chartText}>{topArtists[2][0]} </Text>
+          <Text style={styles.chartTextNum}>
+            {topArtists[2][0] == "" ? null : "X"+ topArtists[2][1]}
           </Text>
         </Text>
       </View>
@@ -308,5 +362,32 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#0078FA",
     fontSize: 12
+  },
+  chartTitle: {
+    marginHorizontal: 0,
+    flex: 1,
+    justifyContent: 'left',
+    alignItems: 'left',
+    fontWeight: "bold",
+    color: "#0078FA",
+    fontSize: 24
+  },
+  chartText: {
+    marginHorizontal: 0,
+    flex: 1,
+    justifyContent: 'left',
+    alignItems: 'left',
+    fontWeight: "bold",
+    color: "#0078FA",
+    fontSize: 14
+  },
+  chartTextNum: {
+    marginHorizontal: 0,
+    flex: 1,
+    justifyContent: 'left',
+    alignItems: 'left',
+    fontWeight: "bold",
+    color: "black",
+    fontSize: 14
   },
 });

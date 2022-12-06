@@ -22,7 +22,6 @@ export function HomeMap({
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
   const [pins, setPins] = useState([]);
-  const [images, setImages] = useState([]);
   const [isOngoingSession, setIsOngoingSession] = useState(false);
 
   /**
@@ -117,7 +116,6 @@ export function HomeMap({
       datestamp: new Date().toLocaleString("en-GB"),
     };
     setPins((prevPins) => [...prevPins, newImage]);
-    setImages((prevImages) => [...prevImages, newImage]);
     setOffset((prevOffset) => prevOffset + 0.005);
 
     axios

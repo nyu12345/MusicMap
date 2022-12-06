@@ -1,11 +1,10 @@
-import MapView, { Marker, Callout, Polygon } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import styles from "./HomeStyles";
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, Pressable, Modal } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import * as Location from "expo-location";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import { getTrack, getCurrentlyPlayingTrack, getTracksAudioFeatures } from "musicmap/util/SpotifyAPICalls";
@@ -24,9 +23,7 @@ export function HomeMap({
   const [offset, setOffset] = useState(0);
   const [pins, setPins] = useState([]);
   const [images, setImages] = useState([]);
-  // const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [isOngoingSession, setIsOngoingSession] = useState(false);
-  const [imageViewVisible, setImageViewVisible] = useState(false);
 
   /**
    * requests permission if needed
@@ -143,6 +140,7 @@ export function HomeMap({
   };
 
   const postSongHandler = () => {
+    console.log("POSTING SONG: " + currentSong.title);
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
       .then((response) => {
@@ -172,6 +170,7 @@ export function HomeMap({
       if (song == null || song.trackID == currentSong.spotifyId) {
         return;
       }
+      currentSong.spotifyId = song.trackID;
       const trackInfo = await getTrack(song.trackID);
       const audioFeatures = await getTracksAudioFeatures(song.trackID);
       const newSong = {
@@ -225,13 +224,6 @@ export function HomeMap({
     setPins([]);
     setOffset(0);
     currentSong = { title: "No song", spotifyId: null };
-  };
-
-  const createImageView = (itemType) => {
-    console.log("images: " + images);
-    if (itemType == "image") {
-      setImageViewVisible(true);
-    }
   };
 
   return (

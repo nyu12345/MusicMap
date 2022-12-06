@@ -23,8 +23,8 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [userId, setUserId] = useState("");
   const [username, setUsername] = useState("");
   const [sentRequests, setSentRequests] = useState([]);
-
   const [friends, setFriends] = useState([]);
+  const [didSendRequest, setDidSendRequest] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -44,18 +44,16 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   // get all sent friend requests
   async function getSent() {
-    if (sentRequests.length == 0) {
-      await axios
-        .get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`)
-        .then((response) => {
-          if (response.data.length != 0) {
-            setSentRequests(response.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    await axios
+      .get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`)
+      .then((response) => {
+        if (response.data.length != 0) {
+          setSentRequests(response.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   // get friends of the current user
@@ -80,11 +78,6 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    // setSentRequests([]);
-    // setUsers([]);
-    // setFriends([]);
-    //setRefreshing(false);
-    console.log("handleRefresh");
   }, []);
 
   const popUp = useRef(null);
@@ -99,6 +92,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       }
       if (sentRequests.length > 0) {
         for (let i = 0; i < sentRequests.length; i++) {
+          console.log("requestedID poop: " + sentRequests[i]["requestedId"]);
           if (sentRequests[i]["requestedId"] == _id) {
             return false;
           }
@@ -122,7 +116,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
         return names.join("").indexOf(input) == 0;
       }
-      return true; 
+      return true;
     });
   };
 
@@ -133,6 +127,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       profilePic={item.profilePic}
       userId={userId}
       friendId={item._id}
+      setDidSendRequest={setDidSendRequest}
     />
   );
 
@@ -143,6 +138,12 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     </View>
   );
 
+  const getFriendAndRequestInfo = async () => {
+    await getUsers();
+    await getSent();
+    await getFriends();
+  };
+
   // initial rendering (will run only once)
   useEffect(() => {
     (async () => {
@@ -151,19 +152,22 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
         setUsername(userInfo[1]);
         setUserId(userInfo[4]);
       }
-      await getUsers().then(await getSent().then(await getFriends()));
+      await getFriendAndRequestInfo();
     })();
   }, []);
 
   useEffect(() => {
-    const refresh = async () => {
+    (async () => {
       if (refreshing) {
-        await getUsers().then(await getSent().then(await getFriends()));
+        await getFriendAndRequestInfo();
+        setRefreshing(false);
       }
-      setRefreshing(false);
-    };
-    refresh();
-  }, [refreshing]);
+      if (didSendRequest) {
+        await getFriendAndRequestInfo();
+        setDidSendRequest(false);
+      }
+    })();
+  }, [refreshing, didSendRequest]);
 
   return (
     <BottomSheetModalProvider>
@@ -183,6 +187,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
           />
           <BottomSheetFlatList
             data={filter(users, searchInput)}
+            extraData={didSendRequest}
             renderItem={renderItem}
             ListEmptyComponent={renderEmpty}
             keyExtractor={(item) => item._id}

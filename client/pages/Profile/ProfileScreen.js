@@ -38,7 +38,7 @@ export function ProfileScreen(props) {
   async function getUserInfo() {
     console.log("getting user info");
     const accessToken = await getAccessTokenFromSecureStorage();
-    console.log(accessToken);
+    //console.log(accessToken);
 
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
@@ -105,10 +105,7 @@ export function ProfileScreen(props) {
     await axios
       .get(`${REACT_APP_BASE_URL}/users/${username}`)
       .then((response) => {
-        console.log("response: " + response.data.length);
         if (response.data.length === 0) {
-          console.log("new user");
-          //setUserExists(false);
           addUserToMongoDB(name, username, numFollowers, profilePic);
         }
       })
@@ -121,8 +118,6 @@ export function ProfileScreen(props) {
     (async () => {
       await getUserInfo();
       if (username != "" && profilePic != "") {
-        console.log("username not empty");
-        console.log(username);
         await addUserIfNew(username);
       }
       if (friends.length == 0) {

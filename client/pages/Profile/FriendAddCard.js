@@ -14,19 +14,18 @@ export const FriendAddCard = ({
   profilePic,
   userId,
   friendId,
+  setDidSendRequest, 
 }) => {
 
   async function createFriendRequest(requestorId, requestedId) {
     console.log("creating friend request");
-    console.log("requestor:");
-    console.log(requestorId);
-    console.log("requested:");
-    console.log(requestedId);
+    console.log("requestor: " + requestorId);
+    console.log("requested: " + requestedId);
     const friendRequest = {
       requestorId: requestorId,
       requestedId: requestedId,
     };
-    axios
+    await axios
       .post(`${REACT_APP_BASE_URL}/friendRequests`, friendRequest)
       .then((response) => {
         console.log("success");
@@ -34,6 +33,7 @@ export const FriendAddCard = ({
       .catch((err) => {
         console.log(err);
       });
+    setDidSendRequest(true); 
   }
 
   return (

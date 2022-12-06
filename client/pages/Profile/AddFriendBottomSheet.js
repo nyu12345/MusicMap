@@ -88,7 +88,6 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       }
       if (sentRequests.length > 0) {
         for (let i = 0; i < sentRequests.length; i++) {
-          console.log("requestedID poop: " + sentRequests[i]["requestedId"]);
           if (sentRequests[i]["requestedId"] == _id) {
             return false;
           }
@@ -145,12 +144,24 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     (async () => {
       let userInfo = await getUserInfo();
       if (userInfo.length > 4) {
+        console.log("user info: " + userInfo); 
+        console.log("user name ahhh: " + userInfo[1]); 
+        console.log("user id ahhhh: " + userInfo[4]); 
         setUsername(userInfo[1]);
         setUserId(userInfo[4]);
+        console.log("in first useEffect"); 
+        console.log("set username: " + username); 
+        console.log("set user Id: " + userId); 
       }
-      await getFriendAndRequestInfo();
     })();
   }, []);
+
+  useEffect(() => {
+    console.log("in second useEffect"); 
+    console.log("set username: " + username); 
+    console.log("set user Id: " + userId); 
+    getFriendAndRequestInfo();
+  }, [username, userId])
 
   useEffect(() => {
     (async () => {

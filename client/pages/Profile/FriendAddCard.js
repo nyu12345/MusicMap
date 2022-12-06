@@ -1,16 +1,20 @@
-import { Text, View, Image, StyleSheet, TouchableHighlight } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  TouchableHighlight,
+} from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 
-export const FriendAddCard = ({ name, numFriends, profilePic, userId, friendId }) => {
-
-  const onPress = async (e) => {
-    console.log("submitted");
-    console.log(userId);
-    console.log(name);
-    console.log(friendId);
-    createFriendRequest(userId, friendId);
-  }
+export const FriendAddCard = ({
+  name,
+  numFriends,
+  profilePic,
+  userId,
+  friendId,
+}) => {
 
   async function createFriendRequest(requestorId, requestedId) {
     console.log("creating friend request");
@@ -21,12 +25,15 @@ export const FriendAddCard = ({ name, numFriends, profilePic, userId, friendId }
     const friendRequest = {
       requestorId: requestorId,
       requestedId: requestedId,
-    }
-    axios.post(`${REACT_APP_BASE_URL}/friendRequests`, friendRequest).then((response) => {
-      console.log("success");
-    }).catch((err) => {
-      console.log(err);
-    })
+    };
+    axios
+      .post(`${REACT_APP_BASE_URL}/friendRequests`, friendRequest)
+      .then((response) => {
+        console.log("success");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   return (
@@ -34,15 +41,20 @@ export const FriendAddCard = ({ name, numFriends, profilePic, userId, friendId }
       <Image source={{ uri: profilePic }} style={styles.image} />
       <View style={styles.friendCardContent}>
         <View style={styles.row}>
-          <Text style={styles.name} numberOfLines={1}>{name}</Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {name}
+          </Text>
         </View>
         <Text numberOfLines={2} style={styles.subTitle}>
           {numFriends} Friends
         </Text>
       </View>
-        <TouchableHighlight onPress={onPress} style={styles.button}>
-          <Text>Add Friend</Text>
-        </TouchableHighlight>
+      <TouchableHighlight
+        onPress={() => {createFriendRequest(userId, friendId)}}
+        style={styles.button}
+      >
+        <Text>Add Friend</Text>
+      </TouchableHighlight>
     </View>
   );
 };

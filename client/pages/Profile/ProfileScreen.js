@@ -8,17 +8,16 @@ import {
   SafeAreaView,
   Pressable,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import { Linking, Networking, RefreshControl } from "react-native";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore";
-import { FriendCard } from "musicmap/pages/Profile/FriendCard";
-import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
+import FriendCard from "musicmap/pages/Profile/FriendCard";
 import { FriendSectionHeader } from "./FriendSectionHeader";
-import { AddFriendRemodel } from "musicmap/pages/Profile/AddFriendRemodel";
+import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 
 export function ProfileScreen(props) {
   const [name, setName] = useState("");
@@ -29,7 +28,7 @@ export function ProfileScreen(props) {
   const [refreshing, setRefreshing] = useState(false);
   const emptyProfilePic = "abc_dummy.com";
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = useCallback(() => {
     console.log("refresh");
     setRefreshing(true);
     setFriends([]);
@@ -62,18 +61,22 @@ export function ProfileScreen(props) {
 
   async function getFriends() {
     if (friends.length == 0) {
-      await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`).then(async function (response2) {
-        if (response2.data[0]["friends"].length > 0) {
-          let friendsInfo = [];
-          for (let i = 0; i < response2.data[0]["friends"].length; i++) {
-            let userId = response2.data[0]["friends"][i];
-            await axios.get(`${REACT_APP_BASE_URL}/users?id=${userId}`).then((response) => {
-              friendsInfo.push(response.data[0])
-            }) 
+      await axios
+        .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
+        .then(async function (response2) {
+          if (response2.data[0]["friends"].length > 0) {
+            let friendsInfo = [];
+            for (let i = 0; i < response2.data[0]["friends"].length; i++) {
+              let userId = response2.data[0]["friends"][i];
+              await axios
+                .get(`${REACT_APP_BASE_URL}/users?id=${userId}`)
+                .then((response) => {
+                  friendsInfo.push(response.data[0]);
+                });
+            }
+            setFriends(friendsInfo);
           }
-          setFriends(friendsInfo);
-        }
-      })
+        });
     } else {
       console.log("friends not null");
       console.log(friends);
@@ -87,34 +90,42 @@ export function ProfileScreen(props) {
       numFriends: numFollowers,
       profilePic: profilePicUrl,
       friends: [],
-    }
-    axios.post(`${REACT_APP_BASE_URL}/users`, user).then((response) => {
-      console.log("success");
-    }).catch((err) => {
-      console.log(err);
-    })
+    };
+    axios
+      .post(`${REACT_APP_BASE_URL}/users`, user)
+      .then((response) => {
+        console.log("success");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   async function addUserIfNew(username) {
-    await axios.get(`${REACT_APP_BASE_URL}/users/${username}`).then((response) => {
-      console.log("response: " + response.data.length);
-      if (response.data.length === 0) {
-        console.log("new user");
-        //setUserExists(false); 
-        addUserToMongoDB(name, username, numFollowers, profilePic)
-      }
-    }).catch((err) => {
-      console.log(err);
-    });
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/${username}`)
+      .then((response) => {
+        console.log("response: " + response.data.length);
+        if (response.data.length === 0) {
+          console.log("new user");
+          //setUserExists(false);
+          addUserToMongoDB(name, username, numFollowers, profilePic);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   useEffect(() => {
     (async () => {
       await getUserInfo();
       if (username != "" && profilePic != "") {
-        console.log("username not empty")
-        console.log(username)
+        console.log("username not empty");
+        console.log(username);
         await addUserIfNew(username);
+      }
+      if (friends.length == 0) {
         await getFriends();
       }
     })();
@@ -130,7 +141,7 @@ export function ProfileScreen(props) {
     await deleteValue("EXPIRATION_TIME");
 
     Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects?
-    Networking.clearCookies(() => { });
+    Networking.clearCookies(() => {});
 
     props.navigation.navigate("login");
   };
@@ -147,10 +158,7 @@ export function ProfileScreen(props) {
           alignItems: "center",
         }}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          /> 
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         <Image
@@ -173,18 +181,27 @@ export function ProfileScreen(props) {
         </View>
 
         <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
-        {(friends.length > 0) ? friends.map((item) => (
-          <FriendCard name={item.name} numFriends={item.numFriends} profilePic={item.profilePic} key={item.spotifyUsername} />
-        )) : <Text>No friends!</Text>}
+        {friends.length > 0 ? (
+          friends.map((item) => (
+            <FriendCard
+              name={item.name}
+              numFriends={item.numFriends}
+              profilePic={item.profilePic}
+              key={item.spotifyUsername}
+            />
+          ))
+        ) : (
+          <Text>No friends!</Text>
+        )}
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>
         </Pressable>
       </ScrollView>
-      <AddFriendRemodel bottomSheetModalRef={bottomSheetModalRef} />
+      <AddFriendBottomSheet bottomSheetModalRef={bottomSheetModalRef} />
     </SafeAreaView>
   );
-};
+}
 
 export default ProfileScreen;
 
@@ -196,46 +213,46 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 10,
     marginBottom: 5,
   },
   userInfoWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
     marginTop: 10,
     marginBottom: 15,
   },
   userInfoItem: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   userInfoTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
-    textAlign: 'center',
+    textAlign: "center",
   },
   userInfoSubTitle: {
     fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   logoutButton: {
     marginTop: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 30,
     elevation: 3,
-    backgroundColor: '#1DB954',
+    backgroundColor: "#1DB954",
   },
   logoutButtonText: {
     fontSize: 16,
     lineHeight: 21,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     letterSpacing: 0.25,
-    color: 'black',
+    color: "black",
   },
 });

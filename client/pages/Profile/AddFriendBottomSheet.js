@@ -1,72 +1,169 @@
 import React, {
+  useCallback,
   useState,
   useMemo,
-  useCallback,
+  useRef,
   useEffect,
 } from "react";
-import { StyleSheet, SafeAreaView, View, TouchableHighlight, Text } from "react-native";
+import { View, StyleSheet, SafeAreaView, Text } from "react-native";
+import { REACT_APP_BASE_URL } from "@env";
+import axios from "axios";
 import {
+  BottomSheetFlatList,
+  BottomSheetTextInput,
   BottomSheetModal,
   BottomSheetModalProvider,
-  BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
-import { REACT_APP_BASE_URL } from '@env';
-import axios from 'axios';
+import { FriendAddCard } from "musicmap/pages/Profile/FriendAddCard";
 import { getUserInfo } from "musicmap/util/UserInfo";
 
 export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
+  const [users, setUsers] = useState([]);
   const [searchInput, setSearchInput] = useState("");
-  const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
+  const [username, setUsername] = useState("");
+  const [sentRequests, setSentRequests] = useState([]);
 
-  useEffect(() => {
-    (async () => {
-      let userInfo = await getUserInfo();
-      if (userInfo) {
-        setUsername(userInfo[1]);
-        setUserId(userInfo[4])
-      }
-    })();
-  });
+  const [friends, setFriends] = useState([]);
 
-  // Points for the bottom sheet to snap to, sorted from bottom to top
-  const snapPoints = useMemo(() => ["15%", "50%", "75%"], []);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // callbacks
+  // get all users in the database
+  async function getUsers() {
+    if (users.length == 0) {
+      await axios
+        .get(`${REACT_APP_BASE_URL}/users/`)
+        .then((response) => {
+          setUsers(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  // get all sent friend requests
+  async function getSent() {
+    if (sentRequests.length == 0) {
+      await axios
+        .get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`)
+        .then((response) => {
+          if (response.data.length != 0) {
+            setSentRequests(response.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  // get friends of the current user
+  async function getFriends() {
+    if (friends.length == 0) {
+      await axios
+        .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
+        .then(async function (response) {
+          if (response.data.length != 0) {
+            setFriends(response.data[0]["friends"]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
   const handleSheetChange = useCallback((index) => {
     console.log("handleSheetChange", index);
   }, []);
 
-  const onPress = async (e) => {
-    console.log("submitted")
-    console.log(searchInput)
-    const data = await axios.get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${searchInput}`);
-    if (data.data.length != 0) {
-      console.log("valid");
-      console.log(data.data);
-      let newId = data.data[0]["_id"];
-      console.log(newId);
-      createFriendRequest(userId, newId); // await?
-      setSearchInput("");
-    }
-  }
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    // setSentRequests([]);
+    // setUsers([]);
+    // setFriends([]);
+    //setRefreshing(false);
+    console.log("handleRefresh");
+  }, []);
 
-  async function createFriendRequest(requestorId, requestedId) {
-    console.log("creating friend request");
-    console.log("requestor:");
-    console.log(requestorId);
-    console.log("requested:");
-    console.log(requestedId);
-    const friendRequest = {
-      requestorId: requestorId,
-      requestedId: requestedId,
-    }
-    axios.post(`${REACT_APP_BASE_URL}/friendRequests`, friendRequest).then((response) => {
-      console.log("success");
-    }).catch((err) => {
-      console.log(err);
-    })
-  }
+  const popUp = useRef(null);
+
+  const snapPoints = useMemo(() => ["13%", "50%", "95%"], []);
+
+  const filter = (users) => {
+    return users.filter(function ({ name, _id }) {
+      const names = name.split(" ");
+      if (_id == userId) {
+        return false;
+      }
+      if (sentRequests.length > 0) {
+        for (let i = 0; i < sentRequests.length; i++) {
+          if (sentRequests[i]["requestedId"] == _id) {
+            return false;
+          }
+        }
+      }
+      if (friends.length > 0) {
+        for (let i = 0; i < friends.length; i++) {
+          if (friends[i] == _id) {
+            return false;
+          }
+        }
+      }
+      if (searchInput != "") {
+        let input = searchInput.toLowerCase().replace(/\s/g, "");
+        for (let i = 0; i < names.length; i++) {
+          names[i] = names[i].toLowerCase();
+          if (names[i].indexOf(input) == 0) {
+            return true;
+          }
+        }
+
+        return names.join("").indexOf(input) == 0;
+      }
+      return true; 
+    });
+  };
+
+  const renderItem = ({ item }) => (
+    <FriendAddCard
+      name={item.name}
+      numFriends={item.numFriends}
+      profilePic={item.profilePic}
+      userId={userId}
+      friendId={item._id}
+    />
+  );
+
+  // render empty component (no roadtrips available yet)
+  const renderEmpty = () => (
+    <View style={styles.emptyText}>
+      <Text>No users at the moment</Text>
+    </View>
+  );
+
+  // initial rendering (will run only once)
+  useEffect(() => {
+    (async () => {
+      let userInfo = await getUserInfo();
+      if (userInfo.length > 4) {
+        setUsername(userInfo[1]);
+        setUserId(userInfo[4]);
+      }
+      await getUsers().then(await getSent().then(await getFriends()));
+    })();
+  }, []);
+
+  useEffect(() => {
+    const refresh = async () => {
+      if (refreshing) {
+        await getUsers().then(await getSent().then(await getFriends()));
+      }
+      setRefreshing(false);
+    };
+    refresh();
+  }, [refreshing]);
 
   return (
     <BottomSheetModalProvider>
@@ -79,18 +176,21 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
           keyboardBehavior="fillParent"
         >
           <BottomSheetTextInput
-            placeholder="Enter your friend's Spotify username!"
+            placeholder="Search by name"
             onChangeText={setSearchInput}
             value={searchInput}
             style={styles.textInput}
           />
-          <View style={styles.container}>
-            <TouchableHighlight onPress={onPress}>
-              <View style={styles.button}>
-                <Text>Submit</Text>
-              </View>
-            </TouchableHighlight>
-          </View>
+          <BottomSheetFlatList
+            data={filter(users, searchInput)}
+            renderItem={renderItem}
+            ListEmptyComponent={renderEmpty}
+            keyExtractor={(item) => item._id}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            style={{ backgroundColor: "white" }}
+            contentContainerStyle={{ backgroundColor: "white" }}
+          />
         </BottomSheetModal>
       </SafeAreaView>
     </BottomSheetModalProvider>
@@ -108,14 +208,15 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "left",
   },
-  container: {
-    justifyContent: "center",
-    paddingHorizontal: 160,
-    borderRadius: 12,
-  },
-  button: {
+  footerText: {
+    flex: 1,
     alignItems: "center",
-    backgroundColor: "#DDDDDD",
-    padding: 10,
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  emptyText: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

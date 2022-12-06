@@ -41,7 +41,7 @@ export function MyPieChart({data, roadtrips, progressTime, title}) {
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.title}>{title}</Text>
             <PieChart
-                data={data.length == 0 ? tempData : data}
+                data={progressTime < 0.1 || data.length == 0 ? tempData : data}
                 width={Dimensions.get("window").width}
                 height={200}
                 chartConfig={styles.chartConfig}

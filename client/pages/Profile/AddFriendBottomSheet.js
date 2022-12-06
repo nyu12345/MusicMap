@@ -44,10 +44,8 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   async function getSent() {
     await axios
       .get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`)
-      .then((response) => {
-        if (response.data.length != 0) {
-          setSentRequests(response.data);
-        }
+      .then(async function (response) {
+        setSentRequests(response.data);
       })
       .catch((err) => {
         console.log(err);
@@ -144,27 +142,29 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     (async () => {
       let userInfo = await getUserInfo();
       if (userInfo.length > 4) {
-        console.log("user info: " + userInfo); 
-        console.log("user name ahhh: " + userInfo[1]); 
-        console.log("user id ahhhh: " + userInfo[4]); 
+        console.log("user info: " + userInfo);
+        console.log("user name ahhh: " + userInfo[1]);
+        console.log("user id ahhhh: " + userInfo[4]);
         setUsername(userInfo[1]);
         setUserId(userInfo[4]);
-        console.log("in first useEffect"); 
-        console.log("set username: " + username); 
-        console.log("set user Id: " + userId); 
+        console.log("in first useEffect");
+        console.log("set username: " + username);
+        console.log("set user Id: " + userId);
       }
     })();
   }, []);
 
   useEffect(() => {
-    console.log("in second useEffect"); 
-    console.log("set username: " + username); 
-    console.log("set user Id: " + userId); 
+    console.log("in second useEffect");
+    console.log("set username: " + username);
+    console.log("set user Id: " + userId);
     getFriendAndRequestInfo();
   }, [username, userId])
 
   useEffect(() => {
     (async () => {
+      console.log("sent request addfriend")
+      console.log(sentRequests)
       if (refreshing) {
         await getFriendAndRequestInfo();
         setRefreshing(false);

@@ -36,7 +36,6 @@ export function SentScreen() {
         .then(async function (response) {
           if (response.data.length != 0) {
             let sentInfo = [];
-            
             for (let i = 0; i < response.data.length; i++) {
               let response2 = response.data[i];
               let currRequestedId = response2["requestedId"];

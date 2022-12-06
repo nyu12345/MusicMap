@@ -22,6 +22,22 @@ import {
 import { MyProgressRing } from "./graphs/MyProgressRing";
 import { MyPieChart } from "./graphs/MyPieChart";
 import { MyContributionGraph } from "./graphs/MyContributionGraph";
+import { MyBezierGraph } from "./graphs/MyBezierGraph";
+
+const colors = [
+  "#52c2f9",
+  "#57a7f9",
+  "#578af8",
+  "#506bf8",
+  "#4149f6",
+  "#150ef4",
+];
+
+/*
+
+Pie charts are really fucked up right now 
+
+*/
 
 export function StatisticsGraphs({ tripId, myStatistics, myRoadtrips, fadeAnim, tripSongs, aggrData }) {
   const [search, onChangeSearch] = React.useState("");
@@ -35,9 +51,14 @@ export function StatisticsGraphs({ tripId, myStatistics, myRoadtrips, fadeAnim, 
 
   }, []);
   // console.log(tripId);
-  if (tripId == -1)
-    return AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrData });
-  return SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, tripSongs });
+  try {
+    if (tripId == -1)
+      return AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrData });
+    return SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, tripSongs });
+  } catch (e) {
+    return <Text> broken </Text>;
+  }
+
 }
 
 function AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrData }) {
@@ -46,15 +67,63 @@ function AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrD
   let numSongs = 0;
   let numMinutes = 0;
   let uniqueDestinations = 0;
+  let startLocData = [];
+  let endLocData = [];
   try {
     // console.log(aggrData.vibeScore);
     vibeScore = (aggrData.vibeScore / Math.max(aggrData.numSongs, 1)).toFixed(2);
     distance = (aggrData.distance).toFixed(2);
     numSongs = aggrData.numSongs;
-    numMinutes = (aggrData.numSeconds / 60).toFixed(0);
+    numMinutes = (aggrData.numSeconds / 60).toFixed(2);
     uniqueDestinations = aggrData.endCities.size;
-  } catch (e) {
 
+    let startCityCount = aggrData.startCityCount;
+    startLocData = [];
+    let index = 0;
+    for (const [key, value] of Object.entries(startCityCount)) {
+      // console.log(key);
+      // console.log(value);
+      startLocData.push({
+        name: key,
+        num: value,
+        color: colors[index % colors.length],
+        legendFontColor: colors[index % colors.length],
+        legendFontSize: 15,
+      });
+      index++;
+    }
+    startLocData.push({
+      name: "",
+      num: (1 - progressTime) * 100,
+      //color: "white",
+      //legendFontColor: "white",
+      //legendFontSize: 0
+    });
+
+    let endCityCount = aggrData.endCityCount;
+    endLocData = [];
+    index = 0;
+    for (const [key, value] of Object.entries(endCityCount)) {
+      // console.log(key);
+      // console.log(value);
+      endLocData.push({
+        name: key,
+        num: value,
+        color: colors[index % colors.length],
+        legendFontColor: colors[index % colors.length],
+        legendFontSize: 15,
+      });
+      index++;
+    }
+    endLocData.push({
+      name: "",
+      num: (1 - progressTime) * 100,
+      //color: "white",
+      //legendFontColor: "white",
+      //legendFontSize: 0
+    });
+  } catch (e) {
+    console.log("Borked");
   }
   return (
     <View style={{ flex: 1, justifyContent: "left", alignItems: "left", marginBottom: 40, }}>
@@ -93,7 +162,9 @@ function AllTripsGraphs({ tripId, myStatistics, myRoadtrips, progressTime, aggrD
           </Text>
         </View>
       </View>
-      <MyPieChart roadtrips={myRoadtrips} progressTime={progressTime} />
+      
+      <MyPieChart roadtrips={myRoadtrips} progressTime={progressTime} data={startLocData} title={"Start Locations"} />
+      <MyPieChart roadtrips={myRoadtrips} progressTime={progressTime} data={endLocData} title={"End Locations"} />
     </View>);
 }
 
@@ -104,19 +175,43 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
   let numMinutes = 0;
   let topSpeed = 0;
   let fastestSong = "Null";
+  let avgSpeed = 0;
+  let bezierData = null;
   try {
     vibeScore = (tripSongs[tripId]['vibeScore'] / Math.max(tripSongs[tripId]['numSongs'], 1)).toFixed(2);
     distance = (tripSongs[tripId]['distance']).toFixed(2);
     numSongs = tripSongs[tripId]['numSongs'];
-    numMinutes = (tripSongs[tripId]['numSeconds'] / 60).toFixed(0);
+    numMinutes = (tripSongs[tripId]['numSeconds'] / 60).toFixed(2);
     topSpeed = tripSongs[tripId]['topSpeed'].toFixed(0);
     fastestSong = tripSongs[tripId]['fastestSong'];
-  } catch (e) {
+    avgSpeed = (distance / numMinutes * 60).toFixed(0);
+    let distances = tripSongs[tripId]['distances'];
 
+    let animatedDistances = [];
+    let index = 0;
+
+    for (d of distances) {
+      // console.log(d);
+      animatedDistances.push(index / distances.length <= progressTime ? d * progressTime : 0);
+      index++;
+    }
+    bezierData = {
+      labels: [],
+      datasets: [
+        {
+          data: animatedDistances,
+          color: (opacity = 1) => `rgba(0, 120, 250, ${opacity})`, // optional
+          strokeWidth: 2 // optional
+        }
+      ]
+    }
+  } catch (e) {
+    console.log("Specifics?");
   }
   return (<View style={{ flex: 1, justifyContent: "left", alignItems: "left", marginBottom: 40, }}>
     <MyProgressRing vibeValue={vibeScore} progressTime={progressTime} />
-    <MyPieChart roadtrips={myRoadtrips} progressTime={progressTime} />
+    <View style={{ marginTop: 30 }}></View>
+    <MyBezierGraph title={"Cumulative Distance (miles) By Song"} data={bezierData} />
     <View style={{ justifyContent: 'left', alignItems: 'left', flexDirection: 'row', flex: 1 }}>
       <View style={styles.boxes}>
         <Text style={styles.title}>Total Distance</Text>
@@ -133,7 +228,7 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
         <Text style={styles.text}>{numSongs}</Text>
       </View>
     </View>
-    <View style={{ justifyContent: 'left', alignItems: 'left', flexDirection: 'row', flex: 1 }}>
+    <View style={{ justifyContent: 'left', alignItems: 'left', flexDirection: 'row', flex: 1, marginBottom: 20 }}>
       <View style={styles.boxes}>
         <Text style={styles.title}>Minutes of Listening</Text>
         <Text>
@@ -143,16 +238,25 @@ function SpecificTripGraphs({ tripId, myStatistics, myRoadtrips, progressTime, t
           </Text>
         </Text>
       </View>
-    </View>
-    <View style={styles.boxes}>
-        <Text style={styles.title}>Fastest Song (may not be accurate)</Text>
+      <View style={styles.boxes}>
+        <Text style={styles.title}>Average Speed</Text>
         <Text>
-        <Text style={styles.text}>{fastestSong} @ {topSpeed} </Text>
+          <Text style={styles.text}>{avgSpeed} </Text>
           <Text style={styles.title}>
             mph
           </Text>
         </Text>
       </View>
+    </View>
+    <View style={styles.boxes}>
+      <Text style={styles.title}>Fastest Song (beta)</Text>
+      <Text>
+        <Text style={styles.text}>{fastestSong} @ {topSpeed} </Text>
+        <Text style={styles.title}>
+          mph
+        </Text>
+      </Text>
+    </View>
   </View>);
 }
 

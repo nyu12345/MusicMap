@@ -11,53 +11,37 @@ import {
     StackedBarChart
 } from "react-native-chart-kit";
 
-const colors = [
-    "#52c2f9",
-    "#57a7f9",
-    "#578af8",
-    "#506bf8",
-    "#4149f6",
-    "#150ef4",
-];
+export function MyPieChart({data, roadtrips, progressTime, title}) {
+    // startLocData.push({
+    //     name: "",
+    //     num: (1-progressTime)*100,
+    //     //color: "white",
+    //     //legendFontColor: "white",
+    //     //legendFontSize: 0
+    // });
 
-export function MyPieChart({roadtrips, progressTime}) {
-    // const base_url = `${REACT_APP_BASE_URL}/users/`;
-    function randColor(index) {
-        //console.log("#" + Math.floor(Math.random()*6777215+10000000).toString(16).padStart(6, '0').toUpperCase());
-        return "#" + Math.floor(477721*index+500000).toString(16).padStart(6, '0').toUpperCase();
-        //return "rgb(0, 0, " + (Math.floor(Math.random() * 255)) + ")";
-    }
-    
-    
-    let datab = [];
-    let counts = {};
-    for (const trip of roadtrips) {
-        counts[trip.startLocation] = counts[trip.startLocation] ? counts[trip.startLocation] + 1 : 1
-    }
-    let index = 0;
-    for (const city of Object.keys(counts)) {
-        datab.push({
-            name: city,
-            num: counts[city],
-            color: colors[index%colors.length],
-            legendFontColor: colors[index%colors.length],
+    const tempData = [
+        {
+            name: "fake1",
+            num: 1,
+            color: "#52c2f9",
+            legendFontColor: "#52c2f9",
             legendFontSize: 15,
-        });
-        index++;
-    }
-    datab.push({
-        name: "",
-        num: (1-progressTime)*100,
-        //color: "white",
-        //legendFontColor: "white",
-        //legendFontSize: 0
-    });
-
+        },
+        {
+            name: "fake2",
+            num: 1,
+            color: "#57a7f9",
+            legendFontColor: "#57a7f9",
+            legendFontSize: 15,
+        },
+    ]
+    
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={styles.title}>Start Locations</Text>
+            <Text style={styles.title}>{title}</Text>
             <PieChart
-                data={datab}
+                data={data.length == 0 ? tempData : data}
                 width={Dimensions.get("window").width}
                 height={200}
                 chartConfig={styles.chartConfig}

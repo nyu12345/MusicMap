@@ -140,7 +140,6 @@ export function HomeMap({
   };
 
   const postSongHandler = () => {
-    console.log("POSTING SONG: " + currentSong.title);
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
       .then((response) => {

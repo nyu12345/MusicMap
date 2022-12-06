@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import { HomeScreen } from "musicmap/pages/Home/HomeScreen";
 import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripsScreen";
 import { MemoriesScreen } from "musicmap/pages/Memories";
-import ProfileScreen from "musicmap/pages/Profile/ProfileScreen";
+import { ProfileHomeScreen } from "musicmap/pages/Profile/ProfileHomeScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -55,7 +55,7 @@ export function LoggedInScreen(props) {
         component={MemoriesScreen}
       />
       <Tab.Screen
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
         name="Profile"
         //component = {ProfileScreen}
         children={(props) => (

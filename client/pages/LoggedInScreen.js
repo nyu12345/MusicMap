@@ -9,7 +9,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createBottomTabNavigator();
 
-
 export function LoggedInScreen(props) {
   const loginToParent = () => {
     props.loginToParent();

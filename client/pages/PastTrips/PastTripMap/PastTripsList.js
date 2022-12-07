@@ -177,6 +177,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
     <PastTrip
       tripId={item._id}
       name={item.name}
+      username={username}
       startLocation={item.startLocation}
       destination={item.destination}
       startDate={item.startDate}

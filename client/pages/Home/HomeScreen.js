@@ -16,7 +16,7 @@ import { REACT_APP_BASE_URL } from "@env";
 import { HomeMap } from "./HomeMap";
 import { ImageViewer } from "musicmap/pages/Home/ImageViewer";
 import * as Location from "expo-location";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
@@ -28,7 +28,10 @@ export function HomeScreen() {
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
+  const [currentSong, setCurrentSong] = useState({
+    title: "No song",
+    spotifyId: null,
+  });
   const [currentUsername, setCurrentUsername] = useState(null);
   const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
   const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
@@ -41,7 +44,7 @@ export function HomeScreen() {
 
   const closeImageViewer = () => {
     setImageViewerVisible(false);
-  }
+  };
 
   const startRoadtripClickHandler = () => {
     if (currentLocation == null) {
@@ -151,7 +154,7 @@ export function HomeScreen() {
   const updateUserTrips = () => {
     if (currentRoadTripData) {
       const roadtripDetails = {
-        roadtripId: currentRoadTripData.createdReview._id
+        roadtripId: currentRoadTripData.createdReview._id,
       };
       axios
         .patch(
@@ -176,7 +179,6 @@ export function HomeScreen() {
     }
   };
 
-
   // map size parameters
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
@@ -197,7 +199,7 @@ export function HomeScreen() {
 
   const updateParentSongHandler = (newSong) => {
     setCurrentSong(newSong);
-  }
+  };
 
   async function getUsername() {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -224,7 +226,7 @@ export function HomeScreen() {
 
   useEffect(() => {
     updateUserTrips();
-  }, [currentRoadTripData])
+  }, [currentRoadTripData]);
 
   return (
     <SafeAreaView
@@ -248,7 +250,10 @@ export function HomeScreen() {
           setImageViewerVisible(false);
         }}
       >
-        <ImageViewer closeImageViewer={closeImageViewer} imageURL={imageToDisplay} />
+        <ImageViewer
+          closeImageViewer={closeImageViewer}
+          imageURL={imageToDisplay}
+        />
       </Modal>
       <Modal
         animationType="slide"
@@ -291,20 +296,24 @@ export function HomeScreen() {
         </Pressable>
       ) : null}
       {!buttonIsStartRoadtrip ? (
-        <View
-          style={styles.roadtripHeader}
-        >
+        <View style={styles.roadtripHeader}>
           <View style={styles.songHeader}>
             {currentSong.imageURL ? (
               <Image
                 style={styles.songImage}
                 source={{ uri: currentSong.imageURL }}
-              />) : null}
+              />
+            ) : null}
             <View style={styles.songTexts}>
-              <Text numberOfLines={1} style={styles.songTitle}>{currentSong.title}</Text>
-              {currentSong.artist ? <Text numberOfLines={1} style={styles.songArtist}>{currentSong.artist}</Text> : null}
+              <Text numberOfLines={1} style={styles.songTitle}>
+                {currentSong.title}
+              </Text>
+              {currentSong.artist ? (
+                <Text numberOfLines={1} style={styles.songArtist}>
+                  {currentSong.artist}
+                </Text>
+              ) : null}
             </View>
-
           </View>
           <View style={styles.roadtripButtonContainer}>
             <Pressable

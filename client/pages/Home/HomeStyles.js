@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     position: "relative",
     top: imageHeight - 20,
     height: 150,
-    zIndex: -1
   },
   roadtripButtonContainer: {
     position: "absolute",

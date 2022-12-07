@@ -352,7 +352,6 @@ export function HomeScreen() {
           <MaterialIcons name="person-add-alt-1" size={28} color="#696969" />
         </Pressable>
       ) : null}
-      <AddFriendRoadtripBottomSheet style={styles.bottomSheetRoadtripFriends} roadtripId={roadtripId} bottomSheetModalRef={bottomSheetModalRef} />
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}
@@ -390,6 +389,7 @@ export function HomeScreen() {
           </View>
         </View>
       ) : null}
+      <AddFriendRoadtripBottomSheet style={styles.bottomSheetRoadtripFriends} roadtripId={roadtripId} bottomSheetModalRef={bottomSheetModalRef} />
     </SafeAreaView>
   );
 }

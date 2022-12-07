@@ -113,13 +113,12 @@ router.patch("/:_id", (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
-router.patch("/update-user-roadtrip/:username", (req, res) => {
+router.patch("/update-user-roadtrip/:spotifyUsername", (req, res) => {
   console.log("Updating user's road trips");
-  const roadtripId = new ObjectId(req.body.roadtripId);
+  const roadtripId = ObjectId(req.body.roadtripId);
   User.updateOne(
-    { username: req.params.username },
+    { spotifyUsername: req.params.spotifyUsername },
     { $push: { roadtrips: roadtripId } },)
-    .exec()
     .then((doc) => {
       res.status(200).json(doc);
     }).catch((err) => {

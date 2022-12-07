@@ -16,6 +16,7 @@ import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
 export function PastTripsList({ getSongs, setSelectedTripImages }) {
+  const [refreshing, setRefreshing] = useState(false); 
   const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
   const [roadtripIds, setRoadtripIds] = useState([]);
@@ -92,6 +93,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
   // initial rendering
   useEffect(() => {
     getUsername(); 
+    setRefreshing(true); 
   }, []);
 
   // after getUsername from initial rendering, get roadtrips using that username
@@ -99,6 +101,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
     (async () => {
       if (username != "") {
         getRoadtrips();
+        setRefreshing(false); 
       }
     })();
   }, [username]);
@@ -106,8 +109,9 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
   // get roadtrip data from API upon refresh
   useEffect(() => {
     (async () => {
-      if (username != "" && roadtrips.length == 0) {
+      if (username != "" && roadtrips.length == 0 && refreshing) {
         getRoadtrips();
+        setRefreshing(false); 
       }
     })();
   }, [roadtrips]);
@@ -125,6 +129,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
   const handleRefresh = useCallback(() => {
     console.log("handleRefresh");
     setRoadtrips([]);
+    setRefreshing(true); 
   }, []);
 
   // handle search (search by name, startLocation and destination)
@@ -220,7 +225,8 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
         renderItem={renderItem}
         ListEmptyComponent={renderEmpty}
         keyExtractor={(item) => item._id}
-        refreshing={roadtrips.length == 0}
+        //refreshing={roadtrips.length == 0}
+        refreshing={refreshing}
         onRefresh={handleRefresh}
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{ backgroundColor: "white" }}

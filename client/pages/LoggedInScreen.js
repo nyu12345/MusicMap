@@ -2,7 +2,7 @@ import * as React from "react";
 import { Text, View } from "react-native";
 import { HomeScreen } from "musicmap/pages/Home/HomeScreen";
 import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripsScreen";
-import { MemoriesScreen } from "musicmap/pages/Memories";
+import { MemoriesScreen } from "musicmap/pages/Memories/MemoriesScreen";
 import { ProfileHomeScreen } from "musicmap/pages/Profile/ProfileHomeScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";

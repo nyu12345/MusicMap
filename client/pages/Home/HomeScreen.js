@@ -47,6 +47,8 @@ export function HomeScreen() {
     if (currentLocation == null) {
       return; // maybe should hide the button until it's not null
     }
+    // send NOTIFICATION!!!
+    
     setModalVisible(true);
   };
 

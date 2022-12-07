@@ -30,6 +30,7 @@ export function ProfileScreen(props) {
   const [username, setUsername] = useState("");
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
+  const [userId, setUserId] = useState("");
   const [friends, setFriends] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const emptyProfilePic = "abc_dummy.com";
@@ -136,6 +137,8 @@ export function ProfileScreen(props) {
       .then((response) => {
         if (response.data.length === 0) {
           addUserToMongoDB(name, username, numFollowers, profilePic);
+        } else {
+          setUserId(response.data[0]["_id"])
         }
       })
       .catch((err) => {
@@ -220,6 +223,9 @@ export function ProfileScreen(props) {
               numFriends={item.numFriends}
               profilePic={item.profilePic}
               key={item.spotifyUsername}
+              friendId={item._id}
+              userId={userId}
+              setFriends={setFriends}
             />
           ))
         ) : (

@@ -59,7 +59,7 @@ router.get("/:username", (req, res) => {
   })
 }); 
 
-router.patch("/:_id", (req, res, next) => {
+router.patch("/add-friend/:_id", (req, res, next) => {
   const id = req.params._id;
   console.log(req.query.friendId);
   const filter = { _id: new ObjectId(id) };
@@ -70,6 +70,30 @@ router.patch("/:_id", (req, res, next) => {
     { _id: id },
     {
       $push: {
+        friends: friend,
+      },
+    }
+  )
+    .exec()
+    .then((doc) => {
+      console.log("updated:");
+      console.log(doc);
+      res.status(200).json(doc);
+    })
+    .catch((err) => res.status(500).json(err));
+});
+
+router.patch("/remove-friend/:_id", (req, res, next) => {
+  const id = req.params._id;
+  console.log(req.query.friendId);
+  const filter = { _id: new ObjectId(id) };
+  const friend = new ObjectId(req.query.friendId);
+  console.log("friend to remove:");
+  console.log(friend);
+  User.updateOne(
+    { _id: id },
+    {
+      $pull: {
         friends: friend,
       },
     }

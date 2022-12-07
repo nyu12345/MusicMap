@@ -102,10 +102,10 @@ export function ReceivedScreen() {
      */
     const onPress = async (e) => {
       // console.log("accepting request")
-      const data = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${friendId}`);
+      const data = await axios.patch(`${REACT_APP_BASE_URL}/users/add-friend/${userId}?friendId=${friendId}`);
       // console.log("data:")
       // console.log(data);
-      const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${friendId}?friendId=${userId}`);
+      const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/add-friend/${friendId}?friendId=${userId}`);
       // console.log("data2:")
       // console.log(data2);
       deleteFriendRequest(friendId, userId)

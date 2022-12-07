@@ -1,8 +1,17 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 
+/**
+ * 
+ * @param {bottom sheet modal property} bottomSheetModalref
+ * @returns the section header for friends that has the + button
+ * to enable the user to add friends
+ */
 export const FriendSectionHeader = ({ bottomSheetModalRef }) => {
 
+  /**
+   * opens the bottomsheet
+   */
   const openModal = () => {
     bottomSheetModalRef.current.present();
   };

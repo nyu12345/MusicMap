@@ -19,6 +19,12 @@ import FriendCard from "musicmap/pages/Profile/FriendCard";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 
+
+/**
+ * 
+ * @returns the user's profile, which displays their spotify profile picture,
+ * their name, and their friends
+ */
 export function ProfileScreen(props) {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -28,6 +34,9 @@ export function ProfileScreen(props) {
   const [refreshing, setRefreshing] = useState(false);
   const emptyProfilePic = "abc_dummy.com";
 
+  /**
+   * set friends to an empty array when refreshed
+   */
   const onRefresh = useCallback(() => {
     console.log("refresh");
     setRefreshing(true);
@@ -35,8 +44,10 @@ export function ProfileScreen(props) {
     setRefreshing(false);
   }, []);
 
+  /**
+   * gets the user's Spotify account information from the Spotify API
+   */
   async function getUserInfo() {
-    console.log("getting user info");
     const accessToken = await getAccessTokenFromSecureStorage();
     //console.log(accessToken);
 
@@ -49,7 +60,7 @@ export function ProfileScreen(props) {
 
     if (response) {
       const responseJson = await response.json();
-      console.log(responseJson);
+      // console.log(responseJson);
       setName(responseJson.display_name);
       setUsername(responseJson.id);
       setNumFollowers(responseJson.followers.total);
@@ -59,6 +70,10 @@ export function ProfileScreen(props) {
     }
   }
 
+  /**
+   * iterates through the user's list of friends
+   * & obtains each friend's info
+   */
   async function getFriends() {
     if (friends.length == 0) {
       await axios
@@ -83,6 +98,14 @@ export function ProfileScreen(props) {
     }
   }
 
+  /**
+   * takes in the user's name, username, number of followers, and profile picture url
+   * & creates a new user in the mongodb database with those attributes
+   * @param {the user's name on Spotify} name 
+   * @param {the user's Spotify username} username 
+   * @param {the number of Spotify followers the user has} numFollowers 
+   * @param {the url of the user's Spotify profile picture} profilePicUrl 
+   */
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
     const user = {
       name: name,
@@ -101,6 +124,12 @@ export function ProfileScreen(props) {
       });
   }
 
+  /**
+   * checks if the user is not already in the mongodb database
+   * (using their Spotify username)
+   * before adding them to the database
+   * @param {the user's Spotify username} username
+   */
   async function addUserIfNew(username) {
     await axios
       .get(`${REACT_APP_BASE_URL}/users/${username}`)
@@ -114,6 +143,10 @@ export function ProfileScreen(props) {
       });
   }
 
+  /**
+   * at each render, get the user's info, call addUserIfNew
+   * if username and profilePic aren't empty, & get the user's friends
+   */
   useEffect(() => {
     (async () => {
       await getUserInfo();
@@ -126,7 +159,9 @@ export function ProfileScreen(props) {
     })();
   });
 
-  // remove token, show Spotify log out screen, clear cookies & navigate to login screen
+  /**
+   * remove token, show Spotify log out screen, clear cookies, & navigate to login screen
+   *  */
   const logOut = async () => {
     props.loginToParent();
     await SecureStore.deleteItemAsync("AUTH_CODE");
@@ -141,7 +176,9 @@ export function ProfileScreen(props) {
     props.navigation.navigate("login");
   };
 
-  // define bottom sheet modal properties
+  /**
+   * define bottom sheet modal properties
+   */
   const bottomSheetModalRef = useRef(null);
 
   return (

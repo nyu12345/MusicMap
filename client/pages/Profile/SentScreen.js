@@ -15,20 +15,33 @@ import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { getUserInfo } from "musicmap/util/UserInfo";
 
+/**
+ * 
+ * @returns a page that returns all the friend requests the user has sent
+ */
 export function SentScreen() {
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
   const [sent, setSent] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  /**
+   * sets sent requests to empty when refreshed
+   * to update
+   */
   const onRefresh = React.useCallback(() => {
     console.log("refresh");
     setRefreshing(true);
-    console.log("setting sent to 0");
+    // console.log("setting sent to 0");
     setSent([]);
     setRefreshing(false);
   }, []);
 
+  /**
+ * gets all friend requests the user has sent
+ * and gets each receiver's information
+ * 
+ */
   async function getSent() {
     if (sent.length == 0) {
       await axios
@@ -60,6 +73,10 @@ export function SentScreen() {
     }
   }
 
+  /**
+   * at each render, get the user's info to obtain their username and id,
+   * & get the user's sent requests
+   */
   useEffect(() => {
     (async () => {
       let userInfo = await getUserInfo();
@@ -73,6 +90,16 @@ export function SentScreen() {
     })();
   });
 
+  /**
+   * 
+   * @param {the name of the friend request receiver} name
+   * @param {the number of friends the friend request receiver has} numFriends
+   * @param {the url of the friend request receiver's Spotify profile pic} profilePic
+   * @param {the username of the friend request receiver} username
+   * @param {the id of the friend request receiver} friendId
+   * @param {the user's id} userId
+   * @returns a card that shows information about each person the user has sent a request to
+   */
   const SentRequestCard = ({
     name,
     numFriends,
@@ -81,6 +108,13 @@ export function SentScreen() {
     friendId,
     userId,
   }) => {
+
+    /**
+     * deletes the friend request from the mongodb database
+     * gets called when the user withdraws the friend request
+     * @param {the user's id} requestorId 
+     * @param {the id of the friend request receiver} requestedId 
+     */
     async function deleteFriendRequest(requestorId, requestedId) {
       console.log("deleting friend request");
       await axios

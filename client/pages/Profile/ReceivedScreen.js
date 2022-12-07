@@ -15,6 +15,10 @@ import axios from "axios";
 import { AntDesign } from '@expo/vector-icons';
 import { getUserInfo } from "musicmap/util/UserInfo";
 
+/**
+ * 
+ * @returns a page that displays all the friend requests the user has received
+ */
 export function ReceivedScreen() {
 
   const [username, setUsername] = useState("");
@@ -22,6 +26,10 @@ export function ReceivedScreen() {
   const [received, setReceived] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  /**
+   * set received requests to empty when refreshed
+   * to update
+   */
   const onRefresh = React.useCallback(() => {
     console.log("refresh");
     setRefreshing(true);
@@ -29,6 +37,11 @@ export function ReceivedScreen() {
     setRefreshing(false);
   }, []);
 
+  /**
+   * gets all friend requests the user has received
+   * and gets each requestor's information
+   * @param {the user's _id} userId 
+   */
   async function getReceived(userId) {
     if (received.length == 0) {
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`).then(async function (response) {
@@ -54,6 +67,10 @@ export function ReceivedScreen() {
     }
   }
 
+  /**
+   * at each render, get the user's info to obtain their username and id,
+   * & get the user's received requests
+   */
   useEffect(() => {
     (async () => {
       let userInfo = await getUserInfo();
@@ -62,27 +79,46 @@ export function ReceivedScreen() {
         setUserId(userInfo[4])
       }
       if (userId != "") {
-        console.log("getting received")
         await getReceived(userId);
       }
     })();
   });
 
+  /**
+   * 
+   * @param {the name of the friend request requestor} name
+   * @param {the number of friends the friend request requestor has} numFriends
+   * @param {the url of the friend request requestor's Spotify profile pic} profilePic
+   * @param {the username of the friend request requestor} username
+   * @param {the id of the friend request requestor} friendId
+   * @param {the user's id} userId
+   * @returns a card that shows information about each person who has requested the user
+   */
   const ReceivedRequestCard = ({ name, numFriends, profilePic, username, friendId, userId }) => {
 
+    /**
+     * when the user accepts the friend request, add each user to the other's friend list
+     * and delete the friend request
+     */
     const onPress = async (e) => {
-      console.log("accepting request")
+      // console.log("accepting request")
       const data = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${friendId}`);
-      console.log("data:")
-      console.log(data);
+      // console.log("data:")
+      // console.log(data);
       const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${friendId}?friendId=${userId}`);
-      console.log("data2:")
-      console.log(data2);
+      // console.log("data2:")
+      // console.log(data2);
       deleteFriendRequest(friendId, userId)
     }
 
+    /**
+     * deletes the friend request from the mongodb database
+     * gets called when the user both accepts and rejects the friend request
+     * @param {the id of the friend request requestor} requestorId 
+     * @param {the user's id} requestedId 
+     */
     async function deleteFriendRequest(requestorId, requestedId) {
-      console.log("deleting friend request");
+      // console.log("deleting friend request");
       await axios.get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${requestedId}&requestorId=${requestorId}`).then((response) => {
         let requestId = response.data[0]["_id"];
         axios.delete(`${REACT_APP_BASE_URL}/friendRequests/${requestId}`).then((response) => {

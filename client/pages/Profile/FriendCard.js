@@ -1,6 +1,13 @@
 import React from "react";
 import { Text, View, Image, StyleSheet } from "react-native";
 
+  /**
+   * 
+   * @param {the name of the friend} name
+   * @param {the number of friends the friend has} numFriends
+   * @param {the url of the friend's Spotify profile pic} profilePic
+   * @returns a card that shows information about a friend of the user
+   */
 const FriendCard = ({ name, numFriends, profilePic }) => {
   return (
     <View style={styles.friendCardContainer}>

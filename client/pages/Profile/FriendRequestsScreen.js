@@ -6,6 +6,11 @@ import { Dimensions } from "react-native";
 
 const Tab = createMaterialTopTabNavigator();
 
+/**
+ * 
+ * @returns a screen that contains the received and sent friend request screens
+ * as tabs
+ */
 export function FriendRequestsScreen(props) {
   const loginToParent = () => {
     props.loginToParent();

@@ -8,6 +8,11 @@ import { Text, View, StyleSheet, Image, Animated, Pressable } from 'react-native
 
 const Tab = createMaterialTopTabNavigator();
 
+/**
+ * 
+ * @returns a screen that has two tabs, one for the user profile, and one that
+ * contains the sent and received friend requests screens
+ */
 export function ProfileHomeScreen(props) {
     const loginToParent = () => {
     props.loginToParent();

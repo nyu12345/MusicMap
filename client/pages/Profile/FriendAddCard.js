@@ -8,6 +8,17 @@ import {
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 
+  /**
+   * 
+   * @param {the name of a user} name
+   * @param {the number of friends a user has} numFriends
+   * @param {the url of a user's Spotify profile pic} profilePic
+   * @param {the username of the friend request requestor} username
+   * @param {the id of a user} friendId
+   * @param {the current user's id} userId
+   * @returns a card that shows information about each person the user can add, with a button to
+   * request to add the person
+   */
 export const FriendAddCard = ({
   name,
   numFriends,
@@ -17,10 +28,16 @@ export const FriendAddCard = ({
   setDidSendRequest,
 }) => {
 
+  /**
+   * creates a friend request in the database, with the user as the requestor
+   * and the person in the card as the requested
+   * @param {the user's id} requestorId 
+   * @param {the id of the person the user is requesting} requestedId 
+   */
   async function createFriendRequest(requestorId, requestedId) {
-    console.log("creating friend request");
-    console.log("requestor: " + requestorId);
-    console.log("requested: " + requestedId);
+    // console.log("creating friend request");
+    // console.log("requestor: " + requestorId);
+    // console.log("requested: " + requestedId);
     const friendRequest = {
       requestorId: requestorId,
       requestedId: requestedId,

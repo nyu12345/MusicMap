@@ -30,14 +30,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }, 
-    "plugins": [
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to create roadtrip memories."
-        }
-      ]
-    ]
+    }
   }
 }

@@ -1,4 +1,11 @@
-import { Text, View, Image, StyleSheet, Pressable, Alert } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  Pressable,
+  Alert,
+} from "react-native";
 import React, { useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
@@ -17,11 +24,9 @@ const PastTrip = ({
   startDate,
   endDate,
   getSongs,
-  getRoadtrips,
-  selectedTripId, 
-  setSelectedTripId, 
+  getRoadtrips, 
 }) => {
-  
+
   const deleteRoadtrip = async (tripId) => {
     await axios
       .delete(`${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip/${tripId}`)
@@ -40,8 +45,6 @@ const PastTrip = ({
         }
         console.log(error.config);
       });
-
-    await getRoadtrips();
   };
 
   const createAlert = () => {
@@ -56,9 +59,10 @@ const PastTrip = ({
         },
         {
           text: "Delete",
-          onPress: async () => {
+          onPress: () => {
             console.log("delete selected");
-            await deleteRoadtrip(tripId);
+            deleteRoadtrip(tripId);
+            getRoadtrips(); 
           },
         },
       ]
@@ -83,10 +87,9 @@ const PastTrip = ({
       <Pressable
         onPress={async () => {
           console.log("selected roadtrip");
-          setSelectedTripId(tripId);
           await getSongs(tripId);
         }}
-        style={tripId === selectedTripId ? styles.selectedRoadtripContainer : styles.roadtripContainer}
+        style={styles.roadtripContainer}
       >
         <Image
           source={require("musicmap/assets/sample_pfp.png")}
@@ -117,26 +120,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
-    borderRadius: 5, 
   },
-  selectedRoadtripContainer: {
-    flexDirection: "row",
-    marginHorizontal: 10,
-    marginVertical: 5,
-    height: 70,
-    backgroundColor: 'rgba(52, 52, 52, 0.1)', 
-    borderRadius: 5, 
-  }, 
   image: {
-    alignSelf: "center", 
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
     borderRadius: 30,
     marginRight: 10,
   },
   roadtripContent: {
-    flex: 1, 
-    top: 5, 
+    flex: 1,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "lightgray",
   },

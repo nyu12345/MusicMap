@@ -1,7 +1,6 @@
-import React from "react";
 import { Text, View, Image, StyleSheet } from "react-native";
 
-const FriendCard = ({ name, numFriends, profilePic }) => {
+export const FriendCard = ({ name, numFriends, profilePic }) => {
   return (
     <View style={styles.friendCardContainer}>
       <Image source={{ uri: profilePic }} style={styles.image} />
@@ -16,8 +15,6 @@ const FriendCard = ({ name, numFriends, profilePic }) => {
     </View>
   );
 };
-
-export default React.memo(FriendCard); 
 
 const styles = StyleSheet.create({
   friendCardContainer: {

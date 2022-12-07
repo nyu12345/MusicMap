@@ -15,22 +15,22 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", async (req, res, next) => {
-  console.log("inside post");
-  console.log(req.body.name);
+  console.log("inside post"); 
+  console.log(req.body.name); 
   const user = new User({
-    spotifyUsername: req.body.spotifyUsername,
-    numTrips: req.body.numTrips,
-  });
+    spotifyUsername: req.body.spotifyUsername, 
+    numTrips: req.body.numTrips, 
+  }); 
 
   user
     .save()
     .then((doc) => {
       res.status(201).json({
-        message: "Statistic created",
+        message: 'Statistic created',
         createdUser: doc,
-      });
+      })
     })
     .catch((err) => res.status(500).json(err));
-});
+}); 
 
 module.exports = router;

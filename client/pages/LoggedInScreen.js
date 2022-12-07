@@ -11,7 +11,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createBottomTabNavigator();
 
-
 export function LoggedInScreen(props) {
   const loginToParent = () => {
     props.loginToParent();
@@ -57,11 +56,11 @@ export function LoggedInScreen(props) {
         component={MemoriesScreen}
       />
       <Tab.Screen
-        options={{ headerShown: false }}
+        options={{ headerShown: true }}
         name="Profile"
         //component = {ProfileScreen}
         children={(props) => (
-          <ProfileHomeScreen
+          <ProfileScreen
             navigation={props.navigation}
             loginToParent={loginToParent}
           />

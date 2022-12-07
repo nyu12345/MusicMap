@@ -30,48 +30,33 @@ router.post("/create-roadtrip", async (req, res, next) => {
     .save()
     .then((doc) => {
       res.status(201).json({
-        message: "Roadtrip created",
+        message: 'Roadtrip created',
         createdReview: doc,
-      });
+      })
     })
     .catch((err) => res.status(500).json(err));
 });
+
 
 router.patch("/update-roadtrip/:id", (req, res) => {
   console.log("Updating roadtrip");
   Roadtrip.findByIdAndUpdate(req.params.id, {
     destination: req.body.destination,
     endDate: req.body.endDate,
+  }).then((doc) => {
+    res.status(200).json(doc);
+  }).catch((err) => {
+    res.status(500).json({ error: err });
   })
-    .then((doc) => {
-      res.status(200).json(doc);
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
-    });
 });
 
 router.delete("/delete-roadtrip/:id", (req, res) => {
   console.log("Delete roadtrip");
-  Roadtrip.findByIdAndDelete(req.params.id)
-    .then((doc) => {
-      res.status(200).json(doc);
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
-    });
-});
-
-// get roadtrip by roadtripId
-router.get("/:roadtripId", (req, res) => {
-  console.log("finding road trip by tripId");
-  Roadtrip.findById(req.params.roadtripId)
-    .then((doc) => {
-      res.status(200).json(doc);
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
-    });
+  Roadtrip.findByIdAndDelete(req.params.id).then((doc) => {
+    res.status(200).json(doc);
+  }).catch((err) => {
+    res.status(500).json({ error: err });
+  })
 });
 
 module.exports = router;

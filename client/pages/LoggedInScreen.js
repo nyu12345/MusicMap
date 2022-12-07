@@ -5,6 +5,7 @@ import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripsScreen";
 import { MemoriesScreen } from "musicmap/pages/Memories";
 import { ProfileHomeScreen } from "musicmap/pages/Profile/ProfileHomeScreen";
 import { MemoriesScreen } from "musicmap/pages/Memories/MemoriesScreen";
+import { MemoriesScreen } from "musicmap/pages/Memories/MemoriesScreen";
 import ProfileScreen from "musicmap/pages/Profile/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";

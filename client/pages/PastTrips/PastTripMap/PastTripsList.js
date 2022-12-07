@@ -5,8 +5,7 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { View, Text } from "react-native";
-import { StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import BottomSheet, {
@@ -16,7 +15,7 @@ import BottomSheet, {
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList({ getSongs }) {
+export function PastTripsList({ getSongs, getImages }) {
   const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
   const [roadtripIds, setRoadtripIds] = useState([]);
@@ -104,8 +103,8 @@ export function PastTripsList({ getSongs }) {
     })();
   }, [username]);
 
+  // get roadtrip data from API upon refresh
   useEffect(() => {
-    // get roadtrip data from API upon refresh
     (async () => {
       if (username != "" && roadtrips.length == 0) {
         getRoadtrips();
@@ -183,6 +182,7 @@ export function PastTripsList({ getSongs }) {
       startDate={item.startDate}
       endDate={item.endDate}
       getSongs={getSongs}
+      getImages={getImages}
       getRoadtrips={getRoadtrips}
       selectedTripId={selectedTripId}
       setSelectedTripId={setSelectedTripId}

@@ -1,11 +1,12 @@
 import { Text, View, Image, StyleSheet, Pressable, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Swipeable } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
+import roadtripPic from "musicmap/assets/roadtripPic.png"; 
 
 dayjs.extend(relativeTime);
 
@@ -17,10 +18,27 @@ const PastTrip = ({
   startDate,
   endDate,
   getSongs,
+  getImages, 
   getRoadtrips,
   selectedTripId, 
   setSelectedTripId, 
+  setImagesForSelectedTrip, 
 }) => {
+  // const [images, setImages] = useState([]); 
+  // const [coverPic, setCoverPic] = useState("musicmap/assets/roadtripPic.png"); 
+
+  // get images for cu
+  // const getImages = async (tripId) => {
+  //   await axios
+  //     .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${tripId}`)
+  //     .then((response) => {
+  //       console.log("images: " + response.data); 
+  //       setImages(response.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
   
   const deleteRoadtrip = async (tripId) => {
     await axios
@@ -78,6 +96,19 @@ const PastTrip = ({
     );
   };
 
+  // initial rendering - get profile pic for roadtrip
+  // useEffect(() => {
+  //   (async () => {
+  //     await getImages(tripId); 
+  //   })
+  // }, []); 
+
+  // useEffect(() => {
+  //   if (images.length != 0) {
+  //     setCoverPic(images[0]); 
+  //   }
+  // }, [images])
+
   return (
     <Swipeable renderRightActions={renderRightActions}>
       <Pressable
@@ -85,11 +116,12 @@ const PastTrip = ({
           console.log("selected roadtrip");
           setSelectedTripId(tripId);
           await getSongs(tripId);
+          await getImages(tripId); 
         }}
         style={tripId === selectedTripId ? styles.selectedRoadtripContainer : styles.roadtripContainer}
       >
         <Image
-          source={require("musicmap/assets/sample_pfp.png")}
+          source={roadtripPic}
           style={styles.image}
         />
         <View style={styles.roadtripContent}>

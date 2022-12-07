@@ -63,7 +63,7 @@ export function HomeScreen() {
 
   const cancelRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
-    deleteAllUsersRoadtrips();
+    deleteRoadtripFromAllUsers();
     setCurrentRoadTripData(null);
     setRoadtripName("");
   };
@@ -138,7 +138,7 @@ export function HomeScreen() {
       });
   };
 
-  const deleteAllUsersRoadtrips = async () => {
+  const deleteRoadtripFromAllUsers = async () => {
     const curRoadtripId = currentRoadTripData.createdReview._id; 
     for (const user in users) {
       const roadtrips = user.roadtrips; 

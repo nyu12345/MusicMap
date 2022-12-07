@@ -24,7 +24,7 @@ const PastTrip = ({
   startDate,
   endDate,
   getSongs,
-  getRoadtrips, 
+  getRoadtrips,
 }) => {
 
   const deleteRoadtrip = async (tripId) => {
@@ -62,7 +62,7 @@ const PastTrip = ({
           onPress: () => {
             console.log("delete selected");
             deleteRoadtrip(tripId);
-            getRoadtrips(); 
+            getRoadtrips();
           },
         },
       ]

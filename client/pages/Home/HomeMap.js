@@ -1,6 +1,6 @@
 import MapView, { Marker, Callout } from "react-native-maps";
 import styles from "./HomeStyles";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, Pressable } from "react-native";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -8,6 +8,7 @@ import { REACT_APP_BASE_URL } from "@env";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import { getTrack, getCurrentlyPlayingTrack, getTracksAudioFeatures } from "musicmap/util/SpotifyAPICalls";
+
 
 let currentSong = { title: "No song", spotifyId: null };
 
@@ -23,6 +24,7 @@ export function HomeMap({
   const [offset, setOffset] = useState(0);
   const [pins, setPins] = useState([]);
   const [isOngoingSession, setIsOngoingSession] = useState(false);
+
 
   /**
    * Requests user location permission, runs on first render on a new device
@@ -111,6 +113,7 @@ export function HomeMap({
       postImage(result.uri);
     }
   };
+
 
   /**
    * adds a user-added image pin to the map and records in database

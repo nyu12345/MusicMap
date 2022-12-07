@@ -29,11 +29,40 @@ const styles = StyleSheet.create({
 
     elevation: 3,
   },
+  homeMap: {
+    position: "absolute",
+    zIndex: -3
+  },
+  addFriendsButton: {
+    alignSelf: 'flex-end',
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: "aliceblue",
+    position: "absolute",
+    right: 20,
+    top: 100,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+
+    elevation: 3,
+  },
   startButton: {
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
     bottom: 30,
+  },
+  bottomSheetRoadtripFriends: {
+    position: "absolute",
+    zIndex: 1
   },
   roadtripHeader: {
     alignItems: "center",
@@ -42,7 +71,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     position: "relative",
     top: imageHeight - 20,
-    height: 150
+    height: 150,
+    zIndex: -1
   },
   roadtripButtonContainer: {
     position: "absolute",

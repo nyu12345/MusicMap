@@ -9,7 +9,7 @@ import {
   Modal,
   Image,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./HomeStyles";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
@@ -19,17 +19,20 @@ import * as Location from "expo-location";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import { AddFriendRoadtripBottomSheet } from "musicmap/pages/Home/AddFriendRoadtripBottomSheet";
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageToDisplay, setImageToDisplay] = useState("");
   const [roadtripName, setRoadtripName] = useState("");
+  const [roadtripId, setRoadtripId] = useState(null);
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [currentUsername, setCurrentUsername] = useState(null);
+  const bottomSheetModalRef = useRef(null);
 
   /**
    * Sets Image picker UI to be visible after road trip session starts
@@ -104,6 +107,7 @@ export function HomeScreen() {
       .post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip)
       .then((response) => {
         setCurrentRoadTripData(response.data);
+        setRoadtripId(response.data.createdReview._id);
         console.log(response.data);
       })
       .catch(function (error) {
@@ -238,6 +242,14 @@ export function HomeScreen() {
     setCurrentSong(newSong);
   }
 
+  const addFriendtoRoadtrip = () => {
+
+  }
+
+  const openAddFriendModal = () => {
+    bottomSheetModalRef.current.present();
+  };
+
 
   /**
    * API call to get the current spotify user's username
@@ -287,6 +299,7 @@ export function HomeScreen() {
         currentSong={currentSong}
         updateParentSongHandler={updateParentSongHandler}
         createImageViewer={createImageViewer}
+        style={styles.homeMap}
       />
       <Modal
         animationType="slide"
@@ -331,6 +344,12 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
+      {!buttonIsStartRoadtrip ? (
+        <Pressable style={styles.addFriendsButton} onPress={openAddFriendModal}>
+          <MaterialIcons name="person-add-alt-1" size={28} color="#696969" />
+        </Pressable>
+      ) : null}
+      <AddFriendRoadtripBottomSheet style={styles.bottomSheetRoadtripFriends} roadtripId={roadtripId} bottomSheetModalRef={bottomSheetModalRef} />
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}

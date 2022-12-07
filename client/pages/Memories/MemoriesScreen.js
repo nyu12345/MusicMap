@@ -102,7 +102,7 @@ export function MemoriesScreen() {
           console.log(err);
         });
 
-      
+
       await axios
         .get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${curTripId}`)
         .then((response) => {

@@ -20,8 +20,8 @@ import { getUserInfo } from "musicmap/util/UserInfo";
 export const AddFriendRoadtripBottomSheet = ({
   bottomSheetModalRef,
   roadtripId,
-  users, 
-  getUsers, 
+  users,
+  getUsers,
 }) => {
   //const [users, setUsers] = useState([]);
   const [searchInput, setSearchInput] = useState("");
@@ -61,25 +61,27 @@ export const AddFriendRoadtripBottomSheet = ({
 
   const filter = (users) => {
     return users.filter(function ({ name, _id }) {
-      const names = name.split(" ");
-      if (_id == userId) {
-        return false;
-      }
-      if (!friends.includes(_id)) {
-        return false;
-      }
-      if (searchInput != "") {
-        let input = searchInput.toLowerCase().replace(/\s/g, "");
-        for (let i = 0; i < names.length; i++) {
-          names[i] = names[i].toLowerCase();
-          if (names[i].indexOf(input) == 0) {
-            return true;
-          }
+      if (name) {
+        const names = name.split(" ");
+        if (_id == userId) {
+          return false;
         }
+        if (!friends.includes(_id)) {
+          return false;
+        }
+        if (searchInput != "") {
+          let input = searchInput.toLowerCase().replace(/\s/g, "");
+          for (let i = 0; i < names.length; i++) {
+            names[i] = names[i].toLowerCase();
+            if (names[i].indexOf(input) == 0) {
+              return true;
+            }
+          }
 
-        return names.join("").indexOf(input) == 0;
+          return names.join("").indexOf(input) == 0;
+        }
+        return true;
       }
-      return true;
     });
   };
 

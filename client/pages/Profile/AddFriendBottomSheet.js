@@ -53,17 +53,17 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       });
   }
 
-    // get all received friend requests
-    async function getReceived() {
-      await axios
-        .get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`)
-        .then(async function (response) {
-          setReceivedRequests(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+  // get all received friend requests
+  async function getReceived() {
+    await axios
+      .get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`)
+      .then(async function (response) {
+        setReceivedRequests(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   // get friends of the current user
   async function getFriends() {
@@ -93,43 +93,45 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   const filter = (users) => {
     return users.filter(function ({ name, _id }) {
-      const names = name.split(" ");
-      if (_id == userId) {
-        return false;
-      }
-      if (sentRequests.length > 0) {
-        for (let i = 0; i < sentRequests.length; i++) {
-          if (sentRequests[i]["requestedId"] == _id) {
-            return false;
+      if (name) {
+        const names = name.split(" ");
+        if (_id == userId) {
+          return false;
+        }
+        if (sentRequests.length > 0) {
+          for (let i = 0; i < sentRequests.length; i++) {
+            if (sentRequests[i]["requestedId"] == _id) {
+              return false;
+            }
           }
         }
-      }
-      if (receivedRequests.length > 0) {
-        for (let i = 0; i < receivedRequests.length; i++) {
-          if (receivedRequests[i]["requestorId"] == _id) {
-            return false;
+        if (receivedRequests.length > 0) {
+          for (let i = 0; i < receivedRequests.length; i++) {
+            if (receivedRequests[i]["requestorId"] == _id) {
+              return false;
+            }
           }
         }
-      }
-      if (friends.length > 0) {
-        for (let i = 0; i < friends.length; i++) {
-          if (friends[i] == _id) {
-            return false;
+        if (friends.length > 0) {
+          for (let i = 0; i < friends.length; i++) {
+            if (friends[i] == _id) {
+              return false;
+            }
           }
         }
-      }
-      if (searchInput != "") {
-        let input = searchInput.toLowerCase().replace(/\s/g, "");
-        for (let i = 0; i < names.length; i++) {
-          names[i] = names[i].toLowerCase();
-          if (names[i].indexOf(input) == 0) {
-            return true;
+        if (searchInput != "") {
+          let input = searchInput.toLowerCase().replace(/\s/g, "");
+          for (let i = 0; i < names.length; i++) {
+            names[i] = names[i].toLowerCase();
+            if (names[i].indexOf(input) == 0) {
+              return true;
+            }
           }
-        }
 
-        return names.join("").indexOf(input) == 0;
+          return names.join("").indexOf(input) == 0;
+        }
+        return true;
       }
-      return true;
     });
   };
 
@@ -180,12 +182,10 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     console.log("set username: " + username);
     console.log("set user Id: " + userId);
     getFriendAndRequestInfo();
-  }, [username, userId])
+  }, [username, userId]);
 
   useEffect(() => {
     (async () => {
-      console.log("sent request addfriend")
-      console.log(sentRequests)
       if (refreshing) {
         await getFriendAndRequestInfo();
         setRefreshing(false);

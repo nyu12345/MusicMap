@@ -72,12 +72,8 @@ export const AddFriendRoadtripBottomSheet = ({ bottomSheetModalRef, roadtripId }
             if (_id == userId) {
                 return false;
             }
-            if (friends.length > 0) {
-                for (let i = 0; i < friends.length; i++) {
-                    if (friends[i] != _id) {
-                        return false;
-                    }
-                }
+            if (!friends.includes(_id)) {
+                return false;
             }
             if (searchInput != "") {
                 let input = searchInput.toLowerCase().replace(/\s/g, "");

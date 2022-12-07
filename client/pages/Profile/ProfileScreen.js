@@ -12,19 +12,10 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-<<<<<<< HEAD
-import { Linking, Networking } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
-import { deleteValue } from "musicmap/util/SecureStore";
-import { FriendCard } from "musicmap/pages/Profile/FriendCard";
-import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
-=======
 import { Linking, Networking, RefreshControl } from "react-native";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore";
 import FriendCard from "musicmap/pages/Profile/FriendCard";
->>>>>>> verify-friends
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 
@@ -33,9 +24,6 @@ export function ProfileScreen(props) {
   const [username, setUsername] = useState("");
   const [numFollowers, setNumFollowers] = useState(0);
   const [profilePic, setProfilePic] = useState("");
-<<<<<<< HEAD
-  const emptyProfilePic = "abc_dummy.com";
-=======
   const [friends, setFriends] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const emptyProfilePic = "abc_dummy.com";
@@ -46,16 +34,12 @@ export function ProfileScreen(props) {
     setFriends([]);
     setRefreshing(false);
   }, []);
->>>>>>> verify-friends
 
   async function getUserInfo() {
     console.log("getting user info");
     const accessToken = await getAccessTokenFromSecureStorage();
-<<<<<<< HEAD
-=======
     //console.log(accessToken);
 
->>>>>>> verify-friends
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
       headers: {
@@ -133,16 +117,12 @@ export function ProfileScreen(props) {
   useEffect(() => {
     (async () => {
       await getUserInfo();
-<<<<<<< HEAD
-      await addUserIfNew(username);
-=======
       if (username != "" && profilePic != "") {
         await addUserIfNew(username);
       }
       if (friends.length == 0) {
         await getFriends();
       }
->>>>>>> verify-friends
     })();
   });
 
@@ -165,29 +145,6 @@ export function ProfileScreen(props) {
   // define bottom sheet modal properties
   const bottomSheetModalRef = useRef(null);
 
-<<<<<<< HEAD
-  // dummy data
-  const friends = [
-    {
-      name: "Jeffrey Liu",
-      numFriends: 30,
-      spotifyUsername: "jzl",
-      friends: [],
-      profilePic:
-        "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
-    },
-    {
-      name: "Nathan Huang",
-      numFriends: 29,
-      spotifyUsername: "nhu",
-      friends: [],
-      profilePic:
-        "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
-    },
-  ];
-
-=======
->>>>>>> verify-friends
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
@@ -220,17 +177,6 @@ export function ProfileScreen(props) {
         </View>
 
         <FriendSectionHeader bottomSheetModalRef={bottomSheetModalRef} />
-<<<<<<< HEAD
-
-        {friends.map((item) => (
-          <FriendCard
-            name={item.name}
-            numFriends={item.numFriends}
-            profilePic={item.profilePic}
-            key={item.spotifyUsername}
-          />
-        ))}
-=======
         {friends.length > 0 ? (
           friends.map((item) => (
             <FriendCard
@@ -243,7 +189,6 @@ export function ProfileScreen(props) {
         ) : (
           <Text>No friends!</Text>
         )}
->>>>>>> verify-friends
 
         <Pressable style={styles.logoutButton} onPress={logOut}>
           <Text style={styles.logoutButtonText}>LOG OUT</Text>

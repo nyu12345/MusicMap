@@ -31,7 +31,8 @@ export function PastTripsList({ getSongs }) {
 
   // get all the roadtrips the current user has been on
   // 1. get current user's username
-  const getUsername = async () => {
+  const getUsername = async () => { 
+    //console.log("inside get username"); 
     const accessToken = await getAccessTokenFromSecureStorage();
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
@@ -50,6 +51,7 @@ export function PastTripsList({ getSongs }) {
 
   // 2. get current user's info from Mongo with username and then get user's road trip ids
   const getUserRoadtripIds = async (username) => {
+    console.log("username in getUserRoadtripIds: " + username); 
     await axios
       .get(`${REACT_APP_BASE_URL}/users/${username}`)
       .then((response) => {
@@ -71,6 +73,8 @@ export function PastTripsList({ getSongs }) {
     const uniqueRoadtripIds = [];
     roadtripSet.forEach((trip) => uniqueRoadtripIds.push(trip));
 
+    console.log("size of roadtripSet: " + roadtripSet.size); 
+
     // get road trip info for all unique road trips
     const uniqueRoadtrips = [];
     for (let i = 0; i < uniqueRoadtripIds.length; i++) {
@@ -90,9 +94,10 @@ export function PastTripsList({ getSongs }) {
 
   // initial rendering
   useEffect(() => {
-    async () => {
-      await getUsername();
-    };
+    // async () => {
+    //   await getUsername();
+    // };
+    getUsername(); 
   }, []);
 
   // after getUsername from initial rendering, get roadtrips using that username
@@ -107,7 +112,7 @@ export function PastTripsList({ getSongs }) {
   useEffect(() => {
     // get roadtrip data from API upon refresh
     (async () => {
-      if (roadtrips.length == 0) {
+      if (username != "" && roadtrips.length == 0) {
         getRoadtrips();
       }
     })();

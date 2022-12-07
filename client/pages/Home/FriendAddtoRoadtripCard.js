@@ -8,6 +8,7 @@ import {
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import { useState } from "react";
+import { sendPushNotification } from "musicmap/util/Notifications"
 
 export const FriendAddtoRoadtripCard = ({
     username,
@@ -43,6 +44,21 @@ export const FriendAddtoRoadtripCard = ({
                     console.log("Error", error.message);
                 }
                 console.log(error.config);
+            });
+        await axios
+            .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
+            .then(async function (response) {
+                console.log("LOOK UNDER HERE");
+                if (response.data.length != 0) {
+                    console.log(response.data[0]);
+                    // sendPushNotification(
+                    // "ExponentPushToken[5sln6yBE02coKhseOam-Qk]",
+                    // "You've been added to a roadtrip!",
+                    // "Go to MusicMap to view the roadtrip!");
+                }
+            })
+            .catch((err) => {
+                console.log(err);
             });
     }
 

@@ -19,7 +19,6 @@ import * as Location from "expo-location";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
-import { sendPushNotification } from "musicmap/util/Notifications"
 import { AddFriendRoadtripBottomSheet } from "musicmap/pages/Home/AddFriendRoadtripBottomSheet";
 
 export function HomeScreen() {
@@ -96,10 +95,10 @@ export function HomeScreen() {
    * Posts the new roadtrip to the roadtrips collection.
    */
   const createHandler = () => {
-    sendPushNotification(
-      "ExponentPushToken[5sln6yBE02coKhseOam-Qk]",
-      "You've been added to a roadtrip!",
-      "Go to MusicMap to view the roadtrip!");
+    // sendPushNotification(
+    //   "ExponentPushToken[5sln6yBE02coKhseOam-Qk]",
+    //   "You've been added to a roadtrip!",
+    //   "Go to MusicMap to view the roadtrip!");
     const roadtrip = {
       name: roadtripName,
       startLocation: currentLocation.name,

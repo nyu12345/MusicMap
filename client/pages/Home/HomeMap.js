@@ -1,6 +1,6 @@
 import MapView, { Marker, Callout } from "react-native-maps";
 import styles from "./HomeStyles";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, Pressable } from "react-native";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -8,6 +8,7 @@ import { REACT_APP_BASE_URL } from "@env";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import { getTrack, getCurrentlyPlayingTrack, getTracksAudioFeatures } from "musicmap/util/SpotifyAPICalls";
+
 
 let currentSong = { title: "No song", spotifyId: null };
 
@@ -24,8 +25,9 @@ export function HomeMap({
   const [pins, setPins] = useState([]);
   const [isOngoingSession, setIsOngoingSession] = useState(false);
 
+
   /**
-   * requests permission if needed
+   * Requests user location permission, runs on first render on a new device
    */
   useEffect(() => {
     (async () => {
@@ -48,6 +50,9 @@ export function HomeMap({
     })();
   }, []);
 
+  /**
+   * Real-time user location tracking, runs in the background
+   */
   useEffect(() => {
     (async () => {
       try {
@@ -71,6 +76,9 @@ export function HomeMap({
     })();
   });
 
+  /**
+   * Manages display of pins on the map based on the status of the session, runs in the background
+   */
   useEffect(() => {
     (async () => {
       try {
@@ -87,6 +95,9 @@ export function HomeMap({
     })();
   });
 
+  /**
+   * launches the image picker UI and calls postImage() to handle the chosen image
+   */
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -103,6 +114,11 @@ export function HomeMap({
     }
   };
 
+
+  /**
+   * adds a user-added image pin to the map and records in database
+   * @param {the image URL} imageUri 
+   */
   const postImage = (imageUri) => {
     console.log("POST Image: " + imageUri);
     const newImage = {
@@ -137,6 +153,9 @@ export function HomeMap({
       });
   };
 
+  /**
+   * records song in database
+   */
   const postSongHandler = () => {
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
@@ -157,6 +176,9 @@ export function HomeMap({
       });
   };
 
+  /**
+   * adds song pins to the map and calls postSongHandler() to record song in database
+   */
   const addPinHandler = async () => {
     try {
       if (currentLocation == null || currentRoadTripData == null || !isOngoingSession) {
@@ -217,6 +239,9 @@ export function HomeMap({
     }
   };
 
+  /**
+   * Removes all pins from the map
+   */
   const clearPinsHandler = () => {
     setPins([]);
     setOffset(0);

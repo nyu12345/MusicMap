@@ -5,8 +5,7 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { View, Text } from "react-native";
-import { StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import BottomSheet, {
@@ -16,7 +15,8 @@ import BottomSheet, {
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList({ getSongs }) {
+export function PastTripsList({ getSongs, setSelectedTripImages }) {
+  const [refreshing, setRefreshing] = useState(false); 
   const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
   const [roadtripIds, setRoadtripIds] = useState([]);
@@ -93,6 +93,7 @@ export function PastTripsList({ getSongs }) {
   // initial rendering
   useEffect(() => {
     getUsername(); 
+    setRefreshing(true); 
   }, []);
 
   // after getUsername from initial rendering, get roadtrips using that username
@@ -100,15 +101,17 @@ export function PastTripsList({ getSongs }) {
     (async () => {
       if (username != "") {
         getRoadtrips();
+        setRefreshing(false); 
       }
     })();
   }, [username]);
 
+  // get roadtrip data from API upon refresh
   useEffect(() => {
-    // get roadtrip data from API upon refresh
     (async () => {
-      if (username != "" && roadtrips.length == 0) {
+      if (username != "" && roadtrips.length == 0 && refreshing) {
         getRoadtrips();
+        setRefreshing(false); 
       }
     })();
   }, [roadtrips]);
@@ -126,9 +129,10 @@ export function PastTripsList({ getSongs }) {
   const handleRefresh = useCallback(() => {
     console.log("handleRefresh");
     setRoadtrips([]);
+    setRefreshing(true); 
   }, []);
 
-  // handle search
+  // handle search (search by name, startLocation and destination)
   const filter = (roadtrips) => {
     if (searchInput == "") {
       return roadtrips;
@@ -178,6 +182,7 @@ export function PastTripsList({ getSongs }) {
     <PastTrip
       tripId={item._id}
       name={item.name}
+      username={username}
       startLocation={item.startLocation}
       destination={item.destination}
       startDate={item.startDate}
@@ -186,10 +191,11 @@ export function PastTripsList({ getSongs }) {
       getRoadtrips={getRoadtrips}
       selectedTripId={selectedTripId}
       setSelectedTripId={setSelectedTripId}
+      setSelectedTripImages={setSelectedTripImages}
     />
   );
 
-  // render empty component (no roadtrips available yet)
+  // render empty component (when no roadtrips are available)
   const renderEmpty = () => (
     <View style={styles.emptyText}>
       <Text style={{ fontSize: 15 }}>No roadtrips at the moment :(</Text>
@@ -209,7 +215,7 @@ export function PastTripsList({ getSongs }) {
     >
       <BottomSheetTextInput
         placeholder="Search by date, song, people, or location"
-        onChangeText={setSearchInput} // look into for setting states
+        onChangeText={setSearchInput}
         value={searchInput}
         style={styles.textInput}
       />
@@ -219,7 +225,8 @@ export function PastTripsList({ getSongs }) {
         renderItem={renderItem}
         ListEmptyComponent={renderEmpty}
         keyExtractor={(item) => item._id}
-        refreshing={roadtrips.length == 0}
+        //refreshing={roadtrips.length == 0}
+        refreshing={refreshing}
         onRefresh={handleRefresh}
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{ backgroundColor: "white" }}

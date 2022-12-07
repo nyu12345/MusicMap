@@ -36,6 +36,7 @@ router.post("/", async (req, res, next) => {
     spotifyUsername: req.body.spotifyUsername,
     numFriends: req.body.numFriends,
     profilePic: req.body.profilePic,
+    notificationToken: req.body.notificationToken,
     friends: [],
     roadtrips: [],
   });
@@ -89,14 +90,15 @@ router.patch("/:_id", (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// delete user
 router.delete("/:id", (req, res) => {
   console.log("deleting user");
-  User.findByIdAndDelete(req.params.id).then((doc) => {
-    res.status(200).json(doc);
-  }).catch((err) => {
-    res.status(500).json({ error: err });
-  })
+  User.findByIdAndDelete(req.params.id)
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
 });
 
 // update user's list of road trips
@@ -105,12 +107,30 @@ router.patch("/update-user-roadtrip/:spotifyUsername", (req, res) => {
   const roadtripId = ObjectId(req.body.roadtripId);
   User.updateOne(
     { spotifyUsername: req.params.spotifyUsername },
-    { $push: { roadtrips: roadtripId } },)
+    { $push: { roadtrips: roadtripId } }
+  )
     .then((doc) => {
       res.status(200).json(doc);
-    }).catch((err) => {
-      res.status(500).json({ error: err });
     })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+});
+
+// delete specific roadtrip from user's list of roadtrips
+router.patch("/delete-user-roadtrip/:spotifyUsername", (req, res) => {
+  console.log("Deleting roadtrip by id");
+  const roadtripId = ObjectId(req.body.roadtripId);
+  User.updateOne(
+    { spotifyUsername: req.params.spotifyUsername },
+    { $pull: { roadtrips: roadtripId } }
+  )
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
 });
 
 module.exports = router;

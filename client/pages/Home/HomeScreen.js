@@ -181,14 +181,6 @@ export function HomeScreen() {
           await deleteRoadtripFromUser(curUsername, curRoadtripId);
         }
       }
-      // for (const roadtrip in roadtrips) {
-      //   if (roadtrip == curRoadtripId) {
-      //     console.log("found trip to delete");
-      //     console.log("curUsername: " + curUsername);
-      //     console.log("curRoadtripId: " + curRoadtripId);
-      //     await deleteRoadtripFromUser(curUsername, curRoadtripId);
-      //   }
-      // }
     }
   };
 
@@ -332,16 +324,6 @@ export function HomeScreen() {
       await getUsername();
     })();
   }, []);
-
-  useEffect(() => {
-    console.log("users: " + JSON.stringify(users));
-    console.log("type of users: " + typeof users);
-  }, [users]);
-
-  // // for use in cancelling roadtrip
-  // useEffect(() => {
-  //   getUsers();
-  // }, [currentRoadTripData])
 
   /**
    * Hook tied to currentRoadTripData state. When currentRoadTripData is loaded, the user roadtrips will automatically update in the users collection

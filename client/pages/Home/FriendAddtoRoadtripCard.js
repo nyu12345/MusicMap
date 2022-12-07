@@ -21,8 +21,7 @@ export const FriendAddtoRoadtripCard = ({
 }) => {
   const [addedState, setAddedState] = useState("Add Friend");
   async function addFriendtoRoadtrip() {
-    console.log("Adding friend to roadtrip");
-    console.log(username);
+    console.log("Adding friend to roadtrip: " + username);
     const roadtripDetails = {
       roadtripId: roadtripId,
     };

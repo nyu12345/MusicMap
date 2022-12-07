@@ -25,6 +25,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [sentRequests, setSentRequests] = useState([]);
   const [friends, setFriends] = useState([]);
   const [didSendRequest, setDidSendRequest] = useState(false);
+  const [receivedRequests, setReceivedRequests] = useState([]);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -51,6 +52,18 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
         console.log(err);
       });
   }
+
+    // get all received friend requests
+    async function getReceived() {
+      await axios
+        .get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`)
+        .then(async function (response) {
+          setReceivedRequests(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
 
   // get friends of the current user
   async function getFriends() {
@@ -87,6 +100,13 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       if (sentRequests.length > 0) {
         for (let i = 0; i < sentRequests.length; i++) {
           if (sentRequests[i]["requestedId"] == _id) {
+            return false;
+          }
+        }
+      }
+      if (receivedRequests.length > 0) {
+        for (let i = 0; i < receivedRequests.length; i++) {
+          if (receivedRequests[i]["requestorId"] == _id) {
             return false;
           }
         }
@@ -134,6 +154,7 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const getFriendAndRequestInfo = async () => {
     await getUsers();
     await getSent();
+    await getReceived();
     await getFriends();
   };
 

@@ -1,8 +1,6 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import { Text, View, StyleSheet, Image, Modal } from "react-native";
 import React, {
-  useCallback,
   useState,
-  useMemo,
   useRef,
   useEffect,
 } from "react";
@@ -10,9 +8,16 @@ import MapView, { Marker, Callout } from "react-native-maps";
 import axios from "axios";
 import lazyfair from "musicmap/assets/lazyfair.jpg";
 import { REACT_APP_BASE_URL } from "@env";
+import { ImageViewer } from "musicmap/pages/Home/ImageViewer";
 import { PastTripsList } from "musicmap/pages/PastTrips/PastTripMap/PastTripsList";
 
 export function MapScreen() {
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageToDisplay, setImageToDisplay] = useState("");
+  const [songs, setSongs] = useState([]);
+  const [selectedTripImages, setSelectedTripImages] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState(defaultLocation);
+
   // map size parameters
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = 0.0421;
@@ -22,9 +27,6 @@ export function MapScreen() {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   };
-
-  const [songs, setSongs] = useState([]);
-  const [currentLocation, setCurrentLocation] = useState(defaultLocation);
 
   // animate/relocate to current location
   const mapRef = useRef();
@@ -44,7 +46,16 @@ export function MapScreen() {
       });
   };
 
-  // something with await/async - not functioning properly
+  const createImageViewer = (item) => {
+    setImageViewerVisible(true);
+    setImageToDisplay(item.imageURL);
+  };
+
+  const closeImageViewer = () => {
+    setImageViewerVisible(false);
+  }
+
+  // set currentLocation to animate to
   useEffect(() => {
     if (songs.length !== 0) {
       setCurrentLocation({
@@ -56,6 +67,7 @@ export function MapScreen() {
     }
   }, [songs]);
 
+  // animate to currentLocation
   useEffect(() => {
     if (currentLocation !== defaultLocation) {
       animateMap();
@@ -64,6 +76,17 @@ export function MapScreen() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={imageViewerVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setImageViewerVisible(false);
+        }}
+      >
+        <ImageViewer closeImageViewer={closeImageViewer} imageURL={imageToDisplay} />
+      </Modal>
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -93,8 +116,31 @@ export function MapScreen() {
             </Marker>
           );
         })}
+        {selectedTripImages.map((item, index) => {
+          return (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: item.location.latitude,
+                longitude: item.location.longitude,
+              }}
+              pinColor={"blue"}
+            >
+              <Callout
+                onPress={() => {
+                  createImageViewer(item);
+                }}
+              >
+                <Image
+                  style={{ alignSelf: "center", width: 50, height: 50 }}
+                  source={{ uri: item.imageURL }}
+                />
+              </Callout>
+            </Marker>
+          );
+        })}
       </MapView>
-      <PastTripsList getSongs={getSongs} />
+      <PastTripsList getSongs={getSongs} setSelectedTripImages={setSelectedTripImages} />
     </View>
   );
 }

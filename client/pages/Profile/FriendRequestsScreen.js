@@ -1,5 +1,4 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { ProfileScreen } from "musicmap/pages/Profile/ProfileScreen";
 import { ReceivedScreen } from "musicmap/pages/Profile/ReceivedScreen";
 import { SentScreen } from "musicmap/pages/Profile/SentScreen";
 import { Dimensions } from "react-native";

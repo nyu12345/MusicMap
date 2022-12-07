@@ -5,62 +5,141 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList({ getSongs }) {
+export function PastTripsList({ getSongs, setSelectedTripImages }) {
+  const [refreshing, setRefreshing] = useState(false); 
+  const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
+  const [roadtripIds, setRoadtripIds] = useState([]);
   const [searchInput, setSearchInput] = useState("");
-
-  // states for handling FlatList pagination
-  const [page, setPage] = useState(1);
-  const [tripsToDisplay, setTripsToDisplay] = useState([]);
+  const [selectedTripId, setSelectedTripId] = useState("");
 
   // get roadtrip data from API
-  const getRoadtrips = () => {
-    axios
-      .get(`${REACT_APP_BASE_URL}/roadtrips/`)
+  const getRoadtrips = async () => {
+    await getUserRoadtripIds(username);
+    await getUserRoadtrips(roadtripIds);
+  };
+
+  // get all the roadtrips the current user has been on
+  // 1. get current user's username
+  const getUsername = async () => { 
+    const accessToken = await getAccessTokenFromSecureStorage();
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setUsername(responseJson.id);
+    } else {
+      console.log("getUserInfo request returned no response");
+    }
+  };
+
+  // 2. get current user's info from Mongo with username and then get user's road trip ids
+  const getUserRoadtripIds = async (username) => {
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/${username}`)
       .then((response) => {
-        setRoadtrips(response.data);
+        setRoadtripIds(response.data[0].roadtrips);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
+  // 3. get all road trip information from the road trip ids
+  const getUserRoadtrips = async (roadtripIds) => {
+    // remove duplicate road trips
+    const roadtripSet = new Set();
+    for (let i = 0; i < roadtripIds.length; i++) {
+      roadtripSet.add(roadtripIds[i]);
+    }
+
+    const uniqueRoadtripIds = [];
+    roadtripSet.forEach((trip) => uniqueRoadtripIds.push(trip));
+
+    console.log("size of roadtripSet: " + roadtripSet.size); 
+
+    // get road trip info for all unique road trips
+    const uniqueRoadtrips = [];
+    for (let i = 0; i < uniqueRoadtripIds.length; i++) {
+      const curTripId = uniqueRoadtripIds[i];
+      await axios
+        .get(`${REACT_APP_BASE_URL}/roadtrips/${curTripId}`)
+        .then((response) => {
+          uniqueRoadtrips.push(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+
+    setRoadtrips(uniqueRoadtrips);
+  };
+
+  // initial rendering
+  useEffect(() => {
+    getUsername(); 
+    setRefreshing(true); 
+  }, []);
+
+  // after getUsername from initial rendering, get roadtrips using that username
+  useEffect(() => {
+    (async () => {
+      if (username != "") {
+        getRoadtrips();
+        setRefreshing(false); 
+      }
+    })();
+  }, [username]);
+
   // get roadtrip data from API upon refresh
-  if (roadtrips.length == 0) {
-    getRoadtrips();
-  }
+  useEffect(() => {
+    (async () => {
+      if (username != "" && roadtrips.length == 0 && refreshing) {
+        getRoadtrips();
+        setRefreshing(false); 
+      }
+    })();
+  }, [roadtrips]);
 
   // configure bottom sheet
   const bottomSheetRef = useRef(null);
 
   // Points for the bottom sheet to snap to, sorted from bottom to top
-  const snapPoints = useMemo(() => ["13%", "50%", "95%"], []);
+  const snapPoints = useMemo(() => ["19%", "50%", "95%"], []);
 
   // callbacks
   const handleSheetChange = useCallback((index) => {
     console.log("handleSheetChange", index);
   }, []);
   const handleRefresh = useCallback(() => {
-    setRoadtrips([]);
     console.log("handleRefresh");
+    setRoadtrips([]);
+    setRefreshing(true); 
   }, []);
 
-  // handle search by name, startLocation and destination
+  // handle search (search by name, startLocation and destination)
   const filter = (roadtrips) => {
-    console.log(searchInput);
     if (searchInput == "") {
       return roadtrips;
     }
     return roadtrips.filter(function ({ name, startLocation, destination }) {
+      // assumption: name, startLocation and destination exist for all roadtrips
+      // currently destination can be null if app exits/reruns before roadtrip is cancelled/ended
       if (name === null || startLocation === null || destination === null) {
         return false;
       }
@@ -98,59 +177,33 @@ export function PastTripsList({ getSongs }) {
     });
   };
 
-  // render past roadtrip
+  // render past trip
   const renderItem = ({ item }) => (
     <PastTrip
       tripId={item._id}
       name={item.name}
+      username={username}
       startLocation={item.startLocation}
       destination={item.destination}
       startDate={item.startDate}
       endDate={item.endDate}
       getSongs={getSongs}
       getRoadtrips={getRoadtrips}
+      selectedTripId={selectedTripId}
+      setSelectedTripId={setSelectedTripId}
+      setSelectedTripImages={setSelectedTripImages}
     />
   );
 
-  // render footer (load more, or signal if reached end of list)
-  const renderFooter = () => (
-    <View style={styles.footerText}>
-      {page < Math.floor(roadtrips.length / 10) + 1 && <ActivityIndicator />}
-      {page !== 1 && page >= Math.floor(roadtrips.length / 10) + 1 && (
-        <Text>No more roadtrips at the moment</Text>
-      )}
-    </View>
-  );
-
-  // render empty component (no roadtrips available yet)
+  // render empty component (when no roadtrips are available)
   const renderEmpty = () => (
     <View style={styles.emptyText}>
-      <Text>No roadtrips at the moment</Text>
+      <Text style={{ fontSize: 15 }}>No roadtrips at the moment :(</Text>
+      <Text style={{ fontSize: 15 }}>
+        Go out there to explore and make more memories!
+      </Text>
     </View>
   );
-
-  const fetchMoreData = () => {
-    console.log("fetch more data");
-    if (page < Math.floor(roadtrips.length / 10) + 1) {
-      setPage(page + 1);
-      setTripsToDisplay(roadtrips.slice(0, 10*page)); 
-    }
-  };
-
-  // used to set trips to display upon first getting roadtrips data from Mongo
-  useEffect(() => {
-    setPage(1); 
-    setTripsToDisplay(roadtrips.slice(0, 10)); 
-  }, [roadtrips]); 
-
-  // search
-  useEffect(() => {
-    if (searchInput !== "") {
-      setTripsToDisplay(filter(roadtrips, searchInput)); 
-    } else {
-      setTripsToDisplay(roadtrips.slice(0, 10*page)); 
-    }
-  }, [searchInput]); 
 
   return (
     <BottomSheet
@@ -162,30 +215,28 @@ export function PastTripsList({ getSongs }) {
     >
       <BottomSheetTextInput
         placeholder="Search by date, song, people, or location"
-        onChangeText={setSearchInput} // look into for setting states
+        onChangeText={setSearchInput}
         value={searchInput}
-        style={styles.searchTextInput}
+        style={styles.textInput}
       />
       <BottomSheetFlatList
-        //data={filter(roadtrips, searchInput)}
-        data={tripsToDisplay}
+        data={filter(roadtrips, searchInput)}
+        extraData={selectedTripId}
         renderItem={renderItem}
-        ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
         keyExtractor={(item) => item._id}
-        refreshing={roadtrips.length == 0}
+        //refreshing={roadtrips.length == 0}
+        refreshing={refreshing}
         onRefresh={handleRefresh}
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{ backgroundColor: "white" }}
-        onEndReachedThreshold={0.2}
-        onEndReached={fetchMoreData}
       />
     </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  searchTextInput: {
+  textInput: {
     alignSelf: "stretch",
     marginHorizontal: 12,
     marginBottom: 12,
@@ -194,12 +245,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(151, 151, 151, 0.25)",
     color: "black",
     textAlign: "left",
-  },
-  footerText: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
   },
   emptyText: {
     flex: 1,

@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Image,
-  TextInput,
   ScrollView,
   SafeAreaView,
   Pressable,
@@ -73,11 +72,7 @@ export function ReceivedScreen() {
     const onPress = async (e) => {
       console.log("accepting request")
       const data = await axios.patch(`${REACT_APP_BASE_URL}/users/${userId}?friendId=${friendId}`);
-      console.log("data:")
-      console.log(data);
       const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/${friendId}?friendId=${userId}`);
-      console.log("data2:")
-      console.log(data2);
       deleteFriendRequest(friendId, userId)
     }
 

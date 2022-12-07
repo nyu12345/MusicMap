@@ -11,6 +11,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+<<<<<<<< < Temporary merge branch 1
 import { Linking, Networking, RefreshControl } from "react-native";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore";
@@ -36,7 +37,6 @@ export function ProfileScreen(props) {
   }, []);
 
   async function getUserInfo() {
-    console.log("getting user info");
     const accessToken = await getAccessTokenFromSecureStorage();
     //console.log(accessToken);
 
@@ -46,7 +46,6 @@ export function ProfileScreen(props) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
     if (response) {
       const responseJson = await response.json();
       console.log(responseJson);

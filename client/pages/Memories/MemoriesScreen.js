@@ -102,6 +102,38 @@ export function MemoriesScreen() {
         .catch((err) => {
           console.log(err);
         });
+
+      
+      await axios
+        .get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${curTripId}`)
+        .then((response) => {
+          // console.log("Song data: ");
+          // console.log(response);
+          // console.log(response.data);
+          let popSongs = {};
+          for(song of response.data) {
+            // console.log(song.songInfo.trackPreviewURL)
+            if(!(popSongs.hasOwnProperty(song.spotifyId)))
+              popSongs[song.songInfo.trackPreviewURL] = 1;
+            popSongs[song.songInfo.trackPreviewURL] += 1;
+          }
+          // console.log(popSongs)
+
+          let maxPlayed = 0;
+          let maxURL = "";
+          for (const [key, value] of Object.entries(popSongs)) {
+            if(value > maxPlayed) {
+              maxPlayed = value;
+              maxURL = key;
+            }
+          }
+          // console.log("URL: " + maxURL)
+          uniqueRoadtrips[i]['songURL'] = maxURL;
+
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
 
     setRoadtrips(uniqueRoadtrips);
@@ -211,6 +243,23 @@ export function MemoriesScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+async function getMostPlayedSong({ tripId }) {
+  let popSong = {};
+  await axios
+    .get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${tripId}`)
+    .then((response) => {
+      console.log("Song data: ");
+      console.log(response);
+      console.log(response.data);
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+
 }
 
 const styles = StyleSheet.create({

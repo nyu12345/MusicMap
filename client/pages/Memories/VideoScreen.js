@@ -17,6 +17,12 @@ export function VideoScreen({ currentRoadtrip }) {
             images.push({"uri": image.imageURL});
         }
     }
+
+    let songURL = "";
+    if(currentRoadtrip != null && 'songURL' in currentRoadtrip) {
+        console.log("Song URL: " + currentRoadtrip['songURL']);
+        songURL = currentRoadtrip['songURL'];
+    }
     // console.log(images);
 
     useEffect(() => {
@@ -27,14 +33,27 @@ export function VideoScreen({ currentRoadtrip }) {
         };
     }, []);
 
+    function validSongURL() {
+        if(songURL=="" || songURL ==null || songURL == undefined){
+            return false;
+        }
+        return true;
+    }
+
     async function playSound() {
+        if(!validSongURL()){
+            console.log("URL not found");
+            return;
+        }
+
         console.log('Loading Sound');
         await Audio.setAudioModeAsync({
             playsInSilentModeIOS: true,
         });
         // const { sound } = await Audio.Sound.createAsync(require('musicmap/assets/song.mp3'));
         const { sound } = await Audio.Sound.createAsync({
-            uri: "https://p.scdn.co/mp3-preview/9987afad70a92173d06c04b1080e273f7362f39f?cid=c860b7dae1614405b0a16ec496254c72"
+            uri: songURL
+            // uri: "https://p.scdn.co/mp3-preview/9987afad70a92173d06c04b1080e273f7362f39f?cid=c860b7dae1614405b0a16ec496254c72"
         })
         setSound(sound);
 
@@ -53,8 +72,8 @@ export function VideoScreen({ currentRoadtrip }) {
     if (images.length == 0)
         return (
             <View style={styles.container}>
-                <Text style={{ textAlign: 'center' }}>No images found. Feel free to listen to your most popular song!</Text>
-                <Button title="Play Music" onPress={playSound} />
+                <Text style={{ textAlign: 'center' }}>No images found</Text>
+                {validSongURL() ? <Button title="Play Music" onPress={playSound} /> : <Text> No song found</Text>}
             </View>
         )
     // images = [{"uri": "file:///var/mobile/Containers/Data/Application/3BC125A9-7B97-4FD2-9313-44602837D197/Library/Caches/ExponentExperienceData/%2540anonymous%252Fmusicmap-cd653aae-17b3-45d9-816b-32dbe7bbae9c/ImagePicker/D417CD48-65EA-4D02-980D-EFEF48D26EFC.jpg"}, 
@@ -62,7 +81,7 @@ export function VideoScreen({ currentRoadtrip }) {
     // console.log(images[count % images.length]);
     return (
         <View>
-            <Button title="Play Music" onPress={playSound} />
+             {validSongURL() ? <Button title="Play Music" onPress={playSound} /> : <Text> No song found</Text>}
             <View style={styles.container}>
             {/* <Image source={{"uri": "file:///var/mobile/Containers/Data/Application/3BC125A9-7B97-4FD2-9313-44602837D197/Library/Caches/ExponentExperienceData/%2540anonymous%252Fmusicmap-cd653aae-17b3-45d9-816b-32dbe7bbae9c/ImagePicker/D417CD48-65EA-4D02-980D-EFEF48D26EFC.jpg"}} style={styles.image} /> */}
                 <Image source={images[count % images.length]} style={styles.image} resizeMode='contain' />

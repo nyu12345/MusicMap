@@ -22,9 +22,7 @@ export const AddFriendRoadtripBottomSheet = ({ bottomSheetModalRef, roadtripId }
     const [searchInput, setSearchInput] = useState("");
     const [userId, setUserId] = useState("");
     const [username, setUsername] = useState("");
-    const [sentRequests, setSentRequests] = useState([]);
     const [friends, setFriends] = useState([]);
-    const [didSendRequest, setDidSendRequest] = useState(false);
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -72,16 +70,9 @@ export const AddFriendRoadtripBottomSheet = ({ bottomSheetModalRef, roadtripId }
             if (_id == userId) {
                 return false;
             }
-            if (sentRequests.length > 0) {
-                for (let i = 0; i < sentRequests.length; i++) {
-                    if (sentRequests[i]["requestedId"] == _id) {
-                        return false;
-                    }
-                }
-            }
             if (friends.length > 0) {
                 for (let i = 0; i < friends.length; i++) {
-                    if (friends[i] == _id) {
+                    if (friends[i] != _id) {
                         return false;
                     }
                 }
@@ -146,20 +137,6 @@ export const AddFriendRoadtripBottomSheet = ({ bottomSheetModalRef, roadtripId }
         getFriendAndRequestInfo();
     }, [username, userId])
 
-    useEffect(() => {
-        (async () => {
-            console.log("sent request addfriend")
-            console.log(sentRequests)
-            if (refreshing) {
-                await getFriendAndRequestInfo();
-                setRefreshing(false);
-            }
-            if (didSendRequest) {
-                await getFriendAndRequestInfo();
-                setDidSendRequest(false);
-            }
-        })();
-    }, [refreshing, didSendRequest]);
 
     return (
         <BottomSheetModalProvider>
@@ -179,7 +156,6 @@ export const AddFriendRoadtripBottomSheet = ({ bottomSheetModalRef, roadtripId }
                     />
                     <BottomSheetFlatList
                         data={filter(users, searchInput)}
-                        extraData={didSendRequest}
                         renderItem={renderItem}
                         ListEmptyComponent={renderEmpty}
                         keyExtractor={(item) => item._id}

@@ -21,6 +21,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
 export function HomeScreen() {
+  const [users, setUsers] = useState([]); 
   const [modalVisible, setModalVisible] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageToDisplay, setImageToDisplay] = useState("");
@@ -62,7 +63,7 @@ export function HomeScreen() {
 
   const cancelRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
-    deleteRoadtrip();
+    deleteAllUsersRoadtrips();
     setCurrentRoadTripData(null);
     setRoadtripName("");
   };
@@ -70,6 +71,18 @@ export function HomeScreen() {
   const cancelCreateHandler = () => {
     setModalVisible(false);
   };
+
+  // get all users in the database
+  async function getUsers() {
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/`)
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   const createHandler = () => {
     console.log(`roadtrip name: ${roadtripName}`);
@@ -102,10 +115,11 @@ export function HomeScreen() {
     setButtonIsStartRoadtrip(false);
   };
 
-  const deleteRoadtrip = () => {
-    axios
-      .delete(
-        `${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip/${currentRoadTripData.createdReview._id}`
+  const deleteRoadtrip = async (username, tripId) => {
+    await axios
+      .patch(
+        `${REACT_APP_BASE_URL}/users/delete-user-roadtrip/${username}`,
+        { roadtripId: tripId, }
       )
       .then((response) => {
         console.log(response);
@@ -123,6 +137,41 @@ export function HomeScreen() {
         console.log(error.config);
       });
   };
+
+  const deleteAllUsersRoadtrips = async () => {
+    const curRoadtripId = currentRoadTripData.createdReview._id; 
+    for (const user in users) {
+      const roadtrips = user.roadtrips; 
+      const curUsername = user.spotifyUsername; 
+      for (const roadtrip in roadtrips) {
+        if (roadtrip == curRoadtripId) {
+          await deleteRoadtrip(curUsername, curRoadtripId); 
+        }
+      }
+    }
+  }
+
+  // const deleteRoadtrip = () => {
+  //   axios
+  //     .delete(
+  //       `${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip/${currentRoadTripData.createdReview._id}`
+  //     )
+  //     .then((response) => {
+  //       console.log(response);
+  //     })
+  //     .catch(function (error) {
+  //       if (error.response) {
+  //         console.log(error.response.data);
+  //         console.log(error.response.status);
+  //         console.log(error.response.headers);
+  //       } else if (error.request) {
+  //         console.log(error.request);
+  //       } else {
+  //         console.log("Error", error.message);
+  //       }
+  //       console.log(error.config);
+  //     });
+  // };
 
   const updateRoadtrip = () => {
     const endDetails = {

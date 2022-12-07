@@ -13,87 +13,112 @@ import MemoryCard from "musicmap/pages/Memories/MemoryCard";
 import React, { useState, useCallback, useEffect } from "react";
 import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
-import { VideoScreen } from "musicmap/pages/Memories/VideoScreen"
+import { VideoScreen } from "musicmap/pages/Memories/VideoScreen";
+import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 
 export function MemoriesScreen() {
   const [refreshing, setRefreshing] = React.useState(false);
+  const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
-  const [roadtripsWImages, setRoadtripsWImages] = useState([]);
+  const [roadtripIds, setRoadtripIds] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRoadtrip, setCurrentRoadtrip] = useState({});
 
-  // get roadtrip data from API (should be just users' roadtrips)
+  // get roadtrip data from API
   const getRoadtrips = async () => {
+    await getUserRoadtripIds(username);
+    await getUserRoadtrips(roadtripIds);
+  };
+
+  // get all the roadtrips the current user has been on
+  // 1. get current user's username
+  const getUsername = async () => { 
+    const accessToken = await getAccessTokenFromSecureStorage();
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response) {
+      const responseJson = await response.json();
+      setUsername(responseJson.id);
+    } else {
+      console.log("getUserInfo request returned no response");
+    }
+  };
+
+  // 2. get current user's info from Mongo with username and then get user's road trip ids
+  const getUserRoadtripIds = async (username) => {
     await axios
-      .get(`${REACT_APP_BASE_URL}/roadtrips/`)
+      .get(`${REACT_APP_BASE_URL}/users/${username}`)
       .then((response) => {
-        setRoadtrips(response.data);
+        setRoadtripIds(response.data[0].roadtrips);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  // TODO: waiting for merge of image branch
-  // use roadtrip ID to get images from each of the roadtrips
-  // return list of imageURLs associated with that roadtrip ID
-  const getImages = async (tripId) => {
-    const endpointResponse = null;
-    await axios
-      .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${tripId}`)
-      .then((response) => {
-        endpointResponse = response.data;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const imageURLs = [];
-    for (let i = 0; i < endpointResponse.length; i++) {
-      imageURLs.push(endpointResponse[i].imageURL);
+  // 3. get all road trip information from the road trip ids
+  const getUserRoadtrips = async (roadtripIds) => {
+    // remove duplicate road trips
+    const roadtripSet = new Set();
+    for (let i = 0; i < roadtripIds.length; i++) {
+      roadtripSet.add(roadtripIds[i]);
     }
 
-    return imageURLs;
-  };
+    const uniqueRoadtripIds = [];
+    roadtripSet.forEach((trip) => uniqueRoadtripIds.push(trip));
 
-  // generate random number
-  const generateRandomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min) + min);
-  };
+    console.log("size of roadtripSet: " + roadtripSet.size); 
 
-  // add images array as a field to the list of roadtrips?
-  const getRoadtripsAndImages = () => {
-    const roadtripsWithImages = [];
-    for (let i = 0; i < roadtrips.length; i++) {
-      const tripID = roadtrips[i]._id;
-      const images = getImages(tripID);
-      const coverImageIdx = Math.random(0, images.length);
-      roadtripsWithImages.push({
-        name: roadtrips[i].name,
-        startLocation: roadtrips[i].startLocation,
-        destination: roadtrips[i].destination,
-        startDate: roadtrips[i].startDate,
-        endDate: roadtrips[i].endDate,
-        images: images,
-        coverImage: images[coverImageIdx],
-      });
+    // get road trip info for all unique road trips
+    const uniqueRoadtrips = [];
+    for (let i = 0; i < uniqueRoadtripIds.length; i++) {
+      const curTripId = uniqueRoadtripIds[i];
+      await axios
+        .get(`${REACT_APP_BASE_URL}/roadtrips/${curTripId}`)
+        .then((response) => {
+          uniqueRoadtrips.push(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    setRoadtripsWImages(roadtripsWithImages);
+
+    setRoadtrips(uniqueRoadtrips);
+    console.log(uniqueRoadtrips[0]);
   };
 
-  // handle refresh
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    getRoadtrips()
-      .then(getRoadtripsAndImages())
-      .then(() => setRefreshing(false));
+  // initial rendering
+  useEffect(() => {
+    getUsername(); 
   }, []);
 
-  // useEffect(() => {
-  //   if (roadtrips.length !== 0) {
-  //     getRoadtripsAndImages();
-  //   }
-  // }, [roadtrips])
+  // after getUsername from initial rendering, get roadtrips using that username
+  useEffect(() => {
+    (async () => {
+      if (username != "") {
+        getRoadtrips();
+      }
+    })();
+  }, [username]);
+
+  useEffect(() => {
+    // get roadtrip data from API upon refresh
+    (async () => {
+      if (username != "" && roadtrips.length == 0) {
+        getRoadtrips();
+      }
+    })();
+  }, [roadtrips]);
+
+  const onRefresh = useCallback(() => {
+    console.log("handleRefresh");
+    setRoadtrips([]);
+  }, []);
 
   const fakeRoadtripsData = [
     {
@@ -125,6 +150,8 @@ export function MemoriesScreen() {
         "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
     },
   ];
+
+  
 
   return (
     <SafeAreaView style={{ bottom: 10 }}>

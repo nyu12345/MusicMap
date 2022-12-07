@@ -1,63 +1,40 @@
 import { Pressable, StyleSheet, Image, Text, View, Button } from "react-native";
 import React, { useState, useEffect } from 'react';
 import { useAsync } from "react-async"
-import { Video, AVPlaybackStatus } from 'expo-av';
-// import { FFmpegKit } from 'ffmpeg-kit-react-native';
+import { Video, AVPlaybackStatus, Audio } from 'expo-av';
+
+const playingAudio = new Audio.Sound();
 
 export function VideoScreen({ currentRoadtrip }) {
-    const video = React.useRef(null);
-    const [videoLink, setVideoLink] = useState("");
-    const [status, setStatus] = useState({});
-    if(currentRoadtrip == null)
-        return <Text> Error </Text>;
-    const images = currentRoadtrip["images"];
-    if(images.length == 0)
-        return <Text> Error: No images found </Text>;
-    
-    useEffect(() => {
-        async function fetchVideo() {
-            try {
-                // const ffmpeg = createFFmpeg({
-                //     log: true,
+    const [sound, setSound] = React.useState();
 
-                // });
-                // await ffmpeg.load();
-                setVideoLink('https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4');
-            } catch (error) {
-                console.log("Error when creating collage");
+    async function playSound() {
+        console.log('Loading Sound');
+        await Audio.setAudioModeAsync({
+            playsInSilentModeIOS: true,
+          });
+        // const { sound } = await Audio.Sound.createAsync(require('musicmap/assets/song.mp3'));
+        const { sound } = await Audio.Sound.createAsync({
+            uri: "https://p.scdn.co/mp3-preview/9987afad70a92173d06c04b1080e273f7362f39f?cid=c860b7dae1614405b0a16ec496254c72"
+        })
+        setSound(sound);
+
+        console.log('Playing Sound');
+        await sound.playAsync();
+    }
+
+    React.useEffect(() => {
+        return sound
+            ? () => {
+                console.log('Unloading Sound');
+                sound.unloadAsync();
             }
-        }
-        fetchVideo();
-    });
-    // console.log("current trip:");
-    // console.log(currentRoadtrip);
-    if (videoLink == "")
-        return <View>
-            <Text>
-                Loading Video
-            </Text>
-        </View>;
+            : undefined;
+    }, [sound]);
+
     return (
         <View style={styles.container}>
-            <Video
-                ref={video}
-                style={styles.video}
-                source={{
-                    uri: videoLink,
-                }}
-                useNativeControls
-                resizeMode="contain"
-                isLooping
-                onPlaybackStatusUpdate={status => setStatus(() => status)}
-            />
-            <View style={styles.button}>
-                <Button
-                    title={status.isPlaying ? 'Pause' : 'Play'}
-                    onPress={() =>
-                        status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
-                    }
-                />
-            </View>
+            <Button title="Play Sound" onPress={playSound} />
         </View>
     );
 }

@@ -15,7 +15,7 @@ import BottomSheet, {
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
-export function PastTripsList({ getSongs, getImages }) {
+export function PastTripsList({ getSongs, setSelectedTripImages }) {
   const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
   const [roadtripIds, setRoadtripIds] = useState([]);
@@ -127,7 +127,7 @@ export function PastTripsList({ getSongs, getImages }) {
     setRoadtrips([]);
   }, []);
 
-  // handle search
+  // handle search (search by name, startLocation and destination)
   const filter = (roadtrips) => {
     if (searchInput == "") {
       return roadtrips;
@@ -182,14 +182,14 @@ export function PastTripsList({ getSongs, getImages }) {
       startDate={item.startDate}
       endDate={item.endDate}
       getSongs={getSongs}
-      getImages={getImages}
       getRoadtrips={getRoadtrips}
       selectedTripId={selectedTripId}
       setSelectedTripId={setSelectedTripId}
+      setSelectedTripImages={setSelectedTripImages}
     />
   );
 
-  // render empty component (no roadtrips available yet)
+  // render empty component (when no roadtrips are available)
   const renderEmpty = () => (
     <View style={styles.emptyText}>
       <Text style={{ fontSize: 15 }}>No roadtrips at the moment :(</Text>
@@ -209,7 +209,7 @@ export function PastTripsList({ getSongs, getImages }) {
     >
       <BottomSheetTextInput
         placeholder="Search by date, song, people, or location"
-        onChangeText={setSearchInput} // look into for setting states
+        onChangeText={setSearchInput}
         value={searchInput}
         style={styles.textInput}
       />

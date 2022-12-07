@@ -14,6 +14,9 @@ import { PastTripsList } from "musicmap/pages/PastTrips/PastTripMap/PastTripsLis
 export function MapScreen() {
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageToDisplay, setImageToDisplay] = useState("");
+  const [songs, setSongs] = useState([]);
+  const [selectedTripImages, setSelectedTripImages] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState(defaultLocation);
 
   // map size parameters
   const LATITUDE_DELTA = 0.0922;
@@ -24,10 +27,6 @@ export function MapScreen() {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   };
-
-  const [songs, setSongs] = useState([]);
-  const [images, setImages] = useState([]);
-  const [currentLocation, setCurrentLocation] = useState(defaultLocation);
 
   // animate/relocate to current location
   const mapRef = useRef();
@@ -47,19 +46,6 @@ export function MapScreen() {
       });
   };
 
-  // get images for the selected roadtrip
-  const getImages = async (tripId) => {
-    await axios
-      .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${tripId}`)
-      .then((response) => {
-        console.log("images: " + response.data); 
-        setImages(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const createImageViewer = (item) => {
     setImageViewerVisible(true);
     setImageToDisplay(item.imageURL);
@@ -69,7 +55,7 @@ export function MapScreen() {
     setImageViewerVisible(false);
   }
 
-  // something with await/async - not functioning properly
+  // set currentLocation to animate to
   useEffect(() => {
     if (songs.length !== 0) {
       setCurrentLocation({
@@ -81,6 +67,7 @@ export function MapScreen() {
     }
   }, [songs]);
 
+  // animate to currentLocation
   useEffect(() => {
     if (currentLocation !== defaultLocation) {
       animateMap();
@@ -129,7 +116,7 @@ export function MapScreen() {
             </Marker>
           );
         })}
-        {images.map((item, index) => {
+        {selectedTripImages.map((item, index) => {
           return (
             <Marker
               key={index}
@@ -153,7 +140,7 @@ export function MapScreen() {
           );
         })}
       </MapView>
-      <PastTripsList getSongs={getSongs} getImages={getImages} />
+      <PastTripsList getSongs={getSongs} setSelectedTripImages={setSelectedTripImages} />
     </View>
   );
 }

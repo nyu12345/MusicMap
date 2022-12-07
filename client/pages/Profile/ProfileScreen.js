@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Image,
-  TextInput,
   ScrollView,
   SafeAreaView,
   Pressable,
@@ -18,6 +17,7 @@ import { deleteValue } from "musicmap/util/SecureStore";
 import FriendCard from "musicmap/pages/Profile/FriendCard";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
+import { getValueFor } from "../../util/SecureStore";
 
 export function ProfileScreen(props) {
   const [name, setName] = useState("");
@@ -37,6 +37,8 @@ export function ProfileScreen(props) {
 
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
+    //console.log(accessToken);
+
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
       headers: {
@@ -80,12 +82,14 @@ export function ProfileScreen(props) {
   }
 
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
+    let token = await getValueFor("NOTIF_TOKEN");
     const user = {
       name: name,
       spotifyUsername: username,
       numFriends: numFollowers,
       profilePic: profilePicUrl,
       friends: [],
+      notificationToken: token,
     };
     axios
       .post(`${REACT_APP_BASE_URL}/users`, user)

@@ -9,7 +9,7 @@ import {
   Modal,
   Image,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./HomeStyles";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
@@ -19,13 +19,15 @@ import * as Location from "expo-location";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
+import { AddFriendRoadtripBottomSheet } from "musicmap/pages/Home/AddFriendRoadtripBottomSheet";
 
 export function HomeScreen() {
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageToDisplay, setImageToDisplay] = useState("");
   const [roadtripName, setRoadtripName] = useState("");
+  const [roadtripId, setRoadtripId] = useState(null);
   const [buttonIsStartRoadtrip, setButtonIsStartRoadtrip] = useState(true);
   const [currentRoadTripData, setCurrentRoadTripData] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -34,26 +36,39 @@ export function HomeScreen() {
     spotifyId: null,
   });
   const [currentUsername, setCurrentUsername] = useState(null);
-  const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
-  const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
-  const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
+  const bottomSheetModalRef = useRef(null);
 
+  /**
+   * Sets Image picker UI to be visible after road trip session starts
+   */
   const createImageViewer = (item) => {
     setImageViewerVisible(true);
     setImageToDisplay(item.imageURL);
   };
 
+  /**
+   * Sets image viewer to be invisible after road trip session ends
+   */
   const closeImageViewer = () => {
     setImageViewerVisible(false);
   };
 
+  /**
+   * Called by the start roadtrip button and sets the roadtrip creation modal to
+   * visible if the currentlocation is found
+   * @returns
+   */
   const startRoadtripClickHandler = () => {
     if (currentLocation == null) {
-      return; // maybe should hide the button until it's not null
+      return;
     }
     setModalVisible(true);
   };
 
+  /**
+   * Handler function called after end roadtrip button is clicked.
+   * Updates the roadtrip in the database and resets UI and roadtrip data
+   */
   const endRoadtripClickHandler = () => {
     setButtonIsStartRoadtrip(true);
     updateRoadtrip();
@@ -61,13 +76,21 @@ export function HomeScreen() {
     setRoadtripName("");
   };
 
-  const cancelRoadtripClickHandler = () => {
+  /**
+   * Handler function called after cancel roadtrip button is clicked.
+   * deletes the roadtrip in the database and resets UI and roadtrip data
+   */
+  const cancelRoadtripClickHandler = async () => {
     setButtonIsStartRoadtrip(true);
-    deleteRoadtripFromAllUsers();
+    await deleteRoadtripFromAllUsers();
+    await deleteRoadtrip();
     setCurrentRoadTripData(null);
     setRoadtripName("");
   };
 
+  /**
+   * In the roadtrip creation modal, if cancel is called, this function will hide the modal again
+   */
   const cancelCreateHandler = () => {
     setModalVisible(false);
   };
@@ -84,20 +107,26 @@ export function HomeScreen() {
       });
   }
 
+  /**
+   * Handles the creation of a roadtrip after create button is clicked
+   * Posts the new roadtrip to the roadtrips collection.
+   */
   const createHandler = () => {
-    console.log(`roadtrip name: ${roadtripName}`);
+    // sendPushNotification(
+    //   "ExponentPushToken[5sln6yBE02coKhseOam-Qk]",
+    //   "You've been added to a roadtrip!",
+    //   "Go to MusicMap to view the roadtrip!");
     const roadtrip = {
       name: roadtripName,
       startLocation: currentLocation.name,
       startDate: new Date().toDateString(),
     };
-    console.log(roadtrip.startLocation);
     // should add check to see if these fields are valid here and present alert if not
     axios
       .post(`${REACT_APP_BASE_URL}/roadtrips/create-roadtrip`, roadtrip)
       .then((response) => {
         setCurrentRoadTripData(response.data);
-        console.log(response.data);
+        setRoadtripId(response.data.createdReview._id);
       })
       .catch(function (error) {
         if (error.response) {
@@ -115,12 +144,14 @@ export function HomeScreen() {
     setButtonIsStartRoadtrip(false);
   };
 
-  const deleteRoadtrip = async (username, tripId) => {
+  /**
+   * Deletes road trip with tripId from a specific user's list of road trips (specified by username)
+   */
+  const deleteRoadtripFromUser = async (username, tripId) => {
     await axios
-      .patch(
-        `${REACT_APP_BASE_URL}/users/delete-user-roadtrip/${username}`,
-        { roadtripId: tripId, }
-      )
+      .patch(`${REACT_APP_BASE_URL}/users/delete-user-roadtrip/${username}`, {
+        roadtripId: tripId,
+      })
       .then((response) => {
         console.log(response);
       })
@@ -139,39 +170,50 @@ export function HomeScreen() {
   };
 
   const deleteRoadtripFromAllUsers = async () => {
-    const curRoadtripId = currentRoadTripData.createdReview._id; 
-    for (const user in users) {
-      const roadtrips = user.roadtrips; 
-      const curUsername = user.spotifyUsername; 
-      for (const roadtrip in roadtrips) {
+    const curRoadtripId = currentRoadTripData.createdReview._id;
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      const roadtrips = user.roadtrips;
+      const curUsername = user.spotifyUsername;
+      for (let j = 0; j < roadtrips.length; j++) {
+        const roadtrip = roadtrips[j];
         if (roadtrip == curRoadtripId) {
-          await deleteRoadtrip(curUsername, curRoadtripId); 
+          await deleteRoadtripFromUser(curUsername, curRoadtripId);
         }
       }
+      // for (const roadtrip in roadtrips) {
+      //   if (roadtrip == curRoadtripId) {
+      //     console.log("found trip to delete");
+      //     console.log("curUsername: " + curUsername);
+      //     console.log("curRoadtripId: " + curRoadtripId);
+      //     await deleteRoadtripFromUser(curUsername, curRoadtripId);
+      //   }
+      // }
     }
-  }
+  };
 
-  // const deleteRoadtrip = () => {
-  //   axios
-  //     .delete(
-  //       `${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip/${currentRoadTripData.createdReview._id}`
-  //     )
-  //     .then((response) => {
-  //       console.log(response);
-  //     })
-  //     .catch(function (error) {
-  //       if (error.response) {
-  //         console.log(error.response.data);
-  //         console.log(error.response.status);
-  //         console.log(error.response.headers);
-  //       } else if (error.request) {
-  //         console.log(error.request);
-  //       } else {
-  //         console.log("Error", error.message);
-  //       }
-  //       console.log(error.config);
-  //     });
-  // };
+  // delete roadtrip from roadtrips database
+  const deleteRoadtrip = () => {
+    axios
+      .delete(
+        `${REACT_APP_BASE_URL}/roadtrips/delete-roadtrip/${currentRoadTripData.createdReview._id}`
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
 
   const updateRoadtrip = () => {
     const endDetails = {
@@ -200,6 +242,9 @@ export function HomeScreen() {
       });
   };
 
+  /**
+   * Handler to update the user's roadtrip list entry in the users collection
+   */
   const updateUserTrips = () => {
     if (currentRoadTripData) {
       const roadtripDetails = {
@@ -246,10 +291,22 @@ export function HomeScreen() {
     });
   };
 
+  /**
+   * Handler function that will update the state of currentSong.
+   * Passes currentSong state updating to the child component HomeMap
+   * @param {Object} newSong
+   */
   const updateParentSongHandler = (newSong) => {
     setCurrentSong(newSong);
   };
 
+  const openAddFriendModal = () => {
+    bottomSheetModalRef.current.present();
+  };
+
+  /**
+   * API call to get the current spotify user's username
+   */
   async function getUsername() {
     const accessToken = await getAccessTokenFromSecureStorage();
     const response = await fetch("https://api.spotify.com/v1/me", {
@@ -267,6 +324,9 @@ export function HomeScreen() {
     }
   }
 
+  /**
+   * Gets the username at the beginning of a render once.
+   */
   useEffect(() => {
     (async () => {
       await getUsername();
@@ -274,7 +334,22 @@ export function HomeScreen() {
   }, []);
 
   useEffect(() => {
+    console.log("users: " + JSON.stringify(users));
+    console.log("type of users: " + typeof users);
+  }, [users]);
+
+  // // for use in cancelling roadtrip
+  // useEffect(() => {
+  //   getUsers();
+  // }, [currentRoadTripData])
+
+  /**
+   * Hook tied to currentRoadTripData state. When currentRoadTripData is loaded, the user roadtrips will automatically update in the users collection
+   * When user trips is updated, also get users data for use in cancelling roadtrip
+   */
+  useEffect(() => {
     updateUserTrips();
+    getUsers();
   }, [currentRoadTripData]);
 
   return (
@@ -289,6 +364,7 @@ export function HomeScreen() {
         currentSong={currentSong}
         updateParentSongHandler={updateParentSongHandler}
         createImageViewer={createImageViewer}
+        style={styles.homeMap}
       />
       <Modal
         animationType="slide"
@@ -336,6 +412,11 @@ export function HomeScreen() {
           </View>
         </ScrollView>
       </Modal>
+      {!buttonIsStartRoadtrip ? (
+        <Pressable style={styles.addFriendsButton} onPress={openAddFriendModal}>
+          <MaterialIcons name="person-add-alt-1" size={28} color="#696969" />
+        </Pressable>
+      ) : null}
       {buttonIsStartRoadtrip ? (
         <Pressable
           style={styles.startButton}
@@ -377,6 +458,13 @@ export function HomeScreen() {
           </View>
         </View>
       ) : null}
+      <AddFriendRoadtripBottomSheet
+        style={styles.bottomSheetRoadtripFriends}
+        roadtripId={roadtripId}
+        bottomSheetModalRef={bottomSheetModalRef}
+        users={users}
+        getUsers={getUsers}
+      />
     </SafeAreaView>
   );
 }

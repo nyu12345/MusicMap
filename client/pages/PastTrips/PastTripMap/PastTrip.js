@@ -11,24 +11,24 @@ dayjs.extend(relativeTime);
 
 const PastTrip = ({
   tripId,
-  username, 
+  username,
   name,
   startLocation,
   destination,
   startDate,
   endDate,
   getSongs,
-  getRoadtrips, 
-  selectedTripId, 
-  setSelectedTripId, 
-  setSelectedTripImages, 
+  getRoadtrips,
+  selectedTripId,
+  setSelectedTripId,
+  setSelectedTripImages,
 }) => {
-  const [images, setImages] = useState([]); 
-  const [coverPic, setCoverPic] = useState("https://reneeroaming.com/wp-content/uploads/2020/08/Best-National-Park-Road-Trip-Itinerary-Grand-Teton-National-Park-Van-Life-819x1024.jpg"); 
+  const [images, setImages] = useState([]);
+  const [coverPic, setCoverPic] = useState("https://reneeroaming.com/wp-content/uploads/2020/08/Best-National-Park-Road-Trip-Itinerary-Grand-Teton-National-Park-Van-Life-819x1024.jpg");
 
   // get images for current trip
   const getImages = async (tripId) => {
-    console.log("tripId: " + tripId); 
+    console.log("tripId: " + tripId);
     await axios
       .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${tripId}`)
       .then((response) => {
@@ -41,7 +41,7 @@ const PastTrip = ({
         console.log(err);
       });
   };
-  
+
   const deleteRoadtrip = async (tripId) => {
     await axios
       .patch(
@@ -63,8 +63,8 @@ const PastTrip = ({
         }
         console.log(error.config);
       });
-    
-    await getRoadtrips(); 
+
+    await getRoadtrips();
   };
 
   // alert when trying to delete roadtrip
@@ -82,7 +82,8 @@ const PastTrip = ({
           text: "Delete",
           onPress: async () => {
             console.log("delete selected");
-            await deleteRoadtrip(tripId);
+            deleteRoadtrip(tripId);
+            getRoadtrips();
           },
         },
       ]
@@ -105,15 +106,15 @@ const PastTrip = ({
 
   // initial rendering - get profile pic for roadtrip
   useEffect(() => {
-    getImages(tripId); 
-  }, []); 
+    getImages(tripId);
+  }, []);
 
   // set cover image
   useEffect(() => {
     if (images.length != 0) {
-      setCoverPic(images[0].imageURL); 
+      setCoverPic(images[0].imageURL);
     }
-  }, [images]); 
+  }, [images]);
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
@@ -122,12 +123,12 @@ const PastTrip = ({
           console.log("selected roadtrip");
           setSelectedTripId(tripId);
           await getSongs(tripId);
-          setSelectedTripImages(images); 
+          setSelectedTripImages(images);
         }}
         style={tripId === selectedTripId ? styles.selectedRoadtripContainer : styles.roadtripContainer}
       >
         <Image
-          source={{uri: coverPic}}
+          source={{ uri: coverPic }}
           style={styles.image}
         />
         <View style={styles.roadtripContent}>
@@ -155,26 +156,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
-    borderRadius: 5, 
+    borderRadius: 5,
   },
   selectedRoadtripContainer: {
     flexDirection: "row",
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
-    backgroundColor: 'rgba(52, 52, 52, 0.1)', 
-    borderRadius: 5, 
-  }, 
+    backgroundColor: 'rgba(52, 52, 52, 0.1)',
+    borderRadius: 5,
+  },
   image: {
-    alignSelf: "center", 
+    alignSelf: "center",
     width: 50,
     height: 50,
     borderRadius: 30,
     marginRight: 10,
   },
   roadtripContent: {
-    flex: 1, 
-    top: 5, 
+    flex: 1,
+    top: 5,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "lightgray",
   },

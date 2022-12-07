@@ -36,6 +36,7 @@ router.post("/", async (req, res, next) => {
     spotifyUsername: req.body.spotifyUsername,
     numFriends: req.body.numFriends,
     profilePic: req.body.profilePic,
+    notificationToken: req.body.notificationToken,
     friends: [],
     roadtrips: [],
   });
@@ -89,7 +90,6 @@ router.patch("/:_id", (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// delete user
 router.delete("/:id", (req, res) => {
   console.log("deleting user");
   User.findByIdAndDelete(req.params.id)

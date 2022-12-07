@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Image,
-  TextInput,
   ScrollView,
   SafeAreaView,
   Pressable,
@@ -13,12 +12,12 @@ import { REACT_APP_BASE_URL } from "@env";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { Linking, Networking } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { deleteValue } from "musicmap/util/SecureStore";
 import { FriendCard } from "musicmap/pages/Profile/FriendCard";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
 import { FriendSectionHeader } from "./FriendSectionHeader";
+import { getValueFor } from "../../util/SecureStore";
 
 const ProfileScreen = (props) => {
   const [name, setName] = useState("");
@@ -48,12 +47,14 @@ const ProfileScreen = (props) => {
   }
 
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
+    let token = await getValueFor("NOTIF_TOKEN");
     const user = {
       name: name,
       spotifyUsername: username,
       numFriends: numFollowers,
       profilePic: profilePicUrl,
       friends: [],
+      notificationToken: token,
     };
     axios
       .post(`${REACT_APP_BASE_URL}/users`, user)

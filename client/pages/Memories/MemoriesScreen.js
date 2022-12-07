@@ -95,7 +95,6 @@ export function MemoriesScreen() {
         .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${curTripId}`)
         .then((response) => {
           if (response.data.length > 0) {
-            console.log("getImages images: " + JSON.stringify(response.data))
             uniqueRoadtrips[i]['images'] = response.data;
           }
         })

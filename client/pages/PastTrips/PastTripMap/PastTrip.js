@@ -28,12 +28,10 @@ const PastTrip = ({
 
   // get images for current trip
   const getImages = async (tripId) => {
-    console.log("tripId: " + tripId);
     await axios
       .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${tripId}`)
       .then((response) => {
         if (response.data.length > 0) {
-          console.log("getImages images: " + JSON.stringify(response.data))
           setImages(response.data);
         }
       })

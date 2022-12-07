@@ -17,7 +17,6 @@ import { deleteValue } from "musicmap/util/SecureStore";
 import FriendCard from "musicmap/pages/Profile/FriendCard";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
-import { FriendSectionHeader } from "./FriendSectionHeader";
 import { getValueFor } from "../../util/SecureStore";
 
 export function ProfileScreen(props) {

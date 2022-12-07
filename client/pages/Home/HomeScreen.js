@@ -245,14 +245,9 @@ export function HomeScreen() {
     setCurrentSong(newSong);
   }
 
-  const addFriendtoRoadtrip = () => {
-
-  }
-
   const openAddFriendModal = () => {
     bottomSheetModalRef.current.present();
   };
-
 
   /**
    * API call to get the current spotify user's username

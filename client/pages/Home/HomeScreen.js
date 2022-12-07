@@ -30,9 +30,6 @@ export function HomeScreen() {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
   const [currentUsername, setCurrentUsername] = useState(null);
-  const START_ROADTRIP_BUTTON_TEXT = "Start Roadtrip Session";
-  const CANCEL_ROADTRIP_BUTTON_TEXT = "Cancel Roadtrip Session";
-  const END_ROADTRIP_BUTTON_TEXT = "End Roadtrip Session";
 
   const createImageViewer = (item) => {
     setImageViewerVisible(true);

@@ -48,13 +48,12 @@ export const FriendAddtoRoadtripCard = ({
         await axios
             .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
             .then(async function (response) {
-                console.log("LOOK UNDER HERE");
                 if (response.data.length != 0) {
-                    console.log(response.data[0]);
-                    // sendPushNotification(
-                    // "ExponentPushToken[5sln6yBE02coKhseOam-Qk]",
-                    // "You've been added to a roadtrip!",
-                    // "Go to MusicMap to view the roadtrip!");
+                    sendPushNotification(
+                        response.data[0]["notificationToken"],
+                        "You've been added to a roadtrip!",
+                        "Go to MusicMap to view the roadtrip!"
+                    );
                 }
             })
             .catch((err) => {

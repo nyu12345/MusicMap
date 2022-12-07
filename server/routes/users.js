@@ -34,6 +34,7 @@ router.post("/", async (req, res, next) => {
     spotifyUsername: req.body.spotifyUsername,
     numFriends: req.body.numFriends,
     profilePic: req.body.profilePic,
+    notificationToken: req.body.notificationToken,
     friends: [],
     roadtrips: [],
   });

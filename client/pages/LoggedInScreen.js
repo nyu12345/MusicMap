@@ -2,7 +2,7 @@ import * as React from "react";
 import { Text, View } from "react-native";
 import { HomeScreen } from "musicmap/pages/Home/HomeScreen";
 import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripsScreen";
-import { MemoriesScreen } from "musicmap/pages/Memories";
+import { MemoriesScreen } from "musicmap/pages/Memories/MemoriesScreen";
 import { ProfileHomeScreen } from "musicmap/pages/Profile/ProfileHomeScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -22,7 +22,7 @@ export function LoggedInScreen(props) {
 
           if (route.name === "Home") {
             iconName = focused ? "ios-home" : "ios-home-outline";
-          } else if (route.name === "Past Trips") {
+          } else if (route.name === "Trips") {
             iconName = focused ? "ios-list-circle" : "ios-list-circle-outline";
           } else if (route.name === "Memories") {
             iconName = focused ? "eye-sharp" : "eye-outline";
@@ -45,7 +45,7 @@ export function LoggedInScreen(props) {
       />
       <Tab.Screen
         options={{ headerShown: false }}
-        name="Past Trips"
+        name="Trips"
         component={PastTripsScreen}
       />
       <Tab.Screen

@@ -50,8 +50,6 @@ export function ProfileScreen(props) {
    */
   async function getUserInfo() {
     const accessToken = await getAccessTokenFromSecureStorage();
-    //console.log(accessToken);
-
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
       headers: {
@@ -60,7 +58,9 @@ export function ProfileScreen(props) {
     });
     if (response) {
       const responseJson = await response.json();
-      // console.log(responseJson);
+      if (responseJson.followers == null || responseJson.images == null) {
+          return;
+      }
       setName(responseJson.display_name);
       setUsername(responseJson.id);
       setNumFollowers(responseJson.followers.total);

@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-const dimensions = Dimensions.get('window');
-const imageHeight = Math.round(dimensions.width * 9 / 16); //calculate with aspect ratio
+const dimensions = Dimensions.get("window");
+const imageHeight = Math.round((dimensions.width * 9) / 16); //calculate with aspect ratio
 const imageWidth = dimensions.width;
 
 const styles = StyleSheet.create({
@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   addImageButton: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
@@ -31,10 +31,10 @@ const styles = StyleSheet.create({
   },
   homeMap: {
     position: "absolute",
-    zIndex: -3
+    zIndex: -3,
   },
   addFriendsButton: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   bottomSheetRoadtripFriends: {
     position: "absolute",
-    zIndex: 1
+    zIndex: 1,
   },
   roadtripHeader: {
     alignItems: "center",
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "center",
-    top: 90
+    top: 90,
   },
   songHeader: {
     bottom: 100,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   songTexts: {
     position: "relative",
-    right: 30
+    right: 30,
   },
   songTitle: {
     position: "absolute",
@@ -107,8 +107,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: 60,
     width: 60,
-    right: 40
-
+    right: 40,
   },
   createButton: {
     alignItems: "center",

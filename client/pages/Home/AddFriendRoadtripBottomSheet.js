@@ -20,8 +20,8 @@ import { getUserInfo } from "musicmap/util/UserInfo";
 export const AddFriendRoadtripBottomSheet = ({
   bottomSheetModalRef,
   roadtripId,
-  users, 
-  getUsers, 
+  users,
+  getUsers,
 }) => {
   //const [users, setUsers] = useState([]);
   const [searchInput, setSearchInput] = useState("");

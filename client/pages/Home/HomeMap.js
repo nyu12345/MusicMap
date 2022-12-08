@@ -7,8 +7,11 @@ import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
-import { getTrack, getCurrentlyPlayingTrack, getTracksAudioFeatures } from "musicmap/util/SpotifyAPICalls";
-
+import {
+  getTrack,
+  getCurrentlyPlayingTrack,
+  getTracksAudioFeatures,
+} from "musicmap/util/SpotifyAPICalls";
 
 let currentSong = { title: "No song", spotifyId: null };
 
@@ -24,7 +27,6 @@ export function HomeMap({
   const [offset, setOffset] = useState(0);
   const [pins, setPins] = useState([]);
   const [isOngoingSession, setIsOngoingSession] = useState(false);
-
 
   /**
    * Requests user location permission, runs on first render on a new device
@@ -114,10 +116,9 @@ export function HomeMap({
     }
   };
 
-
   /**
    * adds a user-added image pin to the map and records in database
-   * @param {the image URL} imageUri 
+   * @param {the image URL} imageUri
    */
   const postImage = (imageUri) => {
     console.log("POST Image: " + imageUri);
@@ -181,8 +182,12 @@ export function HomeMap({
    */
   const addPinHandler = async () => {
     try {
-      if (currentLocation == null || currentRoadTripData == null || !isOngoingSession) {
-        clearPinsHandler()
+      if (
+        currentLocation == null ||
+        currentRoadTripData == null ||
+        !isOngoingSession
+      ) {
+        clearPinsHandler();
         return;
       }
       const song = await getCurrentlyPlayingTrack();
@@ -227,14 +232,10 @@ export function HomeMap({
       };
       currentSong = newSong;
       updateParentSongHandler(currentSong);
-      setPins((prevSongs) => [
-        ...prevSongs,
-        newSong,
-      ]);
+      setPins((prevSongs) => [...prevSongs, newSong]);
       setOffset((prevOffset) => prevOffset + 0.005);
       postSongHandler();
-    }
-    catch {
+    } catch {
       console.log("ADD PIN ERROR");
     }
   };
@@ -268,7 +269,8 @@ export function HomeMap({
             >
               <Callout
                 onPress={() => {
-                  if (item.title == null) { // is an image
+                  if (item.title == null) {
+                    // is an image
                     createImageViewer(item);
                   }
                 }}

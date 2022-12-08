@@ -16,7 +16,7 @@ import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import PastTrip from "musicmap/pages/PastTrips/PastTripMap/PastTrip";
 
 export function PastTripsList({ getSongs, setSelectedTripImages }) {
-  const [refreshing, setRefreshing] = useState(false); 
+  const [refreshing, setRefreshing] = useState(false);
   const [username, setUsername] = useState("");
   const [roadtrips, setRoadtrips] = useState([]);
   const [roadtripIds, setRoadtripIds] = useState([]);
@@ -31,7 +31,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
 
   // get all the roadtrips the current user has been on
   // 1. get current user's username
-  const getUsername = async () => { 
+  const getUsername = async () => {
     const accessToken = await getAccessTokenFromSecureStorage();
     const response = await fetch("https://api.spotify.com/v1/me", {
       method: "GET",
@@ -71,7 +71,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
     const uniqueRoadtripIds = [];
     roadtripSet.forEach((trip) => uniqueRoadtripIds.push(trip));
 
-    console.log("size of roadtripSet: " + roadtripSet.size); 
+    console.log("size of roadtripSet: " + roadtripSet.size);
 
     // get road trip info for all unique road trips
     const uniqueRoadtrips = [];
@@ -92,8 +92,8 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
 
   // initial rendering
   useEffect(() => {
-    getUsername(); 
-    setRefreshing(true); 
+    getUsername();
+    setRefreshing(true);
   }, []);
 
   // after getUsername from initial rendering, get roadtrips using that username
@@ -101,7 +101,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
     (async () => {
       if (username != "") {
         getRoadtrips();
-        setRefreshing(false); 
+        setRefreshing(false);
       }
     })();
   }, [username]);
@@ -111,7 +111,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
     (async () => {
       if (username != "" && roadtrips.length == 0 && refreshing) {
         getRoadtrips();
-        setRefreshing(false); 
+        setRefreshing(false);
       }
     })();
   }, [roadtrips]);
@@ -129,7 +129,7 @@ export function PastTripsList({ getSongs, setSelectedTripImages }) {
   const handleRefresh = useCallback(() => {
     console.log("handleRefresh");
     setRoadtrips([]);
-    setRefreshing(true); 
+    setRefreshing(true);
   }, []);
 
   // handle search (search by name, startLocation and destination)

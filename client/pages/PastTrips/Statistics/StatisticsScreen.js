@@ -418,7 +418,7 @@ const PastTrip = ({ roadtrip, isSelected, mySetSelected, fadeAnim }) => {
   };
   const imageURI =
     roadtrip.coverImage === ""
-      ? require("musicmap/assets/sample_roadtrip.png")
+      ? require("musicmap/assets/sample_roadtrip.jpg")
       : { uri: roadtrip.coverImage };
 
   return (

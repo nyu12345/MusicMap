@@ -17,7 +17,7 @@ export const FriendAddtoRoadtripCard = ({
   name,
   profilePic,
   roadtripId,
-  getUsers, 
+  getUsers,
 }) => {
   const [addedState, setAddedState] = useState("Add Friend");
   async function addFriendtoRoadtrip() {
@@ -63,12 +63,12 @@ export const FriendAddtoRoadtripCard = ({
   }
 
   /**
-   * when friend is added to road trip, re-pull users data to allow for correct cancellation of road trip (need to delete current road trip from 
+   * when friend is added to road trip, re-pull users data to allow for correct cancellation of road trip (need to delete current road trip from
    * that user's list of road trips)
    */
   useEffect(() => {
-    getUsers(); 
-  }, [addedState])
+    getUsers();
+  }, [addedState]);
 
   return (
     <View style={styles.friendCardContainer}>

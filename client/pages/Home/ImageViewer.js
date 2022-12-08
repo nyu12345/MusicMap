@@ -1,10 +1,5 @@
 import React, { useState, useRef, createRef } from "react";
-import {
-  SafeAreaView,
-  Image,
-  Animated,
-  Pressable,
-} from "react-native";
+import { SafeAreaView, Image, Animated, Pressable } from "react-native";
 import {
   PanGestureHandler,
   PinchGestureHandler,

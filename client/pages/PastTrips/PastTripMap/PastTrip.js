@@ -24,7 +24,9 @@ const PastTrip = ({
   setSelectedTripImages,
 }) => {
   const [images, setImages] = useState([]);
-  const [coverPic, setCoverPic] = useState("https://reneeroaming.com/wp-content/uploads/2020/08/Best-National-Park-Road-Trip-Itinerary-Grand-Teton-National-Park-Van-Life-819x1024.jpg");
+  const [coverPic, setCoverPic] = useState(
+    "https://reneeroaming.com/wp-content/uploads/2020/08/Best-National-Park-Road-Trip-Itinerary-Grand-Teton-National-Park-Van-Life-819x1024.jpg"
+  );
 
   // get images for current trip
   const getImages = async (tripId) => {
@@ -33,7 +35,7 @@ const PastTrip = ({
       .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${tripId}`)
       .then((response) => {
         if (response.data.length > 0) {
-          console.log("getImages images: " + JSON.stringify(response.data))
+          console.log("getImages images: " + JSON.stringify(response.data));
           setImages(response.data);
         }
       })
@@ -44,10 +46,9 @@ const PastTrip = ({
 
   const deleteRoadtrip = async (tripId) => {
     await axios
-      .patch(
-        `${REACT_APP_BASE_URL}/users/delete-user-roadtrip/${username}`,
-        { roadtripId: tripId, }
-      )
+      .patch(`${REACT_APP_BASE_URL}/users/delete-user-roadtrip/${username}`, {
+        roadtripId: tripId,
+      })
       .then((response) => {
         console.log(response);
       })
@@ -90,7 +91,7 @@ const PastTrip = ({
     );
   };
 
-  // render action involved with trip deletion when swiping past trip to the right 
+  // render action involved with trip deletion when swiping past trip to the right
   const renderRightActions = () => {
     return (
       <Pressable
@@ -125,12 +126,13 @@ const PastTrip = ({
           await getSongs(tripId);
           setSelectedTripImages(images);
         }}
-        style={tripId === selectedTripId ? styles.selectedRoadtripContainer : styles.roadtripContainer}
+        style={
+          tripId === selectedTripId
+            ? styles.selectedRoadtripContainer
+            : styles.roadtripContainer
+        }
       >
-        <Image
-          source={{ uri: coverPic }}
-          style={styles.image}
-        />
+        <Image source={{ uri: coverPic }} style={styles.image} />
         <View style={styles.roadtripContent}>
           <View style={styles.row}>
             <Text style={styles.name} numberOfLines={1}>
@@ -163,7 +165,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
-    backgroundColor: 'rgba(52, 52, 52, 0.1)',
+    backgroundColor: "rgba(52, 52, 52, 0.1)",
     borderRadius: 5,
   },
   image: {

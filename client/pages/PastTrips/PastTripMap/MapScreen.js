@@ -1,9 +1,5 @@
 import { Text, View, StyleSheet, Image, Modal } from "react-native";
-import React, {
-  useState,
-  useRef,
-  useEffect,
-} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import MapView, { Marker, Callout } from "react-native-maps";
 import axios from "axios";
 import lazyfair from "musicmap/assets/lazyfair.jpg";
@@ -53,7 +49,7 @@ export function MapScreen() {
 
   const closeImageViewer = () => {
     setImageViewerVisible(false);
-  }
+  };
 
   // set currentLocation to animate to
   useEffect(() => {
@@ -85,7 +81,10 @@ export function MapScreen() {
           setImageViewerVisible(false);
         }}
       >
-        <ImageViewer closeImageViewer={closeImageViewer} imageURL={imageToDisplay} />
+        <ImageViewer
+          closeImageViewer={closeImageViewer}
+          imageURL={imageToDisplay}
+        />
       </Modal>
       <MapView
         ref={mapRef}
@@ -140,7 +139,10 @@ export function MapScreen() {
           );
         })}
       </MapView>
-      <PastTripsList getSongs={getSongs} setSelectedTripImages={setSelectedTripImages} />
+      <PastTripsList
+        getSongs={getSongs}
+        setSelectedTripImages={setSelectedTripImages}
+      />
     </View>
   );
 }

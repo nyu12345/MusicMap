@@ -71,7 +71,7 @@ export function HomeMap({
           }
         }
       } catch {
-        console.log("ERROR1");
+        console.log("Error: could not obtain location");
       }
     })();
   });
@@ -90,7 +90,7 @@ export function HomeMap({
           clearPinsHandler();
         }
       } catch {
-        console.log("ERROR2");
+        console.log("Error: something wrong with pins");
       }
     })();
   });

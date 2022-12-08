@@ -38,7 +38,7 @@ export function MyContributionGraph({ roadtrips, progressTime }) {
             <ContributionGraph
                 values={datab}
                 endDate={new Date().toISOString().slice(0, 10)}
-                numDays={119}
+                numDays={98}
                 width={Dimensions.get('window').width - 16}
                 height={200}
                 squareSize={20}

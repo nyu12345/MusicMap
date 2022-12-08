@@ -10,7 +10,7 @@ import {
   TextInput,
   Image,
   Pressable,
-  Animated
+  Animated,
 } from "react-native";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
@@ -29,12 +29,11 @@ import dayjs from "dayjs";
 
 export function StatisticsScreen() {
   try {
-    return <StatisticsScreenHelper />
+    return <StatisticsScreenHelper />;
   } catch (e) {
-    console.log("Statistsfkdlsj fdks brokenfds. ")
-    return <Text> rbrokfodsfklds </Text>
+    console.log("Statistsfkdlsj fdks brokenfds. ");
+    return <Text> rbrokfodsfklds </Text>;
   }
-
 }
 
 export function StatisticsScreenHelper() {
@@ -74,14 +73,12 @@ export function StatisticsScreenHelper() {
     // Listen the animation variable and update chart variable
     fadeAnim.setValue(0);
   }, []);
-  
 
   Animated.timing(fadeAnim, {
     toValue: 1,
     duration: 1000,
     useNativeDriver: false,
   }).start();
-
 
   const getUsername = async () => {
     const accessToken = await getAccessTokenFromSecureStorage();
@@ -103,7 +100,7 @@ export function StatisticsScreenHelper() {
   };
 
   useEffect(() => {
-    if (username === ""){
+    if (username === "") {
       // console.log("Trying to reget the username")
       getUsername();
     }
@@ -131,7 +128,7 @@ export function StatisticsScreenHelper() {
       .get(`${REACT_APP_BASE_URL}/users/${username}`)
       .then((response) => {
         // console.log("Roadtrip IDS:")
-        console.log(response.data[0].roadtrips)
+        console.log(response.data[0].roadtrips);
         setRoadtripIds(response.data[0].roadtrips);
 
         rtid = response.data[0].roadtrips;
@@ -142,7 +139,7 @@ export function StatisticsScreenHelper() {
       });
     // console.log("Getted roadtrip IDs")
     // console.log(rtid)
-    return rtid
+    return rtid;
   };
 
   const getUserRoadtrips = async (rtIDs) => {
@@ -162,9 +159,8 @@ export function StatisticsScreenHelper() {
               .then((response) => {
                 if (response.data.length > 0) {
                   // console.log("getImages images: " + JSON.stringify(response.data))
-                  rts[rts.length-1]['coverImage'] = response.data[0].imageURL;
-                } else 
-                  rts[rts.length-1]['coverImage'] = "";
+                  rts[rts.length - 1]["coverImage"] = response.data[0].imageURL;
+                } else rts[rts.length - 1]["coverImage"] = "";
               })
               .catch((err) => {
                 console.log(err);
@@ -183,13 +179,13 @@ export function StatisticsScreenHelper() {
     // console.log(rts.length);
     // let index = 0;
     let aggrDataCollection = {};
-    aggrDataCollection['distance'] = 0;
-    aggrDataCollection['numSongs'] = 0;
-    aggrDataCollection['numSeconds'] = 0;
-    aggrDataCollection['vibeScore'] = 0;
-    aggrDataCollection['endCities'] = new Set();
-    aggrDataCollection['startCityCount'] = {};
-    aggrDataCollection['endCityCount'] = {};
+    aggrDataCollection["distance"] = 0;
+    aggrDataCollection["numSongs"] = 0;
+    aggrDataCollection["numSeconds"] = 0;
+    aggrDataCollection["vibeScore"] = 0;
+    aggrDataCollection["endCities"] = new Set();
+    aggrDataCollection["startCityCount"] = {};
+    aggrDataCollection["endCityCount"] = {};
     for (const rt of rts) {
       // if (index >= 1)
       //   break;
@@ -199,7 +195,8 @@ export function StatisticsScreenHelper() {
         console.log("It is null");
         continue;
       }
-      axios.get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${rt._id}`)
+      axios
+        .get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${rt._id}`)
         .then((response) => {
           // console.log("Returning data");
           // console.log(rt._id);
@@ -210,10 +207,10 @@ export function StatisticsScreenHelper() {
             return a.datestamp - b.datestamp;
           });
           trip_song_map[rt._id] = {};
-          trip_song_map[rt._id]['songCount'] = {};
-          trip_song_map[rt._id]['artistCount'] = {};
-          trip_song_map[rt._id]['songs'] = s1;
-          trip_song_map[rt._id]['distances'] = [];
+          trip_song_map[rt._id]["songCount"] = {};
+          trip_song_map[rt._id]["artistCount"] = {};
+          trip_song_map[rt._id]["songs"] = s1;
+          trip_song_map[rt._id]["distances"] = [];
           let totalDistance = 0;
           let numSongs = 0;
           let numSeconds = 0;
@@ -228,13 +225,15 @@ export function StatisticsScreenHelper() {
           for (const s of s1) {
             try {
               numSongs += 1;
-              if (!(trip_song_map[rt._id]['songCount'].hasOwnProperty(s.title)))
-                trip_song_map[rt._id]['songCount'][s.title] = 1;
-              trip_song_map[rt._id]['songCount'][s.title] += 1;
+              if (!trip_song_map[rt._id]["songCount"].hasOwnProperty(s.title))
+                trip_song_map[rt._id]["songCount"][s.title] = 1;
+              trip_song_map[rt._id]["songCount"][s.title] += 1;
               // console.log(trip_song_map[rt._id]['songCount'][s.title]);
-              if (!(trip_song_map[rt._id]['artistCount'].hasOwnProperty(s.artist)))
-                trip_song_map[rt._id]['artistCount'][s.artist] = 1;
-              trip_song_map[rt._id]['artistCount'][s.artist] += 1;
+              if (
+                !trip_song_map[rt._id]["artistCount"].hasOwnProperty(s.artist)
+              )
+                trip_song_map[rt._id]["artistCount"][s.artist] = 1;
+              trip_song_map[rt._id]["artistCount"][s.artist] += 1;
               let curLat = s.location.latitude;
               let curLong = s.location.longitude;
               tempVibeScore += calcVibeScore(s);
@@ -245,14 +244,19 @@ export function StatisticsScreenHelper() {
                 numSeconds += (currDate - lastDate) / 1000;
                 let timeDifferenceHours = (currDate - lastDate) / 3600000;
 
-                let distanceSinceLast = getDistanceFromLatLonInMi(lastLat, lastLong, curLat, curLong);
+                let distanceSinceLast = getDistanceFromLatLonInMi(
+                  lastLat,
+                  lastLong,
+                  curLat,
+                  curLong
+                );
                 cumuluativeDistance += distanceSinceLast;
                 let mph = distanceSinceLast / timeDifferenceHours;
                 if (mph > highestSpeed) {
                   highestSpeed = mph;
                   fastestSong = s.title;
                 }
-                trip_song_map[rt._id]['distances'].push(cumuluativeDistance);
+                trip_song_map[rt._id]["distances"].push(cumuluativeDistance);
                 totalDistance += distanceSinceLast;
               }
               lastDate = dayjs(s.datestamp);
@@ -262,49 +266,57 @@ export function StatisticsScreenHelper() {
               console.log("Parsing song failed id: " + rt._id);
             }
           }
-          trip_song_map[rt._id]['numSongs'] = numSongs;
-          trip_song_map[rt._id]['numSeconds'] = numSeconds;
-          trip_song_map[rt._id]['distance'] = totalDistance;
-          trip_song_map[rt._id]['vibeScore'] = tempVibeScore;
-          trip_song_map[rt._id]['topSpeed'] = highestSpeed;
-          trip_song_map[rt._id]['fastestSong'] = fastestSong;
+          trip_song_map[rt._id]["numSongs"] = numSongs;
+          trip_song_map[rt._id]["numSeconds"] = numSeconds;
+          trip_song_map[rt._id]["distance"] = totalDistance;
+          trip_song_map[rt._id]["vibeScore"] = tempVibeScore;
+          trip_song_map[rt._id]["topSpeed"] = highestSpeed;
+          trip_song_map[rt._id]["fastestSong"] = fastestSong;
 
-          let items = Object.keys(trip_song_map[rt._id]['songCount']).map(function (key) {
-            return [key, trip_song_map[rt._id]['songCount'][key]];
-          });
+          let items = Object.keys(trip_song_map[rt._id]["songCount"]).map(
+            function (key) {
+              return [key, trip_song_map[rt._id]["songCount"][key]];
+            }
+          );
           items.sort(function (first, second) {
             return second[1] - first[1];
           });
-          trip_song_map[rt._id]['topSongs'] = items;
+          trip_song_map[rt._id]["topSongs"] = items;
           // console.log(items);
 
-          items = Object.keys(trip_song_map[rt._id]['artistCount']).map(function (key) {
-            return [key, trip_song_map[rt._id]['artistCount'][key]];
-          });
+          items = Object.keys(trip_song_map[rt._id]["artistCount"]).map(
+            function (key) {
+              return [key, trip_song_map[rt._id]["artistCount"][key]];
+            }
+          );
           items.sort(function (first, second) {
             return second[1] - first[1];
           });
-          trip_song_map[rt._id]['topArtists'] = items;
+          trip_song_map[rt._id]["topArtists"] = items;
 
-          aggrDataCollection['distance'] += totalDistance;
-          aggrDataCollection['numSongs'] += numSongs;
-          aggrDataCollection['numSeconds'] += numSeconds;
-          aggrDataCollection['vibeScore'] += tempVibeScore;
-          aggrDataCollection['endCities'].add(rt.destination);
-          if (aggrDataCollection['startCityCount'].hasOwnProperty(rt.startLocation))
-            aggrDataCollection['startCityCount'][rt.startLocation] += 1;
-          else
-            aggrDataCollection['startCityCount'][rt.startLocation] = 1;
-          if (aggrDataCollection['endCityCount'].hasOwnProperty(rt.startLocation))
-            aggrDataCollection['endCityCount'][rt.destination] += 1;
-          else
-            aggrDataCollection['endCityCount'][rt.destination] = 1;
+          aggrDataCollection["distance"] += totalDistance;
+          aggrDataCollection["numSongs"] += numSongs;
+          aggrDataCollection["numSeconds"] += numSeconds;
+          aggrDataCollection["vibeScore"] += tempVibeScore;
+          aggrDataCollection["endCities"].add(rt.destination);
+          if (
+            aggrDataCollection["startCityCount"].hasOwnProperty(
+              rt.startLocation
+            )
+          )
+            aggrDataCollection["startCityCount"][rt.startLocation] += 1;
+          else aggrDataCollection["startCityCount"][rt.startLocation] = 1;
+          if (
+            aggrDataCollection["endCityCount"].hasOwnProperty(rt.startLocation)
+          )
+            aggrDataCollection["endCityCount"][rt.destination] += 1;
+          else aggrDataCollection["endCityCount"][rt.destination] = 1;
           // console.log(aggrDataCollection['startCityCount'][rt.startLocation]);
           // console.log("Aggr: " + aggrDataCollection['vibeScore']);
           // console.log("Songs: " + numSongs + ", Seconds: " + numSeconds + ", Distance: " + totalDistance);
 
           // console.log(trip_song_map.length);
-        })
+        });
       // console.log(trip_song_map);
       // index+=1;
     }
@@ -313,20 +325,28 @@ export function StatisticsScreenHelper() {
     setAggrData(aggrDataCollection);
     setRoadtrips(rts);
     setSelected(-1);
-  }
+  };
 
   return (
-    <View style={{ flex: 1 }} >
+    <View style={{ flex: 1 }}>
       <View style={styles.horizontalScroll}>
         <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
-          <AllTrips key={-1} name={"All Roadtrips"} isSelected={selected == -1} mySetSelected={setSelected} fadeAnim={fadeAnim}></AllTrips>
-          {
-            (
-              roadtrips.map((roadtrip) =>
-                <PastTrip key={roadtrip._id} roadtrip={roadtrip} isSelected={selected == roadtrip._id} mySetSelected={setSelected} fadeAnim={fadeAnim} ></PastTrip>
-              )
-            )
-          }
+          <AllTrips
+            key={-1}
+            name={"All Roadtrips"}
+            isSelected={selected == -1}
+            mySetSelected={setSelected}
+            fadeAnim={fadeAnim}
+          ></AllTrips>
+          {roadtrips.map((roadtrip) => (
+            <PastTrip
+              key={roadtrip._id}
+              roadtrip={roadtrip}
+              isSelected={selected == roadtrip._id}
+              mySetSelected={setSelected}
+              fadeAnim={fadeAnim}
+            ></PastTrip>
+          ))}
         </ScrollView>
       </View>
       <ScrollView
@@ -339,7 +359,14 @@ export function StatisticsScreenHelper() {
           />
         }
       >
-        <StatisticsGraphs tripId={selected} myStatistics={statistics} myRoadtrips={roadtrips} fadeAnim={fadeAnim} tripSongs={tripSongs} aggrData={aggrData}></StatisticsGraphs>
+        <StatisticsGraphs
+          tripId={selected}
+          myStatistics={statistics}
+          myRoadtrips={roadtrips}
+          fadeAnim={fadeAnim}
+          tripSongs={tripSongs}
+          aggrData={aggrData}
+        ></StatisticsGraphs>
       </ScrollView>
     </View>
   );
@@ -354,19 +381,26 @@ const AllTrips = ({ name, isSelected, mySetSelected, fadeAnim }) => {
       duration: 1000,
       useNativeDriver: false,
     }).start();
-  }
+  };
   return (
     <Pressable
       style={{ marginRight: 20 }}
       onPress={onP} // Set selected and reset fade
     >
       <View style={styles.icon}>
-        <Image source={require('musicmap/assets/earth.jpeg')} style={styles.image} />
-        <View style={isSelected ? styles.bubbleSelected : styles.bubbleNonSelected} >
-          <Text style={isSelected ? styles.textSelected : styles.textNonSelected}>{name}</Text>
-
+        <Image
+          source={require("musicmap/assets/earth.jpeg")}
+          style={styles.image}
+        />
+        <View
+          style={isSelected ? styles.bubbleSelected : styles.bubbleNonSelected}
+        >
+          <Text
+            style={isSelected ? styles.textSelected : styles.textNonSelected}
+          >
+            {name}
+          </Text>
         </View>
-
       </View>
     </Pressable>
   );
@@ -381,8 +415,11 @@ const PastTrip = ({ roadtrip, isSelected, mySetSelected, fadeAnim }) => {
       duration: 1000,
       useNativeDriver: false,
     }).start();
-  }
-  const imageURI = roadtrip.coverImage === "" ? require('musicmap/assets/sample_roadtrip.png') : {uri: roadtrip.coverImage};
+  };
+  const imageURI =
+    roadtrip.coverImage === ""
+      ? require("musicmap/assets/sample_roadtrip.png")
+      : { uri: roadtrip.coverImage };
 
   return (
     <Pressable
@@ -391,11 +428,15 @@ const PastTrip = ({ roadtrip, isSelected, mySetSelected, fadeAnim }) => {
     >
       <View style={styles.icon}>
         <Image source={imageURI} style={styles.image} />
-        <View style={isSelected ? styles.bubbleSelected : styles.bubbleNonSelected} >
-          <Text style={isSelected ? styles.textSelected : styles.textNonSelected}>{roadtrip.name}</Text>
-
+        <View
+          style={isSelected ? styles.bubbleSelected : styles.bubbleNonSelected}
+        >
+          <Text
+            style={isSelected ? styles.textSelected : styles.textNonSelected}
+          >
+            {roadtrip.name}
+          </Text>
         </View>
-
       </View>
     </Pressable>
   );
@@ -403,20 +444,21 @@ const PastTrip = ({ roadtrip, isSelected, mySetSelected, fadeAnim }) => {
 
 function getDistanceFromLatLonInMi(lat1, lon1, lat2, lon2) {
   var R = 6371; // Radius of the earth in km
-  var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
   var dLon = deg2rad(lon2 - lon1);
   var a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2)
-    ;
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c; // Distance in km
   return d * 0.621371;
 }
 
 function deg2rad(deg) {
-  return deg * (Math.PI / 180)
+  return deg * (Math.PI / 180);
 }
 
 function calcVibeScore(song) {
@@ -432,11 +474,8 @@ function calcVibeScore(song) {
       score += song.songInfo.speechiness;
       score += song.songInfo.valence;
     }
-  } catch (e) {
-
-  }
-  if (isNaN(score))
-    return 0;
+  } catch (e) {}
+  if (isNaN(score)) return 0;
   return score / 7;
 }
 

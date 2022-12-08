@@ -31,7 +31,6 @@ export function MemoriesScreen() {
     await getUserRoadtrips(roadtripIds);
   };
 
-
   // get all the roadtrips the current user has been on
   // 1. get current user's username
   const getUsername = async () => {
@@ -95,15 +94,14 @@ export function MemoriesScreen() {
         .get(`${REACT_APP_BASE_URL}/images/get-trip-images/${curTripId}`)
         .then((response) => {
           if (response.data.length > 0) {
-            console.log("getImages images: " + JSON.stringify(response.data))
-            uniqueRoadtrips[i]['images'] = response.data;
+            console.log("getImages images: " + JSON.stringify(response.data));
+            uniqueRoadtrips[i]["images"] = response.data;
           }
         })
         .catch((err) => {
           console.log(err);
         });
 
-      
       await axios
         .get(`${REACT_APP_BASE_URL}/songs/get-trip-songs/${curTripId}`)
         .then((response) => {
@@ -111,9 +109,9 @@ export function MemoriesScreen() {
           // console.log(response);
           // console.log(response.data);
           let popSongs = {};
-          for(song of response.data) {
+          for (song of response.data) {
             // console.log(song.songInfo.trackPreviewURL)
-            if(!(popSongs.hasOwnProperty(song.spotifyId)))
+            if (!popSongs.hasOwnProperty(song.spotifyId))
               popSongs[song.songInfo.trackPreviewURL] = 1;
             popSongs[song.songInfo.trackPreviewURL] += 1;
           }
@@ -122,14 +120,13 @@ export function MemoriesScreen() {
           let maxPlayed = 0;
           let maxURL = "";
           for (const [key, value] of Object.entries(popSongs)) {
-            if(value > maxPlayed) {
+            if (value > maxPlayed) {
               maxPlayed = value;
               maxURL = key;
             }
           }
           // console.log("URL: " + maxURL)
-          uniqueRoadtrips[i]['songURL'] = maxURL;
-
+          uniqueRoadtrips[i]["songURL"] = maxURL;
         })
         .catch((err) => {
           console.log(err);
@@ -180,7 +177,8 @@ export function MemoriesScreen() {
           __v: 0,
           _id: "638ff8774f4388d78059ff84",
           datestamp: "06/12/2022, 21:20:39",
-          imageURL: "file:///var/mobile/Containers/Data/Application/3BC125A9-7B97-4FD2-9313-44602837D197/Library/Caches/ExponentExperienceData/%2540anonymous%252Fmusicmap-cd653aae-17b3-45d9-816b-32dbe7bbae9c/ImagePicker/9A6F0A63-437A-423F-B404-72C6E4D29F91.png",
+          imageURL:
+            "file:///var/mobile/Containers/Data/Application/3BC125A9-7B97-4FD2-9313-44602837D197/Library/Caches/ExponentExperienceData/%2540anonymous%252Fmusicmap-cd653aae-17b3-45d9-816b-32dbe7bbae9c/ImagePicker/9A6F0A63-437A-423F-B404-72C6E4D29F91.png",
           location: {
             latitude: 36.00244964632923,
             longitude: -78.93366090627352,
@@ -200,8 +198,7 @@ export function MemoriesScreen() {
       endDate: "2022-11-14T05:00:00.000+00:00",
       startDate: "2022-12-02T05:00:00.000+00:00",
       endDate: "2022-12-03T05:00:00.000+00:00",
-      images: [
-      ],
+      images: [],
       coverImage:
         "https://i.scdn.co/image/ab6775700000ee85601521a5282a3797015eeed6",
     },
@@ -237,9 +234,13 @@ export function MemoriesScreen() {
         style={{ top: 8 }}
       >
         {roadtrips.map((item, index) => (
-          <MemoryCard roadtripData={item} key={index} setModalVisible={setModalVisible} setCurrentRoadtrip={setCurrentRoadtrip} />
+          <MemoryCard
+            roadtripData={item}
+            key={index}
+            setModalVisible={setModalVisible}
+            setCurrentRoadtrip={setCurrentRoadtrip}
+          />
         ))}
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -253,13 +254,10 @@ async function getMostPlayedSong({ tripId }) {
       console.log("Song data: ");
       console.log(response);
       console.log(response.data);
-
     })
     .catch((err) => {
       console.log(err);
     });
-
-
 }
 
 const styles = StyleSheet.create({
@@ -267,7 +265,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    marginTop: 22,
   },
   modalView: {
     margin: 20,
@@ -278,16 +276,16 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   button: {
     borderRadius: 20,
     padding: 10,
-    elevation: 2
+    elevation: 2,
   },
   buttonOpen: {
     backgroundColor: "#F194FF",
@@ -298,10 +296,10 @@ const styles = StyleSheet.create({
   textStyle: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center"
+    textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center"
-  }
+    textAlign: "center",
+  },
 });

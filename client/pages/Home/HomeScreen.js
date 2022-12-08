@@ -22,6 +22,7 @@ import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests";
 import { AddFriendRoadtripBottomSheet } from "musicmap/pages/Home/AddFriendRoadtripBottomSheet";
 
 export function HomeScreen() {
+  const [users, setUsers] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageToDisplay, setImageToDisplay] = useState("");
@@ -53,9 +54,9 @@ export function HomeScreen() {
   };
 
   /**
-   * Called by the start roadtrip button and sets the roadtrip creation modal to 
+   * Called by the start roadtrip button and sets the roadtrip creation modal to
    * visible if the currentlocation is found
-   * @returns 
+   * @returns
    */
   const startRoadtripClickHandler = () => {
     if (currentLocation == null) {
@@ -65,7 +66,7 @@ export function HomeScreen() {
   };
 
   /**
-   * Handler function called after end roadtrip button is clicked. 
+   * Handler function called after end roadtrip button is clicked.
    * Updates the roadtrip in the database and resets UI and roadtrip data
    */
   const endRoadtripClickHandler = () => {
@@ -76,12 +77,13 @@ export function HomeScreen() {
   };
 
   /**
-   * Handler function called after cancel roadtrip button is clicked. 
+   * Handler function called after cancel roadtrip button is clicked.
    * deletes the roadtrip in the database and resets UI and roadtrip data
    */
-  const cancelRoadtripClickHandler = () => {
+  const cancelRoadtripClickHandler = async () => {
     setButtonIsStartRoadtrip(true);
-    deleteRoadtrip();
+    await deleteRoadtripFromAllUsers();
+    await deleteRoadtrip();
     setCurrentRoadTripData(null);
     setRoadtripName("");
   };
@@ -92,6 +94,18 @@ export function HomeScreen() {
   const cancelCreateHandler = () => {
     setModalVisible(false);
   };
+
+  // get all users in the database
+  async function getUsers() {
+    await axios
+      .get(`${REACT_APP_BASE_URL}/users/`)
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   /**
    * Handles the creation of a roadtrip after create button is clicked
@@ -113,7 +127,6 @@ export function HomeScreen() {
       .then((response) => {
         setCurrentRoadTripData(response.data);
         setRoadtripId(response.data.createdReview._id);
-        console.log(response.data);
       })
       .catch(function (error) {
         if (error.response) {
@@ -132,9 +145,46 @@ export function HomeScreen() {
   };
 
   /**
-   * Handles the deletion of a roadtrip after delete button is clicked
-   * deletes the new roadtrip from the roadtrips collection.
+   * Deletes road trip with tripId from a specific user's list of road trips (specified by username)
    */
+  const deleteRoadtripFromUser = async (username, tripId) => {
+    await axios
+      .patch(`${REACT_APP_BASE_URL}/users/delete-user-roadtrip/${username}`, {
+        roadtripId: tripId,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
+  const deleteRoadtripFromAllUsers = async () => {
+    const curRoadtripId = currentRoadTripData.createdReview._id;
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      const roadtrips = user.roadtrips;
+      const curUsername = user.spotifyUsername;
+      for (let j = 0; j < roadtrips.length; j++) {
+        const roadtrip = roadtrips[j];
+        if (roadtrip == curRoadtripId) {
+          await deleteRoadtripFromUser(curUsername, curRoadtripId);
+        }
+      }
+    }
+  };
+
+  // delete roadtrip from roadtrips database
   const deleteRoadtrip = () => {
     axios
       .delete(
@@ -157,10 +207,6 @@ export function HomeScreen() {
       });
   };
 
-  /**
-   * Handles the updating of a roadtrip after end button is clicked
-   * updates the new roadtrip from the roadtrips collection to include a destination and end time
-   */
   const updateRoadtrip = () => {
     const endDetails = {
       destination: currentLocation.name,
@@ -240,11 +286,11 @@ export function HomeScreen() {
   /**
    * Handler function that will update the state of currentSong.
    * Passes currentSong state updating to the child component HomeMap
-   * @param {Object} newSong 
+   * @param {Object} newSong
    */
   const updateParentSongHandler = (newSong) => {
     setCurrentSong(newSong);
-  }
+  };
 
   const openAddFriendModal = () => {
     bottomSheetModalRef.current.present();
@@ -281,9 +327,11 @@ export function HomeScreen() {
 
   /**
    * Hook tied to currentRoadTripData state. When currentRoadTripData is loaded, the user roadtrips will automatically update in the users collection
+   * When user trips is updated, also get users data for use in cancelling roadtrip
    */
   useEffect(() => {
     updateUserTrips();
+    getUsers();
   }, [currentRoadTripData]);
 
   return (
@@ -392,7 +440,13 @@ export function HomeScreen() {
           </View>
         </View>
       ) : null}
-      <AddFriendRoadtripBottomSheet style={styles.bottomSheetRoadtripFriends} roadtripId={roadtripId} bottomSheetModalRef={bottomSheetModalRef} />
+      <AddFriendRoadtripBottomSheet
+        style={styles.bottomSheetRoadtripFriends}
+        roadtripId={roadtripId}
+        bottomSheetModalRef={bottomSheetModalRef}
+        users={users}
+        getUsers={getUsers}
+      />
     </SafeAreaView>
   );
 }

@@ -147,7 +147,7 @@ export function SentScreen() {
             </Text>
           </View>
           <Text numberOfLines={2} style={styles.subTitle}>
-            {numFriends} Friends
+            {numFriends} Followers
           </Text>
         </View>
         <Pressable>

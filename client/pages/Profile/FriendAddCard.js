@@ -63,7 +63,7 @@ export const FriendAddCard = ({
           </Text>
         </View>
         <Text numberOfLines={2} style={styles.subTitle}>
-          {numFriends} Friends
+          {numFriends} Followers
         </Text>
       </View>
       <TouchableHighlight

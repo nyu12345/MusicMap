@@ -139,7 +139,7 @@ export function ReceivedScreen() {
             <Text style={styles.name} numberOfLines={1}>{name}</Text>
           </View>
           <Text numberOfLines={2} style={styles.subTitle}>
-            {numFriends} Friends
+            {numFriends} Followers
           </Text>
         </View>
         <Pressable>

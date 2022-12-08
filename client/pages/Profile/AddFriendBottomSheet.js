@@ -17,6 +17,12 @@ import {
 import { FriendAddCard } from "musicmap/pages/Profile/FriendAddCard";
 import { getUserInfo } from "musicmap/util/UserInfo";
 
+/**
+ * 
+ * @param {bottom sheet modal property} bottomSheetModalref
+ * @returns the bottom sheet that displays all the users the user
+ * can add
+ */
 export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
   const [users, setUsers] = useState([]);
   const [searchInput, setSearchInput] = useState("");
@@ -29,7 +35,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  // get all users in the database
+/**
+ * gets all users in the database
+ */
   async function getUsers() {
     await axios
       .get(`${REACT_APP_BASE_URL}/users/`)
@@ -41,7 +49,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       });
   }
 
-  // get all sent friend requests
+  /**
+   * gets all frined requests the user has sent
+   */
   async function getSent() {
     await axios
       .get(`${REACT_APP_BASE_URL}/friendRequests?requestorId=${userId}`)
@@ -53,7 +63,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       });
   }
 
-    // get all received friend requests
+    /**
+     * gets all friend requests the user has received
+     */
     async function getReceived() {
       await axios
         .get(`${REACT_APP_BASE_URL}/friendRequests?requestedId=${userId}`)
@@ -65,7 +77,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
         });
     }
 
-  // get friends of the current user
+  /**
+   * gets all friends the user has
+   */
   async function getFriends() {
     await axios
       .get(`${REACT_APP_BASE_URL}/users?spotifyUsername=${username}`)
@@ -79,18 +93,36 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
       });
   }
 
+  /**
+   * handles the user moving the bottom sheet
+   */
   const handleSheetChange = useCallback((index) => {
     console.log("handleSheetChange", index);
   }, []);
 
+  /**
+   * refreshing
+   */
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
   }, []);
 
   const popUp = useRef(null);
 
+  /**
+   * points for the bottom sheet to snap to, sorted from bottom to top
+   */
   const snapPoints = useMemo(() => ["13%", "50%", "95%"], []);
 
+  /**
+   * filters each user. removes them if they are the current user,
+   * if the user has already sent them a friend request,
+   * if they have already sent the user a friend request,
+   * if they are already friends with the user,
+   * and if their name doesn't match the search input
+   * @param {all users in the database} users 
+   * @returns true if the user passes the filter, false otherwise
+   */
   const filter = (users) => {
     return users.filter(function ({ name, _id }) {
       const names = name.split(" ");
@@ -133,6 +165,10 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     });
   };
 
+  /**
+   * passes in each user's attributes into the FriendAddCard as parameters
+   * @param {each user} item
+   */
   const renderItem = ({ item }) => (
     <FriendAddCard
       name={item.name}
@@ -144,13 +180,23 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     />
   );
 
-  // render empty component (no roadtrips available yet)
+
+  /**
+   * 
+   * @returns empty component (no users available yet)
+   */
   const renderEmpty = () => (
     <View style={styles.emptyText}>
       <Text>No users at the moment</Text>
     </View>
   );
 
+  /**
+   * gets all the users in the database,
+   * all the users the user has sent requests to,
+   * all the users the user has received requests from,
+   * and all the users the user is friends with
+   */
   const getFriendAndRequestInfo = async () => {
     await getUsers();
     await getSent();
@@ -158,7 +204,9 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     await getFriends();
   };
 
-  // initial rendering (will run only once)
+  /**
+   * initial rendering (will run only once)
+   */
   useEffect(() => {
     (async () => {
       let userInfo = await getUserInfo();
@@ -175,6 +223,10 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     })();
   }, []);
 
+  /**
+   * second use effect, gets the user's friends and friend request
+   * info after obtaining the user's username and userid
+   */
   useEffect(() => {
     console.log("in second useEffect");
     console.log("set username: " + username);
@@ -182,6 +234,10 @@ export const AddFriendBottomSheet = ({ bottomSheetModalRef }) => {
     getFriendAndRequestInfo();
   }, [username, userId])
 
+  /**
+   * gets called once the sheet is refreshed, and
+   * updates the user's friends and friend requests
+   */
   useEffect(() => {
     (async () => {
       console.log("sent request addfriend")

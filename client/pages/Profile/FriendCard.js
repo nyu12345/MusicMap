@@ -1,7 +1,24 @@
 import React from "react";
-import { Text, View, Image, StyleSheet } from "react-native";
+import { Text, View, Image, StyleSheet, Pressable } from "react-native";
+import { REACT_APP_BASE_URL } from "@env";
+import axios from "axios";
+import { AntDesign } from '@expo/vector-icons';
 
-const FriendCard = ({ name, numFriends, profilePic }) => {
+  /**
+   * 
+   * @param {the name of the friend} name
+   * @param {the number of friends the friend has} numFriends
+   * @param {the url of the friend's Spotify profile pic} profilePic
+   * @returns a card that shows information about a friend of the user
+   */
+const FriendCard = ({ name, numFriends, profilePic, friendId, userId, setFriends }) => {
+
+  const onPress = async (e) => {
+    const data = await axios.patch(`${REACT_APP_BASE_URL}/users/remove-friend/${userId}?friendId=${friendId}`);
+    const data2 = await axios.patch(`${REACT_APP_BASE_URL}/users/remove-friend/${friendId}?friendId=${userId}`);
+    setFriends([]);
+  }
+
   return (
     <View style={styles.friendCardContainer}>
       <Image source={{ uri: profilePic }} style={styles.image} />
@@ -10,9 +27,12 @@ const FriendCard = ({ name, numFriends, profilePic }) => {
           <Text style={styles.name} numberOfLines={1}>{name}</Text>
         </View>
         <Text numberOfLines={2} style={styles.subTitle}>
-          {numFriends} Friends
+          {numFriends} Followers
         </Text>
       </View>
+      <Pressable>
+          <AntDesign name="close" size={15} color="black" style={styles.delete} onPress={onPress} />
+        </Pressable>
     </View>
   );
 };
@@ -25,6 +45,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "lightgray",
   },
   image: {
     width: 60,
@@ -34,8 +56,6 @@ const styles = StyleSheet.create({
   },
   friendCardContent: {
     flex: 1,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "lightgray",
   },
   row: {
     flexDirection: "row",
@@ -48,5 +68,11 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: "gray",
+  },
+  delete: {
+    marginTop: 20,
+    marginRight: 15,
+    color: "#b50000",
+    fontWeight: "bold",
   },
 });

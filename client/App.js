@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LoginScreen from 'musicmap/pages/LoginScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { LoggedInScreen } from 'musicmap/pages/LoggedInScreen';
 import { createStackNavigator } from '@react-navigation/stack';
-import { save, getValueFor } from "musicmap/util/SecureStore";
-//import { createAppContainer } from 'react-navigation';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
-import { getAccessTokenFromSecureStorage } from "musicmap/util/TokenRequests"; 
+import { getValueFor } from "musicmap/util/SecureStore";
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import { registerForPushNotificationsAsync, notificationCommonHandler, notificationNavigationHandler } from "musicmap/util/Notifications";
 
 const Stack = createStackNavigator();
 
@@ -14,26 +14,31 @@ export default function App() {
   const [initialRoute, setInitialRoute] = useState("");
   const [authCode, setAuthCode] = useState("");
 
-  // get user's username from Spotify API
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
-  // async function getUserInfo() {
-  //   const accessToken = await getAccessTokenFromSecureStorage();
+  useEffect( () => {
+    // Register for push notification
+    registerForPushNotificationsAsync();
 
-  //   const response = await fetch("https://api.spotify.com/v1/me", {
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${accessToken}`,
-  //     },
-  //   });
+    // This listener is fired whenever a notification is received while the app is foregrounded
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      notificationCommonHandler(notification);
+    });
 
-  //   if (response) {
-  //     const responseJson = await response.json();
-  //     console.log("poop: " + responseJson); 
-  //     return [responseJson.display_name, responseJson.id, responseJson.followers.total, responseJson.images[0].url];  
-  //   } else {
-  //     console.log("getUserInfo request returned no response");
-  //   }
-  // }
+    // This listener is fired whenever a user taps on or interacts with a notification 
+    // (works when app is foregrounded, backgrounded, or killed)
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      notificationCommonHandler(response.notification);
+      notificationNavigationHandler(response.notification.request.content);
+    });
+
+    // The listeners must be clear on app unmount
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
 
   const loginToParent = () => {
     console.log("TESTU TESTSTT");

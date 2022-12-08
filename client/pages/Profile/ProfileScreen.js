@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Image,
-  TextInput,
   ScrollView,
   SafeAreaView,
   Pressable,
@@ -18,6 +17,7 @@ import { deleteValue } from "musicmap/util/SecureStore";
 import FriendCard from "musicmap/pages/Profile/FriendCard";
 import { FriendSectionHeader } from "./FriendSectionHeader";
 import { AddFriendBottomSheet } from "musicmap/pages/Profile/AddFriendBottomSheet";
+import { getValueFor } from "../../util/SecureStore";
 
 
 /**
@@ -58,7 +58,6 @@ export function ProfileScreen(props) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
     if (response) {
       const responseJson = await response.json();
       // console.log(responseJson);
@@ -108,12 +107,14 @@ export function ProfileScreen(props) {
    * @param {the url of the user's Spotify profile picture} profilePicUrl 
    */
   async function addUserToMongoDB(name, username, numFollowers, profilePicUrl) {
+    let token = await getValueFor("NOTIF_TOKEN");
     const user = {
       name: name,
       spotifyUsername: username,
       numFriends: numFollowers,
       profilePic: profilePicUrl,
       friends: [],
+      notificationToken: token,
     };
     axios
       .post(`${REACT_APP_BASE_URL}/users`, user)
@@ -174,7 +175,7 @@ export function ProfileScreen(props) {
     await deleteValue("EXPIRATION_TIME");
 
     Linking.openURL("https://accounts.spotify.com/en/logout"); // look into redirects?
-    Networking.clearCookies(() => {});
+    Networking.clearCookies(() => { });
 
     props.navigation.navigate("login");
   };

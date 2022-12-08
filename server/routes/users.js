@@ -4,7 +4,8 @@ const User = require("../models/userSchema");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 
-router.get("/", (req, res) => {
+// get all users
+router.get("/", async (req, res) => {
   const filter = {};
   if (req.query.spotifyUsername)
     filter.spotifyUsername = req.query.spotifyUsername;
@@ -21,6 +22,7 @@ router.get("/", (req, res) => {
     });
 });
 
+// create a new user
 router.post("/", async (req, res, next) => {
   console.log("inside post");
   console.log(req.body.name);
@@ -32,9 +34,11 @@ router.post("/", async (req, res, next) => {
   const user = new User({
     name: req.body.name,
     spotifyUsername: req.body.spotifyUsername,
-    numFriends: req.body.numFriends, 
-    profilePic: req.body.profilePic, 
+    numFriends: req.body.numFriends,
+    profilePic: req.body.profilePic,
+    notificationToken: req.body.notificationToken,
     friends: [],
+    roadtrips: [],
   });
 
   user
@@ -50,14 +54,17 @@ router.post("/", async (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
+// get user by username
 router.get("/:username", (req, res) => {
-  console.log("finding user by username"); 
-  User.find({ spotifyUsername: req.params.username }).then((doc) => {
-    res.status(200).json(doc); 
-  }).catch((err) => {
-    res.status(500).json({ error: err }); 
-  })
-}); 
+  console.log("finding user by username");
+  User.find({ spotifyUsername: req.params.username })
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+});
 
 router.patch("/add-friend/:_id", (req, res, next) => {
   const id = req.params._id;
@@ -109,11 +116,45 @@ router.patch("/remove-friend/:_id", (req, res, next) => {
 
 router.delete("/:id", (req, res) => {
   console.log("deleting user");
-  User.findByIdAndDelete(req.params.id).then((doc) => {
-    res.status(200).json(doc);
-  }).catch((err) => {
-    res.status(500).json({ error: err });
-  })
+  User.findByIdAndDelete(req.params.id)
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+});
+
+// update user's list of road trips
+router.patch("/update-user-roadtrip/:spotifyUsername", (req, res) => {
+  console.log("Updating user's road trips");
+  const roadtripId = ObjectId(req.body.roadtripId);
+  User.updateOne(
+    { spotifyUsername: req.params.spotifyUsername },
+    { $push: { roadtrips: roadtripId } }
+  )
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+});
+
+// delete specific roadtrip from user's list of roadtrips
+router.patch("/delete-user-roadtrip/:spotifyUsername", (req, res) => {
+  console.log("Deleting roadtrip by id");
+  const roadtripId = ObjectId(req.body.roadtripId);
+  User.updateOne(
+    { spotifyUsername: req.params.spotifyUsername },
+    { $pull: { roadtrips: roadtripId } }
+  )
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
 });
 
 module.exports = router;

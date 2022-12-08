@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   numFriends: { type: Number },
   profilePic: { type: String },
   friends: [{ type: Schema.Types.ObjectId, ref: "User", optional: true }],
+  roadtrips: [{ type: Schema.Types.ObjectId, ref: "Roadtrip", optional: true }],
+  notificationToken: {type: String},
 });
 
 // generate createdAt & updatedAt fields

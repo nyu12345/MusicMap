@@ -1,29 +1,58 @@
 import MapView, { Marker, Callout } from "react-native-maps";
 import styles from "./HomeStyles";
-import React, { useState, useEffect } from "react";
-import { Text, Image } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, Image, Pressable } from "react-native";
 import * as Location from "expo-location";
-import { getValueFor } from "musicmap/util/SecureStore";
 import axios from "axios";
 import { REACT_APP_BASE_URL } from "@env";
+import * as ImagePicker from "expo-image-picker";
+import { MaterialIcons } from "@expo/vector-icons";
+import { getTrack, getCurrentlyPlayingTrack, getTracksAudioFeatures } from "musicmap/util/SpotifyAPICalls";
 
-export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTripData }) {
+
+let currentSong = { title: "No song", spotifyId: null };
+
+export function HomeMap({
+  updateLocationHandler,
+  currentLocation,
+  currentRoadTripData,
+  buttonIsStartRoadtrip,
+  updateParentSongHandler,
+  createImageViewer,
+}) {
   const [permissionStatus, setStatus] = useState(null);
   const [offset, setOffset] = useState(0);
-  const [songs, setSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState({ title: "No song", spotifyId: null });
+  const [pins, setPins] = useState([]);
   const [isOngoingSession, setIsOngoingSession] = useState(false);
 
+
   /**
-   * requests permission if needed
+   * Requests user location permission, runs on first render on a new device
    */
   useEffect(() => {
     (async () => {
       let permission = await Location.requestForegroundPermissionsAsync();
       setStatus(permission);
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        timeInterval: 10000,
+        distanceInterval: 0,
+      });
+      if (location) {
+        let regionName = await Location.reverseGeocodeAsync({
+          longitude: location.coords.longitude,
+          latitude: location.coords.latitude,
+        });
+        if (regionName) {
+          updateLocationHandler(location, regionName);
+        }
+      }
     })();
   }, []);
 
+  /**
+   * Real-time user location tracking, runs in the background
+   */
   useEffect(() => {
     (async () => {
       try {
@@ -38,22 +67,18 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
             distanceInterval: 0,
           });
           if (location) {
-            let regionName = await Location.reverseGeocodeAsync({
-              longitude: location.coords.longitude,
-              latitude: location.coords.latitude,
-            });
-            if (regionName) {
-              updateLocationHandler(location, regionName);
-            }
+            updateLocationHandler(location, currentLocation.regionName);
           }
         }
-      }
-      catch {
+      } catch {
         console.log("ERROR1");
       }
     })();
   });
 
+  /**
+   * Manages display of pins on the map based on the status of the session, runs in the background
+   */
   useEffect(() => {
     (async () => {
       try {
@@ -64,46 +89,74 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
           setIsOngoingSession(false);
           clearPinsHandler();
         }
-      }
-      catch {
+      } catch {
         console.log("ERROR2");
       }
     })();
   });
 
-  useEffect(() => {
-    if (currentSong.spotifyId != null) {
-      postSongHandler();
-    }
-  }, [currentSong])
+  /**
+   * launches the image picker UI and calls postImage() to handle the chosen image
+   */
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-  const getSongFromSpotify = async () => {
-    let accessToken = await getValueFor("ACCESS_TOKEN");
-    const response = await fetch(
-      "https://api.spotify.com/v1/me/player/currently-playing",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    if (response) {
-      const responseJson = await response.json();
-      return {
-        id: responseJson.item.id,
-        title: responseJson.item.name,
-        artist: responseJson.item.artists[0].name,
-        imageURL: responseJson.item.album.images[0].url,
-      };
+    console.log(result);
+
+    if (!result.cancelled) {
+      postImage(result.uri);
     }
-    console.log("COULD NOT GET SONG :(");
-    return null;
   };
 
+
+  /**
+   * adds a user-added image pin to the map and records in database
+   * @param {the image URL} imageUri 
+   */
+  const postImage = (imageUri) => {
+    console.log("POST Image: " + imageUri);
+    const newImage = {
+      tripId: currentRoadTripData.createdReview._id,
+      imageURL: imageUri,
+      location: {
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude + offset,
+        name: currentLocation.name,
+      },
+      datestamp: new Date().toLocaleString("en-GB"),
+    };
+    setPins((prevPins) => [...prevPins, newImage]);
+    setOffset((prevOffset) => prevOffset + 0.005);
+
+    axios
+      .post(`${REACT_APP_BASE_URL}/images/create-image`, newImage)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
+  /**
+   * records song in database
+   */
   const postSongHandler = () => {
-    console.log(`name: ${currentSong.title}`);
-    // should add check to see if these fields are valid here and present alert if not
     axios
       .post(`${REACT_APP_BASE_URL}/songs/create-song`, currentSong)
       .then((response) => {
@@ -123,40 +176,76 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
       });
   };
 
+  /**
+   * adds song pins to the map and calls postSongHandler() to record song in database
+   */
   const addPinHandler = async () => {
-    if (currentLocation == null) {
-      return;
+    try {
+      if (currentLocation == null || currentRoadTripData == null || !isOngoingSession) {
+        clearPinsHandler()
+        return;
+      }
+      const song = await getCurrentlyPlayingTrack();
+      if (song == null || song.trackID == currentSong.spotifyId) {
+        return;
+      }
+      currentSong.spotifyId = song.trackID;
+      const trackInfo = await getTrack(song.trackID);
+      const audioFeatures = await getTracksAudioFeatures(song.trackID);
+      const newSong = {
+        tripId: currentRoadTripData.createdReview._id,
+        spotifyId: song.trackID,
+        title: song.title,
+        artist: song.artist,
+        imageURL: song.imageURL,
+        location: {
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude + offset,
+          name: currentLocation.name,
+        },
+        songInfo: {
+          albumID: trackInfo.albumID,
+          albumName: trackInfo.albumName,
+          releaseDate: trackInfo.releaseDate,
+          trackPopularity: trackInfo.popularity,
+          trackPreviewURL: trackInfo.previewURL,
+          acousticness: audioFeatures.acousticness,
+          danceability: audioFeatures.danceability,
+          duration_ms: audioFeatures.duration_ms,
+          energy: audioFeatures.energy,
+          instrumentalness: audioFeatures.instrumentalness,
+          key: audioFeatures.key,
+          liveness: audioFeatures.liveness,
+          loudness: audioFeatures.loudness,
+          mode: audioFeatures.mode,
+          speechiness: audioFeatures.speechiness,
+          tempo: audioFeatures.tempo,
+          timeSignature: audioFeatures.timeSignature,
+          valence: audioFeatures.valence,
+        },
+        datestamp: new Date().toLocaleString("en-GB"),
+      };
+      currentSong = newSong;
+      updateParentSongHandler(currentSong);
+      setPins((prevSongs) => [
+        ...prevSongs,
+        newSong,
+      ]);
+      setOffset((prevOffset) => prevOffset + 0.005);
+      postSongHandler();
     }
-    const song = await getSongFromSpotify();
-    if (song == null || song.id == currentSong.spotifyId) {
-      console.log("NO NEW SONG CURRENTLY :(");
-      return;
+    catch {
+      console.log("ADD PIN ERROR");
     }
-    const newSong = {
-      tripId: currentRoadTripData.createdReview._id,
-      spotifyId: song.id,
-      title: song.title,
-      artist: song.artist,
-      imageURL: song.imageURL,
-      location: {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude + offset,
-        name: "Durham, NC",
-      },
-      datestamp: new Date().toLocaleString("en-GB"),
-    };
-    setCurrentSong(newSong);
-    setSongs((prevSongs) => [
-      ...prevSongs,
-      newSong,
-    ]);
-    setOffset((prevOffset) => prevOffset + 0.005);
   };
 
+  /**
+   * Removes all pins from the map
+   */
   const clearPinsHandler = () => {
-    setSongs([]);
+    setPins([]);
     setOffset(0);
-    setCurrentSong({ title: "No song", spotifyId: null });
+    currentSong = { title: "No song", spotifyId: null };
   };
 
   return (
@@ -166,33 +255,55 @@ export function HomeMap({ updateLocationHandler, currentLocation, currentRoadTri
         initialRegion={currentLocation}
         showsUserLocation={true}
       >
-        {songs.map((item, index) => {
-          return (
+        {pins.map((item, index) => {
+          return isOngoingSession ? (
             <Marker
               key={index}
+              pinColor={item.title != null ? "red" : "blue"}
               coordinate={{
                 latitude: item.location.latitude,
                 longitude: item.location.longitude,
               }}
+              icon={{ uri: item.imageURL }}
             >
-              <Callout>
-                <Image
-                  style={{ alignSelf: "center", width: 50, height: 50 }}
-                  source={{ uri: item.imageURL }}
-                />
-                <Text style={{ textAlign: "center" }}>{item.title}</Text>
-                <Text style={{ textAlign: "center" }}>{item.artist}</Text>
-                <Text style={{ textAlign: "center" }}>{item.datestamp}</Text>
+              <Callout
+                onPress={() => {
+                  if (item.title == null) { // is an image
+                    createImageViewer(item);
+                  }
+                }}
+              >
+                {item.title != null ? (
+                  <View>
+                    <Image
+                      style={{ alignSelf: "center", width: 50, height: 50 }}
+                      source={{ uri: item.imageURL }}
+                    />
+                    <Text style={{ textAlign: "center" }}>{item.title}</Text>
+                    <Text style={{ textAlign: "center" }}>{item.artist}</Text>
+                    <Text style={{ textAlign: "center" }}>
+                      {item.datestamp}
+                    </Text>
+                  </View>
+                ) : (
+                  <Image
+                    style={{ alignSelf: "center", width: 50, height: 50 }}
+                    source={{ uri: item.imageURL }}
+                  />
+                )}
               </Callout>
             </Marker>
-          );
+          ) : null;
         })}
       </MapView>
       <Text style={styles.modalText}>
-        {currentLocation
-          ? `coords: (${currentLocation.latitude}, ${currentLocation.longitude}) \n ${currentLocation.name}`
-          : "Retrieving your location..."}
+        {currentLocation ? "" : "Retrieving your location..."}
       </Text>
+      {!buttonIsStartRoadtrip ? (
+        <Pressable style={styles.addImageButton} onPress={pickImage}>
+          <MaterialIcons name="add-photo-alternate" size={28} color="#696969" />
+        </Pressable>
+      ) : null}
     </>
   );
 }

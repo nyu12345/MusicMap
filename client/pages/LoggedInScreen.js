@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Text, View } from "react-native";
 import { HomeScreen } from "musicmap/pages/Home/HomeScreen";
-import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripMap/PastTripsScreen";
+import { PastTripsScreen } from "musicmap/pages/PastTrips/PastTripsScreen";
 import { MemoriesScreen } from "musicmap/pages/Memories";
 import { ProfileHomeScreen } from "musicmap/pages/Profile/ProfileHomeScreen";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator();
 export function LoggedInScreen(props) {
   const loginToParent = () => {
     props.loginToParent();
-  }
+  };
 
   return (
     <Tab.Navigator
@@ -57,7 +57,7 @@ export function LoggedInScreen(props) {
         options={{ headerShown: false }}
         name="Profile"
         //component = {ProfileScreen}
-        children={props => <ProfileHomeScreen navigation = {props.navigation} loginToParent = {loginToParent}/>}
+        children={props => <ProfileHomeScreen navigation={props.navigation} loginToParent={loginToParent} />}
       />
     </Tab.Navigator>
   );

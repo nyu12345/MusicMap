@@ -6,7 +6,6 @@ import React, {
 } from "react";
 import MapView, { Marker, Callout } from "react-native-maps";
 import axios from "axios";
-import lazyfair from "musicmap/assets/lazyfair.jpg";
 import { REACT_APP_BASE_URL } from "@env";
 import { ImageViewer } from "musicmap/pages/Home/ImageViewer";
 import { PastTripsList } from "musicmap/pages/PastTrips/PastTripMap/PastTripsList";

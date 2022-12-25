@@ -1,4 +1,4 @@
-##MusicMap 🎧
+## MusicMap 🎧
 MusicMap is a a mobile app that documents the songs played during road trips, allowing users to not only revisit a catalog of all the songs played during the trip, but also the specific locations associated with each song. 
 
 ![](client/assets/app-mockup.png)
